@@ -1,0 +1,119 @@
+﻿
+@using Gatekeeper.Models.MenuInfo
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider authenticationProvider
+
+@inject Blazored.SessionStorage.ISessionStorageService session
+@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
+
+
+
+
+
+<style>
+
+    
+
+
+    .required {
+        color: red;
+        background-color: inherit;
+        font-weight: bold;
+        font-weight: bold;
+    }
+
+    .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: aliceblue;
+        /*border-radius: 2px 2px 2px 2px; */
+    }
+
+        .tab button {
+            color: black;
+            background-color: inherit;
+            float: left;
+            border: 1px solid;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+            justify-content: space-between
+        }
+
+            .tab button:hover {
+                background-color: #ddd;
+            }
+
+    .tabcontent {
+        padding: 6px 12px;
+        /* border: 1px solid black; */
+        border-top: none;
+    }
+
+    .stick-to-right {
+        width: 250px;
+        float: right;
+        justify-content: flex-end;
+        margin-left: 500px
+    }
+
+</style>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row">
+            <div class="col-7 align-self-start">
+                <TopMenu></TopMenu>
+            </div>
+            <div class="col-3">
+                &nbsp;
+            </div>
+            <div class="col-2  align-self-center" style="font-weight:bold">
+                <label id="lblfilenumber" style="display:content">Reg#: @userReg</label>
+            </div>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    private string? userReg;
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var nameUser = user.Identity?.Name;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+      
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            session.SetItemAsync("SessionUser", userReg);
+            firstRender = false;
+        }
+         
+
+    }
+
+}

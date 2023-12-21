@@ -1,0 +1,506 @@
+﻿@rendermode InteractiveServer
+@using Gatekeeper.Models.MenuInfo
+@using Gatekeeper.CustomValidators
+@using System.Text
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService session
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject IPersonnameService personNameService
+@inject IPersonService personService
+@inject IRequestfileService requestFileService
+@inject IJSRuntime JSRuntime
+
+
+@page "/accessrequests/add"
+
+
+@code {
+    public int fileid;
+    public SelectedmenuInfo currentmenu;
+
+    public bool DisplayAlert { get; set; }
+    //public StringBuilder AlertText = new StringBuilder();
+    public List<string> AlertText1 = new List<string>();
+    public List<string> AlertText2 = new List<string>();
+
+
+    [Inject]
+    private IRequestfileService RequestfileService { get; set; }
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    private Requestfile Sessionrequestfile { get; set; } = new Requestfile();
+    private List<Requestfile> requestfiles { get; set; } = new List<Requestfile>();
+    public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
+
+    private Person person { get; set; } = new Person();
+
+    private bool alertMessageShow = false;
+    private string? SuccessMessage { get; set; }
+    public List<Holiday>? holidays { get; set; } = new List<Holiday>();
+
+
+
+    protected async override Task OnInitializedAsync()
+    {
+
+        DisplayTab(1);
+
+        // var  xuser =  await session.SetItemAsync("SessionUser", user);
+    }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        requesttypes = await context.LkRequesttypes.ToListAsync();
+         // requestfiles = await context.Requestfiles.ToListAsync();
+        holidays = await context.Holidays.ToListAsync();
+        if (requestfile.Yearid == 0 || requestfile.Yearid is null)
+        {
+            requestfile.Filenumber = "TBD";
+        }
+
+        // userReg = await session.GetItemAsStringAsync("SessionUser");
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+
+        SuccessMessage = "";
+        // Sessionrequestfile = await session.GetItemAsync<Requestfile>("SessionRequestFile");
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("changetab", "file-tab");
+        }
+
+    }
+    private string? userReg;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // await  JSRuntime.InvokeVoidAsync("showTopmenu");
+        // await  JSRuntime.InvokeVoidAsync("changetab", "file-tab");
+
+        if (firstRender)
+        {
+            // using var context = DbFactory.CreateDbContext();
+            // requesttypes = await context.LkRequesttypes.ToListAsync();
+            // requestfiles = await context.Requestfiles.ToListAsync();
+            // holidays = await context.Holidays.ToListAsync();
+            // if (requestfile.Yearid == 0 || requestfile.Yearid is null)
+            // {
+            //     requestfile.Filenumber = "TBD";
+            // }
+
+            // // userReg = await session.GetItemAsStringAsync("SessionUser");
+            // var authState = await authenticationProvider.GetAuthenticationStateAsync();
+            // var user = authState.User;
+            // userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\","");
+
+            // SuccessMessage = "";
+            // Sessionrequestfile = await session.GetItemAsync<Requestfile>("SessionRequestFile");
+
+          
+        }
+    }
+
+    private void FillData()
+    {
+
+        person.Firstname = "Donald";
+        person.Lastname = "Duck";
+        person.Middlename = "D";
+
+        person.Birthdate = DateTime.Today.Date.AddYears(-30);
+
+        person.Email = "dnald@gmail.com";
+        person.Daytimephone = "403-305-3197";
+        person.Alternatephone = "403-994-888";
+        person.Faxphone = "1800-555-784";
+
+        person.Street = "152 1 street";
+        person.City = "Calgary";
+        person.Province = "Alberta";
+        person.Country = "Canada";
+
+        person.Personofinterestfirstname = "Mickey";
+        person.Personofinterestlastname = "Mouse";
+        person.Personofinterestmiddlename = "MD";
+
+        person.Companyname = "Disney";
+
+        requestfile.Requestdate = DateTime.Today.Date;
+        requestfile.Receivedate = DateTime.Today.Date;
+        setDuedate();
+        requestfile.Referencenumber = "RF";
+        requestfile.Idviewed = 0;
+        requestfile.Requesttypeid = 1;
+        requestfile.Recorddeliverymethodid = 1;
+        requestfile.Processingdeficiency = 1;
+        requestfile.Analystassignedid = 9;
+        requestfile.Requestdetails = "Request Details For";
+        requestfile.Previousrequests = "Test";
+        requestfile.Intakenotes = "Intake Notes For";
+        requestfile.Timeframe = "1 month";
+        requestfile.Moddate = DateTime.Today;
+        requestfile.Moduser = userReg;
+        requestfile.Createdate = DateTime.Today;
+        requestfile.Createuser = userReg;
+    }
+
+    private async Task ValidSubmit()
+    {
+
+        ValidateData();
+
+        if (AlertText1.Count > 0 || AlertText2.Count > 0)
+        {
+            DisplayAlert = true;
+        }
+        else
+        {
+            DisplayAlert = false;
+
+            if (person.Id != 0  && requestfile.Id != 0)
+            {
+
+                person.Moduser = userReg;
+                person.Moddate = DateTime.Today;
+
+                requestfile.Moduser = userReg;
+                requestfile.Moddate = DateTime.Today;
+
+
+                await personService.UpdatePerson(person);
+                UpdateFileNumber(requestfile.Id);
+                // await RequestfileService.UpdateRequestfile(requestfile);
+
+                SuccessMessage = "Data updated successfully";
+            }
+            else
+            {
+
+                person.Moduser = userReg;
+                person.Createdby = userReg;
+
+                person.Moddate = DateTime.Today;
+                person.Createdate = DateTime.Today;
+                await personService.CreatePerson(person);
+
+                if (person.Id != null)
+                {
+                    requestfile.Personid = person.Id;
+                    requestfile.Moduser = userReg;
+                    requestfile.Createuser = userReg;
+
+                    requestfile.Moddate = DateTime.Today;
+                    requestfile.Createdate = DateTime.Today;
+
+                    /*********************************************************/
+                    /**** Create Request File without Receive Date First  ****/
+                    /*********************************************************/
+
+                    await requestFileService.CreateRequestfile(requestfile);
+                    UpdateFileNumber(requestfile.Id);
+                    await session.SetItemAsync("SessioRequestFile", requestfile);
+
+                    // await JSRuntime.InvokeVoidAsync("alert", "Data saved successfully");
+                    SuccessMessage = "Data saved successfully";
+                }
+               
+            }
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+            alertMessageShow = false;
+        }
+    }
+
+
+    private async void UpdateFileNumber(int fileid)
+    {
+
+        Requestfile updatefile = await RequestfileService.GetRequestfileById(fileid);
+        //Requestfile updatefile = requestfiles.FirstOrDefault(x => x.Id == fileid);
+
+        var rtype = requesttypes.Where(x => x.Id == requestfile.Requesttypeid).FirstOrDefault();
+
+        // If receive date is not null then update file number with new format
+        if (updatefile.Filenumber == "TBD" && requestfile.Receivedate != null )
+        {
+            updatefile = requestfile;
+
+            int year = ((DateTime)updatefile.Receivedate).Year;
+            updatefile.Yearid = requestfiles.Where(x => x.Receivedate.ToString().Contains(year.ToString())).Count() + 1;
+
+            if (updatefile.Yearid != null)
+            {
+                updatefile.Filenumber = ((DateTime)requestfile.Receivedate).Year + "-" + rtype.Refertype + "-" + ((int)requestfile.Yearid).ToString("D4");
+
+                // Start Test Data
+                updatefile.Referencenumber = "RF " + requestfile.Filenumber;
+                updatefile.Requestdetails = "Request Details For " + requestfile.Filenumber;
+                updatefile.Previousrequests = "Test For " + requestfile.Filenumber;
+                updatefile.Intakenotes = "Intake Notes For " + requestfile.Filenumber;
+
+                // End Test Data
+
+            }
+            await requestFileService.UpdateRequestfile(updatefile);
+        }
+
+        requestfile = updatefile;
+      //  StateHasChanged();
+
+        
+    
+    }
+
+    private void ClearData()
+    {
+        requestfile = new Requestfile();
+        person = new Person();
+        requestfile.Filenumber = "TBD";
+        session.ClearAsync();
+    }
+
+    private void ValidateData()
+    {
+        AlertText1 = new List<string>();
+
+        if (requestfile != null)
+        {
+            if (requestfile.Requestdate == null)
+            {
+                AlertText1.Add("- Request Date");
+            }
+
+            if (requestfile.Idviewed == null || requestfile.Idviewed < 0)
+            {
+                AlertText1.Add("- ID Viewed");
+            }
+
+            if (requestfile.Requesttypeid == null || requestfile.Requesttypeid < 0)
+            {
+                AlertText1.Add("- Request Type");
+            }
+
+            if (requestfile.Analystassignedid == null || requestfile.Analystassignedid < 0)
+            {
+                AlertText1.Add("- Analyst");
+            }
+
+            if (requestfile.Requestdetails == null)
+            {
+                AlertText1.Add("- Request Details");
+            }
+
+            if (AlertText1.Count > 0)
+            {
+                AlertText1.Insert(0, "The access file request Information below is required.");
+            }
+        }
+        else
+        {
+            AlertText1.Add("Access Request is required.");
+        }
+
+        AlertText2 = new List<string>();
+        if (person != null || person.Id == 0)
+        {
+            if (person.Firstname == null)
+            {
+                AlertText2.Add("- First Name");
+            }
+
+            if (person.Street == null)
+            {
+                AlertText2.Add("- Street");
+            }
+
+            if (person.City == null)
+            {
+                AlertText2.Add("- City");
+            }
+
+            if (person.Province == null)
+            {
+                AlertText2.Add("- Province");
+            }
+
+            if (person.Daytimephone == null)
+            {
+                AlertText2.Add("- Daytime Phone");
+            }
+            if (AlertText2.Count > 0)
+            {
+                AlertText2.Insert(0, "The person request Information below is required.");
+            }
+        }
+        else
+        {
+
+            AlertText2.Add("Person Request is required.");
+        }
+    }
+
+    public void setDuedate()
+    {
+        // var dt = e.Value;
+        /*  await Task.Delay(500) */
+        ;
+
+        if (requestfile.Receivedate != null)
+        {
+            List<DateTime> dateRange1 = new List<DateTime>();
+            List<DateTime> dateRange2 = new List<DateTime>();
+
+            DateTime dueDate = (DateTime)requestfile.Receivedate;
+            DateTime setDate;
+
+            dueDate = ((DateTime)requestfile.Receivedate).AddDays(30);
+
+            for (int i = 1; i < 11; i++)
+            {
+                setDate = dueDate.AddDays(i);
+                if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
+                {
+                    dateRange1.Add(setDate);
+                    dateRange2.Add(setDate);
+                }
+            }
+
+            //Remove holidays
+            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == DateTime.Today.Year);
+
+            foreach (var item in thisYearHolidays)
+            {
+                foreach (var dt in dateRange1)
+                {
+                    int y = dateRange1.IndexOf(dt);
+                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
+                    {
+                        dateRange2.RemoveAt(y);
+                    }
+                }
+            }
+
+            requestfile.Requestduedate = dateRange2.FirstOrDefault();
+            // var rtype = requesttypes.Where(x => x.Id == requestfile.Requesttypeid);
+            // filenumberDisplay = ((DateTime)requestfile.Receivedate).Year + "-" + rtype + "=" + requestfile.Id;
+        }
+    }
+
+    #region Tab menu
+    private bool tab1 = true;
+    private bool tab2 = true;
+    private bool tab3 = true;
+
+    public void DisplayTab(int TabNumber)
+    {
+        DisplayAlert = false;
+        switch (TabNumber)
+        {
+            case 1:
+                this.tab1 = true;
+                this.tab2 = false;
+                this.tab3 = false;
+                break;
+            case 2:
+                this.tab1 = false;
+                this.tab2 = true;
+                this.tab3 = false;
+                break;
+            case 3:
+                this.tab1 = false;
+                this.tab2 = false;
+                this.tab3 = true;
+                break;
+            default:
+                this.tab1 = true;
+                this.tab2 = false;
+                this.tab3 = false;
+                break;
+        }
+
+    }
+    #endregion
+
+}
+
+<h3>Access Request</h3>
+
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <button class="@(tab1?"nav-link active":"nav-link")" @onclick="x=>DisplayTab(1)">File Detail</button>
+        <button class="@(tab2?"nav-link active":"nav-link")" @onclick="x=>DisplayTab(2)">Request Person</button>
+        <button class="@(tab3?"nav-link active":"nav-link")" @onclick="x=>DisplayTab(3)">Other</button>
+    </div>
+</nav>
+
+<EditForm Model="requestfile" OnValidSubmit="@ValidSubmit">
+
+    @if (alertMessageShow)
+    {
+        <br/>
+        <div class="alert alert-success" style="margin-left: 50px">@SuccessMessage</div>
+    }
+    @if (DisplayAlert)
+    {
+        <div class="alert alert-danger fade-in" role="alert" style="width:auto;border:solid;border-color:darkred;">
+            @if (AlertText1.Count > 0)
+            {
+
+                @foreach (var item in AlertText1)
+                {
+                    <div>&nbsp; @item</div>
+
+                }
+            }
+            @if (AlertText2.Count > 0)
+            {
+
+                @foreach (var item in AlertText2)
+                {
+                    <div>&nbsp; @item</div>
+                }
+            }
+        </div>
+    }
+
+    @if (tab1)
+    {
+        <br />
+        <div class="tabcontent">
+            <RequestFileForm requestfile="@requestfile" person="@person" />
+        </div>
+    }
+
+    @if (tab2)
+    {
+        <br />
+        <div class="tabcontent">
+            <PersonRequestForm person="@person" />..
+        </div>
+    }
+
+    @if (tab3)
+    {
+        <br />
+        <div class="tabcontent">
+            Three
+        </div>
+    }
+    <br />
+    <br />
+    <br />
+
+    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm>

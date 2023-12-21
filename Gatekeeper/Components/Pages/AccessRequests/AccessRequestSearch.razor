@@ -1,0 +1,352 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ISearchrequestfileService searchfileService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject IPersonnameService personNameService
+@page "/accessrequests/search"
+
+
+@code {
+
+
+    private List<string> header = new List<string>();
+    private IRequestfileService RequestfileService { get; set; }
+    private Requestfile requestfile { get; set; } = new Requestfile();
+
+    public List<Searchrequestfile>? requestfileInfos { get; set; } = new List<Searchrequestfile>();
+    private Searchrequestfile fileInfo { get; set; } = new Searchrequestfile();
+
+    private IQueryable<Searchrequestfile> searchrequestfiles;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+
+    QuickGrid<Searchrequestfile>? grid;
+    bool showpanel = true;
+    bool showyear = true;
+
+
+    #region Lookup Parameters
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
+    public List<LkRequeststate>? requeststates { get; set; } = new List<LkRequeststate>();
+    public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
+    private POIName POIselectedpersonname;
+    private POIName POIpersonname { get; set; } = new POIName();
+    public List<PersonName>? personnames { get; set; } = new List<PersonName>();
+    private PersonName selectedpersonname;
+    private PersonName personname { get; set; } = new PersonName();
+    #endregion
+
+    protected async override Task OnInitializedAsync()
+    {
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        LoadData();
+        requesttypes = await context.LkRequesttypes.ToListAsync();
+        requeststates = await context.LkRequeststates.ToListAsync();
+        analysts = await context.Analysts.ToListAsync();
+        POIpersonnames = personNameService.GetPOINames();
+        personnames = personNameService.GetNames();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+
+    }
+
+
+    private void ClearSearch()
+    {
+
+        fileInfo = new Searchrequestfile();
+        LoadData();
+
+    }
+
+    private void FilterData()
+    {
+        // LoadData();
+
+        if (fileInfo.Requesttypeid < 0)
+        {
+            fileInfo.Requesttypeid = null;
+        }
+
+        if (fileInfo.Analystassignedid < 0)
+        {
+            fileInfo.Analystassignedid = null;
+        }
+
+        if (fileInfo.Requeststateid < 0)
+        {
+            fileInfo.Requeststateid = null;
+        }
+
+        searchrequestfiles = searchfileService.GetRequestfileList()
+        .Where(r => r.Filenumber.ToLower().Contains(fileInfo.Filenumber.ToLower()) || fileInfo.Filenumber == null)
+        // .Where(r => r.Lastname.ToLower().Contains(fileInfo.Lastname.ToLower()) || fileInfo.Lastname == null)
+        // .Where(r => r.Firstname.ToLower().Contains(fileInfo.Firstname.ToLower()) || fileInfo.Firstname == null)
+        // .Where(r => r.Middlename.ToLower().Contains(fileInfo.Middlename.ToLower()) || fileInfo.Middlename == null)
+        // .Where(r => r.POIlastname.ToLower().Contains(fileInfo.POIlastname.ToLower()) || fileInfo.POIlastname == null)
+        // .Where(r => r.POIfirstname.ToLower().Contains(fileInfo.POIfirstname.ToLower()) || fileInfo.POIfirstname == null)
+        // .Where(r => r.POImiddlename.ToLower().Contains(fileInfo.POImiddlename.ToLower()) || fileInfo.POImiddlename == null)
+        // .Where(r => r.Requestdate >= fileInfo.Requestdate || fileInfo.Requestdate == null)
+        // .Where(r => r.Requestdate <= fileInfo.Requestduedate || fileInfo.Requestduedate == null)
+        // .Where(r => r.Requesttypeid == fileInfo.Requesttypeid || fileInfo.Requesttypeid == null)
+        // // .Where(r => r.Requeststateid == fileInfo.Requeststateid || fileInfo.Requeststateid == null)
+        // .Where(r => r.Referencenumber == fileInfo.Referencenumber || fileInfo.Referencenumber == null)
+        .AsQueryable<Searchrequestfile>();
+
+        // if (fileInfo.Intakenotes != null)
+        // {
+        //     searchrequestfiles = searchrequestfiles
+        //     .Where(r => r.Intakenotes.ToLower().Contains(fileInfo.Intakenotes.ToLower()) || fileInfo.Intakenotes == null)
+        //      .AsQueryable<Searchrequestfile>();
+        // }
+
+        // if (fileInfo.Requestdetails != null)
+        // {
+        //     searchrequestfiles = searchrequestfiles
+        //     .Where(r => r.Requestdetails.ToLower().Contains(fileInfo.Requestdetails.ToLower()) || fileInfo.Requestdetails == null)
+        //      .AsQueryable<Searchrequestfile>();
+        // }
+
+    }
+
+    private void LoadData()
+    {
+        searchrequestfiles = searchfileService.GetRequestfileList().AsQueryable<Searchrequestfile>();
+    }
+
+    private void goToAddPage()
+    {
+        navigationManager.NavigateTo("/accessrequests/add");
+    }
+
+    private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
+    {
+        //filter data for Blazor Type Ahead
+        return await Task.FromResult(POIpersonnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<PersonName>> SearchPersonName(string searchText)
+    {
+        return await Task.FromResult(personnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
+    }
+}
+
+<EditForm Model="@fileInfo">
+    @if (showpanel)
+    {
+        <p id="searchpanel">
+            <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        File Number:
+                    </label>
+                    <InputText id="filenumber" class="form-control" @bind-Value="fileInfo.Filenumber" />
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        Reference Number:
+                    </label>
+                    <InputText id="referencenumber" class="form-control" @bind-Value="fileInfo.Referencenumber" />
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        Analyst:
+                    </label>
+                    <InputSelect id="analystassignedid" class="form-control" placeholder="ANALYST" @bind-Value="fileInfo.Analystassignedid">
+                        <option value="-1">All...</option>
+                        @foreach (var lktype in analysts)
+                        {
+                            <option value="@lktype.Id">@lktype.Displayname</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label for="lbrequesttypeid">
+                        Request Type:
+                    </label>
+                    <InputSelect id="requesttypeid" class="form-control" placeholder="REQUEST TYPE" @bind-Value="fileInfo.Requesttypeid">
+                        <option value="-1">All...</option>
+                        @foreach (var lktype in requesttypes)
+                        {
+                            <option value="@lktype.Id">@lktype.Detail</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        Request State:
+                    </label>
+                    <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="fileInfo.Requeststateid">
+                        <option value="-1">All...</option>
+                        @foreach (var lktype in requeststates)
+                        {
+                            <option value="@lktype.Id">@lktype.Detail</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label>
+                        Person Name:
+                    </label>
+                    <div class="input-group ">
+                        <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
+                            <SelectedTemplate Context="personname">@personname.firstname @personname.middlename  @personname.lastname</SelectedTemplate>
+                            <ResultTemplate Context="personname">@personname.firstname @personname.middlename @personname.lastname </ResultTemplate>
+                        </BlazoredTypeahead>
+                    </div>
+                </div>
+                @if (selectedpersonname != null)
+                {
+                    string lname = string.Empty;
+                    string fname = string.Empty;
+                    string mname = string.Empty;
+
+                    lname = selectedpersonname.lastname != null ? "," + selectedpersonname.lastname : "";
+                    fname = selectedpersonname.firstname != null ? selectedpersonname.firstname : "";
+                    mname = selectedpersonname.middlename != null ? " " + selectedpersonname.middlename : "";
+
+                    fileInfo.Personname = lname + fname + mname;
+                    fileInfo.Firstname = selectedpersonname.firstname;
+                    fileInfo.Lastname = selectedpersonname.lastname;
+                    fileInfo.Middlename = selectedpersonname.middlename;
+
+                }
+
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label>
+                        Person Of Request:
+                    </label>
+                    <div class="input-group ">
+                        <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIpersonName" @bind-Value="POIselectedpersonname">
+                            <SelectedTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</SelectedTemplate>
+                            <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
+                        </BlazoredTypeahead>
+                    </div>
+                </div>
+                @if (POIselectedpersonname != null)
+                {
+                    string poilname = string.Empty;
+                    string poifname = string.Empty;
+                    string poimname = string.Empty;
+
+                    poilname = POIselectedpersonname.lastname != null ? "," + POIselectedpersonname.lastname : "";
+                    poifname = POIselectedpersonname.firstname != null ? POIselectedpersonname.firstname : "";
+                    poimname = POIselectedpersonname.middlename != null ? " " + POIselectedpersonname.middlename : "";
+
+                    fileInfo.PersonOfInterest = poilname + poifname + poimname;
+                    fileInfo.POIfirstname = POIselectedpersonname.firstname;
+                    fileInfo.POIlastname = POIselectedpersonname.lastname;
+                    fileInfo.POImiddlename = POIselectedpersonname.middlename;
+
+                }
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        Request Date From:
+                    </label>
+                    <InputDate id="requestdatefrom" class="form-control" @bind-Value="fileInfo.Requestdate" />
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        To Request Date
+                    </label>
+                    <InputDate id="requestdateto" class="form-control" @bind-Value="fileInfo.Requestduedate" />
+                </div>
+
+                <div class="col-lg-4 col-md-3 col-sm-12">
+                    <label>
+                        Request Details:
+                    </label>
+                    <InputText id="requestdetail" class="form-control" @bind-Value="fileInfo.Requestdetails" />
+                </div>
+
+                <div class="col-lg-4 col-md-3 col-sm-12">
+                    <label>
+                        Intake Notes:
+                    </label>
+                    <InputText id="intakenotes" class="form-control" @bind-Value="fileInfo.Intakenotes" />
+                </div>
+            </div>
+
+        </p>
+        <div>
+            <button class="btn btn-primary" @onclick="FilterData">Search</button>
+            <button type="button" class="btn btn-primary" @onclick="ClearSearch">Reset</button>
+        </div>
+    }
+</EditForm>
+<br />
+
+<div class="row" style="width:100%">
+    <div class="col-lg-5" style="float:left">
+        Show:
+        <label><input type="checkbox" @bind="showyear" /> Year</label>
+        &nbsp;&nbsp;&nbsp;
+        <label><input type="checkbox" @bind="showpanel" /> Search Panel</label>
+    </div>
+    <div class="col-lg-5" style="float:left">
+        <div class="page-size-chooser">
+            Items per page:
+            <select @bind="@pagination.ItemsPerPage">
+                <option>5</option>
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+            </select>
+
+        </div>
+
+    </div>
+    <div class="col-lg-2" style="float:revert">
+        <div class="page-size-chooser">
+            <button type="button" class="btn btn-warning" @onclick="goToAddPage">Add New</button>
+        </div>
+    </div>
+
+</div>
+
+<p>
+
+
+</p>
+
+
+<div class="grid" tabindex="-1">
+    <QuickGrid Items="@searchrequestfiles" Virtualize="true" Pagination="@pagination">
+        @if (showyear)
+        {
+            <PropertyColumn Property="@(r => r.Fileyear)" Title="Year" Sortable="true" />
+        }
+        <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Filenumber)" Title="File Number" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Referencenumber)" Title="Reference Number" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requestduedate)" Title="Requst Due Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" />
+        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Person Of Interest" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <a href="@($"/accessrequests/add/{context.Id}")" class="btn btn-outline-primary">
+                <i class="fas fa-edit">Edit</i>
+            </a>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />

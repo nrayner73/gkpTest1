@@ -1,0 +1,269 @@
+﻿@rendermode InteractiveServer
+
+@inject IPersonnameService personNameService
+@inject IAddressService addressService
+@inject IContactService contactService
+@inject IJSRuntime JSRuntime
+
+
+
+
+@code {
+    [Parameter]
+    public Person person { get; set; } = new Person();
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnSubmit { get; set; }
+    #region TypeAhead Parameters
+    public List<PersonName>? personnames { get; set; } = new List<PersonName>();
+    private PersonName selectedpersonname;
+    private PersonName personname { get; set; } = new PersonName();
+
+
+    public List<CompanyName>? companynames { get; set; } = new List<CompanyName>();
+    private CompanyName selectedcompanyname;
+    private CompanyName companyname { get; set; } = new CompanyName();
+
+    public List<AddressInfo>? addresses { get; set; } = new List<AddressInfo>();
+    private AddressInfo selectedaddress;
+    private AddressInfo address { get; set; } = new AddressInfo();
+
+
+    public List<ContactInfo>? daytimephones { get; set; } = new List<ContactInfo>();
+    private ContactInfo selecteddaytimephone;
+    private ContactInfo daytimephone { get; set; } = new ContactInfo();
+
+
+    public List<ContactInfo>? alternatephones { get; set; } = new List<ContactInfo>();
+    private ContactInfo selectedalternatephone;
+    private ContactInfo alternatephone { get; set; } = new ContactInfo();
+
+
+    public List<ContactInfo>? faxphones { get; set; } = new List<ContactInfo>();
+    private ContactInfo selectedfaxphone;
+    private ContactInfo faxphone { get; set; } = new ContactInfo();
+
+
+    public List<ContactInfo>? emails { get; set; } = new List<ContactInfo>();
+    private ContactInfo selectedemail;
+    private ContactInfo email { get; set; } = new ContactInfo();
+    #endregion
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        EditContext editContext = new EditContext(person);
+        personnames = personNameService.GetNames();
+        companynames = personNameService.GetCompanyNames();
+
+        daytimephones = contactService.GetContactInfo();
+        alternatephones = contactService.GetContactInfo();
+        faxphones = contactService.GetContactInfo();
+        emails = contactService.GetContactInfo();
+
+        addresses = addressService.GetAddress();
+
+    }
+ 
+
+    #region TypeAhead function
+    private async Task<IEnumerable<PersonName>> SearchPersonName(string searchText)
+    {
+        return await Task.FromResult(personnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<CompanyName>> SearchCompanyName(string searchText)
+    {
+        return await Task.FromResult(companynames.Where(x => (x.companyname).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<AddressInfo>> SearchAddress(string searchText)
+    {
+        return await Task.FromResult(addresses.Where(x => (x.Street + x.City + x.Country + x.Province + x.Postalcode).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<ContactInfo>> SearchDayTimePhone(string searchText)
+    {
+        return await Task.FromResult(daytimephones.Where(x => (x.contactinfo).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<ContactInfo>> SearchAlternatePhone(string searchText)
+    {
+        return await Task.FromResult(alternatephones.Where(x => (x.contactinfo).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<ContactInfo>> SearchFaxPhone(string searchText)
+    {
+        return await Task.FromResult(faxphones.Where(x => (x.contactinfo).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<ContactInfo>> SearchEmail(string searchText)
+    {
+        return await Task.FromResult(emails.Where(x => (x.contactinfo).ToLower().Contains(searchText.ToLower())));
+    }
+    #endregion
+}
+
+<EditForm Model="@person" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+    <div class="row">
+        <div class="col-lg-6 col-md-3 col-sm-12">
+            <div class="input-group ">
+                <label style="font-weight:bold;color:blue;">Search Company Name:</label>
+                <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" @bind-Value="selectedcompanyname">
+                    <SelectedTemplate Context="companyname">@companyname.companyname. </SelectedTemplate>
+                    <ResultTemplate Context="companyname">@companyname.companyname.</ResultTemplate>
+                </BlazoredTypeahead>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-3 col-sm-12">
+            <div class="input-group ">
+                <label style="font-weight:bold;color:blue;">Search Request Name:</label>
+                <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
+                    <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
+                    <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
+                </BlazoredTypeahead>
+            </div>
+        </div>
+      
+
+    </div>
+
+    @if (selectedpersonname != null)
+    {
+        person.Firstname = selectedpersonname.firstname;
+        person.Lastname = selectedpersonname.lastname;
+        person.Middlename = selectedpersonname.middlename;
+        selectedpersonname = null;
+
+    }
+
+    @if (selectedcompanyname != null)
+    {
+        person.Companyname = selectedcompanyname.companyname;
+        selectedcompanyname = null;
+    }
+    <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <label>
+                Company:
+            </label>
+            <InputText id="companyname" class="form-control" @bind-Value="person.Companyname" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <span class="required">*</span>
+            <label>First Name:</label>
+            <InputText id="firstname" class="form-control" @bind-Value="person.Firstname" />
+            <ValidationMessage For="@(() => person.Firstname)" />
+        </div>
+
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <label>Middle Name:</label>
+            <InputText id="middlename" class="form-control" @bind-Value="person.Middlename" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <label>Last Name:</label>
+            <InputText id="lastname" class="form-control" @bind-Value="person.Lastname" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <label>Birth Date:</label>
+            <InputDate id="birthdate" class="form-control" placeholder="BIRTH DATE" @bind-Value="person.Birthdate" />
+        </div>
+    </div>
+
+    @* Request Person Address *@
+    <hr />
+    <div class="row">
+        <div class="col-lg-6 col-md-3 col-sm-12">
+            <div class="input-group ">
+                <label style="font-weight:bold;color:blue;">Search Address:</label>
+                <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" @bind-Value="selectedaddress">
+                    <SelectedTemplate Context="address">@address.Street @address.City @address.Province @address.City @address.Postalcode</SelectedTemplate>
+                    <ResultTemplate Context="address">@address.Street @address.City @address.Province @address.City @address.Postalcode</ResultTemplate>
+                </BlazoredTypeahead>
+            </div>
+        </div>
+    </div>
+
+    @if (selectedaddress != null)
+    {
+        person.Street = selectedaddress.Street;
+        person.City = selectedaddress.City;
+        person.Province = selectedaddress.Province;
+        person.Country = selectedaddress.Country;
+        person.Postalcode = selectedaddress.Postalcode;
+
+        selectedaddress = null;
+    }
+
+    <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <span class="required">*</span>
+            <label>
+                Street:
+            </label>
+            <InputText id="street" class="form-control" @bind-Value="person.Street" />
+            <ValidationMessage For="@(() => person.Street)" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <span class="required">*</span>
+            <label>
+                City:
+            </label>
+            <InputText id="city" class="form-control" @bind-Value="person.City" />
+            <ValidationMessage For="@(() => person.City)" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <span class="required">*</span>
+            <label>
+                Province:
+            </label>
+            <InputText id="province" class="form-control" @bind-Value="person.Province" />
+            <ValidationMessage For="@(() => person.Province)" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <label>
+                Country:
+            </label>
+            <InputText id="country" class="form-control" @bind-Value="person.Country" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <label>
+                Postal Code:
+            </label>
+            <InputText id="postalcode" class="form-control" @bind-Value="person.Postalcode" />
+        </div>
+    </div>
+
+    @* Request Person Contact *@
+
+    <hr />
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-12">
+            <span class="required">*</span>
+            <label>Daytime Phone:</label>
+            <InputText id="daytimephone" class="form-control" @bind-Value="person.Daytimephone" />
+            <ValidationMessage For="@(() => person.Daytimephone)" />
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-12">
+            <label>Alternate Phone:</label>
+            <InputText id="alternatephone" class="form-control" @bind-Value="person.Alternatephone" />
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-12">
+            <label style="font-weight:200">Fax Phone:</label>
+            <InputText id="faxphone" class="form-control" @bind-Value="person.Faxphone" />
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-12">
+            <label style="font-weight:200">Email:</label>
+            <InputText id="email" class="form-control" @bind-Value="person.Email" />
+        </div>
+
+    </div>
+
+</EditForm>

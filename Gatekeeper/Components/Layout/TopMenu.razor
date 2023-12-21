@@ -1,0 +1,33 @@
+﻿@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+
+<nav class="navbar .navbar-collapse  bg-body-tertiary" >
+        <div class="container-fluid">
+        <ul id="fileTabs" class="nav nav-pills" style="display:none">
+            <li class="nav-item">
+                <a id="file-tab" class="nav-link " href="accessrequests/search">Access Request</a>
+            </li>
+            <li class="nav-item">
+                <a id="payment-tab" class="nav-link active" href="/weather">Payment</a>
+            </li>
+            <li class="nav-item">
+                <a id="note-tab" class="nav-link" href="#">Notes</a>
+            </li>
+            <li class="nav-item">
+                <a id="video-tab" class="nav-link" href="#">Video Notes</a>
+            </li>
+            <li class="nav-item">
+                <a id="disclosure-tab" class="nav-link" href="#">Disclousure</a>
+            </li>
+            <li class="nav-item">
+                <a id="other-tab" class="nav-link disabled" aria-disabled="true">Disabled</a>
+            </li>
+        </ul>
+    </div>
+    </nav>
+
+@code {
+
+
+}

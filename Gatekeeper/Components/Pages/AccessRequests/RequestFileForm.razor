@@ -1,0 +1,307 @@
+﻿
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject IPersonnameService personNameService
+
+
+@code {
+
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnSubmit { get; set; }
+    [Parameter]
+    public Person person { get; set; }
+    [Parameter]
+    public Requestfile requestfile { get; set; }
+
+    #region Lookup parameters
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
+    public List<LkRequeststate>? requeststates { get; set; } = new List<LkRequeststate>();
+    public List<LkProcessingdeficiency>? processingdeficiencies { get; set; } = new List<LkProcessingdeficiency>();
+    public List<LkRecorddeliverymethod> recorddeliverymethods { get; set; } = new List<LkRecorddeliverymethod>();
+    public List<Holiday>? holidays { get; set; } = new List<Holiday>();
+    public List<Holiday>? thisYearholidays { get; set; } = new List<Holiday>();
+
+    public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
+    private POIName POIselectedpersonname;
+    private POIName POIpersonname { get; set; } = new POIName();
+    #endregion
+
+    protected async override Task OnInitializedAsync()
+    {
+        //Generate lookup data using DbContext
+        using var context = DbFactory.CreateDbContext();
+
+        requesttypes = await context.LkRequesttypes.ToListAsync();
+        processingdeficiencies = await context.LkProcessingdeficiencies.ToListAsync();
+        recorddeliverymethods = await context.LkRecorddeliverymethods.ToListAsync();
+        requeststates = await context.LkRequeststates.ToListAsync();
+        analysts = await context.Analysts.ToListAsync();
+        holidays = await context.Holidays.ToListAsync();
+        POIpersonnames = personNameService.GetPOINames();
+    }
+
+
+
+    private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
+    {
+        //filter data for Blazor Type Ahead
+        return await Task.FromResult(POIpersonnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
+    }
+
+    public async Task setDuedate()
+    {
+        // var dt = e.Value;
+        await Task.Delay(500);
+
+        if (requestfile.Receivedate != null)
+        {
+            List<DateTime> dateRange1 = new List<DateTime>();
+            List<DateTime> dateRange2 = new List<DateTime>();
+
+            DateTime dueDate = (DateTime)requestfile.Receivedate;
+            DateTime setDate;
+
+            dueDate = ((DateTime)requestfile.Receivedate).AddDays(30);
+
+            for (int i = 1; i < 11; i++)
+            {
+                setDate = dueDate.AddDays(i);
+                if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
+                {
+                    dateRange1.Add(setDate);
+                    dateRange2.Add(setDate);
+                }
+            }
+
+            //Remove holidays
+            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == DateTime.Today.Year);
+
+            foreach (var item in thisYearHolidays)
+            {
+                foreach (var dt in dateRange1)
+                    {
+                        int y = dateRange1.IndexOf(dt);
+                        if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
+                        {
+                            dateRange2.RemoveAt(y);
+                        }
+                    }
+            }
+
+            requestfile.Requestduedate = dateRange2.FirstOrDefault();
+        }
+    }
+
+
+}
+
+<EditForm  Model="@requestfile">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbfilenumber">
+                    File Number:
+                </label>
+                <InputText id="filenumber" class="form-control" readonly="true" placeholder="FILE NUMBER" @bind-Value="requestfile.Filenumber" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+               <span class="required">*</span> <label for="lbrequestdate">
+                    Request Date:
+                </label>
+                <InputDate id="requestdate" class="form-control" placeholder="REQUEST DATE" @bind-Value="requestfile.Requestdate" />
+                <ValidationMessage For="@(() => requestfile.Requestdate)" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbreceivedate">
+                    Receive Date:
+                </label>
+                <InputDate id="receivedate" class="form-control" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="requestfile.Receivedate" @bind-Value:after="setDuedate" />
+                
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbrequestduedate">
+                    Request Due Date:
+                </label>
+                <InputDate id="requestduedate" class="form-control" readonly="true" placeholder="REQUEST DUEDATE" @bind-Value="requestfile.Requestduedate" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbreferencenumber">
+                    Reference Number:
+                </label>
+                <InputText id="referencenumber" class="form-control" placeholder="REFERENCE NUMBER" @bind-Value="requestfile.Referencenumber" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label for="lbidviewed">
+                    ID Viewed:
+                </label>
+                <InputSelect id="idviewed" class="form-control" placeholder="ID VIEWED" @bind-Value="requestfile.Idviewed">
+                    <option value="-1">Select...</option>
+                    <option value="0">Yes</option>
+                    <option value="1">No</option>
+                    <option value="2">NA</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => requestfile.Idviewed)" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label for="lbrequesttypeid">
+                    Request Type:
+                </label>
+                <InputSelect id="requesttypeid" class="form-control" placeholder="REQUEST TYPE" @bind-Value="requestfile.Requesttypeid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in requesttypes)
+                    {
+                        <option value="@lktype.Id">@lktype.Detail</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => requestfile.Requesttypeid)" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbprocessingdeficiency">
+                    Processingdeficiency:
+                </label>
+                <InputSelect id="processingdeficiency" class="form-control" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in processingdeficiencies)
+                    {
+                        <option value="@lktype.Id">@lktype.Detail</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+
+        <br />
+
+
+        <hr />
+        <div class="row">
+            <div class="col-lg-6 col-md-3 col-sm-12">
+                <div class="input-group ">
+                    <label style="font-weight:bold;color:blue;">Search Person Of Interest:</label>
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIpersonName" @bind-Value="POIselectedpersonname">
+                        <SelectedTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</SelectedTemplate>
+                        <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
+                    </BlazoredTypeahead>
+                </div>
+            </div>
+        </div>
+
+        @* Person Of Interest Info *@
+        <br />
+       
+        @if (POIselectedpersonname != null)
+        {
+            
+         
+            person.Personofinterestfirstname = POIselectedpersonname.firstname;
+            person.Personofinterestlastname = POIselectedpersonname.lastname;
+            person.Personofinterestmiddlename = POIselectedpersonname.middlename;
+            POIselectedpersonname = null;
+        }
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label>First Name:</label>
+                <InputText id="poifirstname" class="form-control" @bind-Value="person.Personofinterestfirstname" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label>Middle Name:</label>
+                <InputText id="poimiddlename" class="form-control" @bind-Value="person.Personofinterestmiddlename" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label>Last Name:</label>
+                <InputText id="poilastname" class="form-control" @bind-Value="person.Personofinterestlastname" />
+            </div>
+        </div>
+
+        <hr />
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbrecorddeliverymethodid">
+                    Record Delivery Methodid:
+                </label>
+                <InputSelect id="recorddeliverymethodid" class="form-control" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in recorddeliverymethods)
+                    {
+                        <option value="@lktype.Id">@lktype.Detail</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label for="lbanalystassignedid">
+                    Analyst Assigned:
+                </label>
+                <InputSelect id="analystassignedid" class="form-control" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in analysts)
+                    {
+                        <option value="@lktype.Id">@lktype.Displayname</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => requestfile.Analystassignedid)" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label for="lbrequestdetails">
+                    Request Details:
+                </label>
+                <InputTextArea id="requestdetails" class="form-control" placeholder="REQUEST DETAILS" @bind-Value="requestfile.Requestdetails" row="5" col="50" />
+                <ValidationMessage For="@(() => requestfile.Requestdetails)" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbpreviousrequests">
+                    Previous Requests:
+                </label>
+                <InputText id="previousrequests" class="form-control" placeholder="PREVIOUS REQUESTS" @bind-Value="requestfile.Previousrequests" />
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbtimeframe">
+                    Time Frame:
+                </label>
+                <InputText id="timeframe" class="form-control" placeholder="TIME FRAME" @bind-Value="requestfile.Timeframe" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbintakenotes">
+                    Intake Notes:
+                </label>
+                <InputTextArea id="intakenotes" class="form-control" placeholder="INTAKE NOTES" @bind-Value="requestfile.Intakenotes" row="5" col="50" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbrequeststate">
+                    Request State:
+                </label>
+                <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in requeststates)
+                    {
+                        <option value="@lktype.Id">@lktype.Detail</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbclosedate">
+                    Close Date:
+                </label>
+                <InputDate id="closedate" class="form-control" placeholder="CLOSE DATE" @bind-Value="requestfile.Closedate" />
+            </div>
+
+        </div>
+    </div>
+</EditForm>

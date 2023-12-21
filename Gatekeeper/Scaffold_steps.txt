@@ -1,0 +1,11 @@
+﻿Scaffold-DbContext -Connection "Server=.\; Database=GateKeeper;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;"-Provider Microsoft.EntityFrameworkCore.SqlServer -OutputDir "Models" -ContextDir "Models" -Context "AppDbContext" –NoOnConfiguring
+
+
+--dotnet ef dbcontext scaffold "Server=.\;Database=GateKeeper;Trusted_Connection=True;trustServerCertificate=true" Microsoft.EntityFrameworkCore.SqlServer -o Model -ContextDir "Data" -Context "AppDbContext" –NoOnConfiguring
+--Scaffold-DbContext -Connection "Server=.\; Database=GateKeeper;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;"-Provider Microsoft.EntityFrameworkCore.SqlServer -OutputDir "Models" -ContextDir "Data" -Context "AppDbContext" –NoOnConfiguring
+--Scaffold-DbContext "Server=(localdb)\mssqllocaldb;Database=GateKeeper;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir "Data" -Context "AppDbContext" –NoOnConfiguring
+--Scaffold-DbContext "Server=(localdb)\mssqllocaldb;Database=GateKeeper;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir Context -Context AppContext –NoOnConfiguring
+
+
+dotnet ef migrations add InitialCreate
+dotnet ef database update

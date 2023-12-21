@@ -1,0 +1,49 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\Gatekeeper.bundle.scp.css",
+      "PackagePath": "staticwebassets\\Gatekeeper.bundle.scp.css"
+    },
+    {
+      "Id": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\crest-cps.svg",
+      "PackagePath": "staticwebassets\\crest-cps.svg"
+    },
+    {
+      "Id": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\tabs.js",
+      "PackagePath": "staticwebassets\\tabs.js"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.Gatekeeper.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.Gatekeeper.props",
+      "PackagePath": "build\\Gatekeeper.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.Gatekeeper.props",
+      "PackagePath": "buildMultiTargeting\\Gatekeeper.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.Gatekeeper.props",
+      "PackagePath": "buildTransitive\\Gatekeeper.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\CSI Projects\\Gatekeeper\\Gatekeeper.csproj": {}
+    "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj": {}
   },
   "projects": {
-    "D:\\CSI Projects\\Gatekeeper\\Gatekeeper.csproj": {
+    "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\CSI Projects\\Gatekeeper\\Gatekeeper.csproj",
+        "projectUniqueName": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
         "projectName": "Gatekeeper",
-        "projectPath": "D:\\CSI Projects\\Gatekeeper\\Gatekeeper.csproj",
+        "projectPath": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
         "packagesPath": "C:\\Users\\pol11067\\.nuget\\packages\\",
-        "outputPath": "D:\\CSI Projects\\Gatekeeper\\obj\\",
+        "outputPath": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

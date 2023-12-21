@@ -25,7 +25,7 @@ public partial class Requestfile
 
     public string? Referencenumber { get; set; }
 
-    [Required(ErrorMessage = "ID Viewed is required")]
+    //[Required(ErrorMessage = "ID Viewed is required")]
     public int? Idviewed { get; set; }
 
     [Required(ErrorMessage = "Request Type is required")]

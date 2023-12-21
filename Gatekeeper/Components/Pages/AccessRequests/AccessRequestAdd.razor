@@ -13,11 +13,12 @@
 @inject IJSRuntime JSRuntime
 
 
-@page "/accessrequests/add"
+@page "/accessrequests/add/{fileid:int?}"
 
 
 @code {
-    public int fileid;
+    [Parameter]
+    public int fileid { get; set; }
     public SelectedmenuInfo currentmenu;
 
     public bool DisplayAlert { get; set; }
@@ -30,9 +31,11 @@
     private IRequestfileService RequestfileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
     private Requestfile Sessionrequestfile { get; set; } = new Requestfile();
-    private List<Requestfile> requestfiles { get; set; } = new List<Requestfile>();
+    private List<Requestfile>? requestfiles { get; set; } = new List<Requestfile>();
     public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
 
+    
+    private List<Person> persons { get; set; } =new List<Person>();
     private Person person { get; set; } = new Person();
 
     private bool alertMessageShow = false;
@@ -51,10 +54,20 @@
 
     protected async override Task OnParametersSetAsync()
     {
+
         using var context = DbFactory.CreateDbContext();
         requesttypes = await context.LkRequesttypes.ToListAsync();
-         // requestfiles = await context.Requestfiles.ToListAsync();
+        persons = await context.People.ToListAsync();
+        requestfiles = await context.Requestfiles.ToListAsync();
         holidays = await context.Holidays.ToListAsync();
+        if (fileid > 0)
+        {
+            requestfile = requestfiles.Where(r => r.Id == fileid).FirstOrDefault();
+            person = persons.Where(p => p.Id == requestfile.Personid).FirstOrDefault();
+
+
+        }
+
         if (requestfile.Yearid == 0 || requestfile.Yearid is null)
         {
             requestfile.Filenumber = "TBD";
@@ -77,6 +90,8 @@
         {
             JSRuntime.InvokeVoidAsync("showTopmenu");
             JSRuntime.InvokeVoidAsync("changetab", "file-tab");
+
+         
         }
 
     }
@@ -497,8 +512,7 @@
         </div>
     }
     <br />
-    <br />
-    <br />
+
 
     <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>

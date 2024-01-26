@@ -21,6 +21,10 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<Searchrequestfile> RequestfileInfos { get; set; }
 
+        public virtual DbSet<Searchmytask> MytaskfileInfos { get; set; }
+
+        public virtual DbSet<SearchAnalystNotes> AnalystNoteInfos { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

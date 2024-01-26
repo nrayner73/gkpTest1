@@ -9,6 +9,8 @@ using Gatekeeper.Models.Lookups;
 using System.Net.NetworkInformation;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Gatekeeper.Interfaces.Audit;
+using Gatekeeper.DataServices.Audit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,10 +29,11 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 builder.Services.AddDbContextFactory<LookupDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("gkConnectionString")));
 
-
+builder.Services.AddBlazorBootstrap();
 
 builder.Services.AddScoped<IRequestfileService, RequestfileService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
+builder.Services.AddScoped <IAnalystnoteService, AnalystnoteService>();
 
 //Lookup
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
@@ -39,6 +42,12 @@ builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficienc
 builder.Services.AddScoped<ILkRecorddeliverymethodService, LkRecorddeliverymethodService>();
 builder.Services.AddScoped<IAnalystsService, AnalystsService>();
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
+builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
+builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
+
+//Audit
+builder.Services.AddScoped<IAuditlogService, AuditlogService>();
+
 
 //View
 builder.Services.AddScoped<IPersonnameService,PersonnameService>();

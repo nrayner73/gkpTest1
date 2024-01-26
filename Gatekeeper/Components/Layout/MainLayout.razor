@@ -1,19 +1,15 @@
-﻿
-@using Gatekeeper.Models.MenuInfo
+﻿@using Gatekeeper.Models.MenuInfo
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider authenticationProvider
 
-@inject Blazored.SessionStorage.ISessionStorageService session
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
 
 
-
-
-
 <style>
 
-    
+
 
 
     .required {
@@ -60,6 +56,8 @@
         margin-left: 500px
     }
 
+ 
+
 </style>
 
 <div class="page">
@@ -100,19 +98,23 @@
         var user = authState.User;
         var nameUser = user.Identity?.Name;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-      
+        // session.SetItemAsStringAsync("SessionUser", userReg);
 
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            session.SetItemAsync("SessionUser", userReg);
+           // await sessionStorage.SetItemAsync("RQID", fileid);
+            await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
+            var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+  
+
             firstRender = false;
         }
-         
+
 
     }
 

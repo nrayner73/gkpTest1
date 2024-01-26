@@ -73,3 +73,11 @@ build_metadata.AdditionalFiles.CssScope = b-e4iuz7yxhz
 [D:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/AccessRequestSearch.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBY2Nlc3NSZXF1ZXN0c1xBY2Nlc3NSZXF1ZXN0U2VhcmNoLnJhem9y
 build_metadata.AdditionalFiles.CssScope = b-vrjkvxbnqu
+
+[D:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AnalystNotes/AnalystNoteAdd.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBbmFseXN0Tm90ZXNcQW5hbHlzdE5vdGVBZGQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-l5pgvhum4i
+
+[D:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/MyTasks/MytaskSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNeVRhc2tzXE15dGFza1NlYXJjaC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-cnhds8r9c9

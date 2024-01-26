@@ -1,13 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "LIa7R4GzFJYvTc0GgPzs4Xko1sW3Zhqg2rB2i+1g+2Mnm3mRLU+JP8IbdEs0Op0RnNeTCQvf89ERT6A2CHdEHw==",
+  "dgSpecHash": "jVBhNUFFqamyZVsQ520ONdMMQr7oR9qh2LH0cPvSVW423Y9Z3kAyhP7DDbMY7BkVbYy4nR1zAu1pOUY2XvC1zg==",
   "success": true,
   "projectFilePath": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\pol11067\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\pol11067\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
+    "C:\\Users\\pol11067\\.nuget\\packages\\blazor.bootstrap\\1.10.5\\blazor.bootstrap.1.10.5.nupkg.sha512",
     "C:\\Users\\pol11067\\.nuget\\packages\\blazored.sessionstorage\\2.4.0\\blazored.sessionstorage.2.4.0.nupkg.sha512",
     "C:\\Users\\pol11067\\.nuget\\packages\\blazored.typeahead\\4.7.0\\blazored.typeahead.4.7.0.nupkg.sha512",
+    "C:\\Users\\pol11067\\.nuget\\packages\\htmlagilitypack\\1.11.57\\htmlagilitypack.1.11.57.nupkg.sha512",
     "C:\\Users\\pol11067\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\pol11067\\.nuget\\packages\\liquidtechnologies.blazor.modaldialog\\0.9.7\\liquidtechnologies.blazor.modaldialog.0.9.7.nupkg.sha512",
     "C:\\Users\\pol11067\\.nuget\\packages\\microsoft.aspnetcore.authentication.negotiate\\8.0.0\\microsoft.aspnetcore.authentication.negotiate.8.0.0.nupkg.sha512",

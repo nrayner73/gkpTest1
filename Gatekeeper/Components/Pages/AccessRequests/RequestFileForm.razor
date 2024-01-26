@@ -43,8 +43,6 @@
         POIpersonnames = personNameService.GetPOINames();
     }
 
-
-
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
     {
         //filter data for Blazor Type Ahead
@@ -82,19 +80,18 @@
             foreach (var item in thisYearHolidays)
             {
                 foreach (var dt in dateRange1)
+                {
+                    int y = dateRange1.IndexOf(dt);
+                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
                     {
-                        int y = dateRange1.IndexOf(dt);
-                        if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
-                        {
-                            dateRange2.RemoveAt(y);
-                        }
+                        dateRange2.RemoveAt(y);
                     }
+                }
             }
 
             requestfile.Requestduedate = dateRange2.FirstOrDefault();
         }
     }
-
 
 }
 
@@ -181,7 +178,6 @@
 
         <br />
 
-
         <hr />
         <div class="row h-auto">
             <div class="col-lg-6 col-md-3 col-sm-12">
@@ -200,8 +196,6 @@
        
         @if (POIselectedpersonname != null)
         {
-            
-         
             person.Personofinterestfirstname = POIselectedpersonname.firstname;
             person.Personofinterestlastname = POIselectedpersonname.lastname;
             person.Personofinterestmiddlename = POIselectedpersonname.middlename;
@@ -287,7 +281,10 @@
                 <label for="lbrequestdetails">
                     Request Details:
                 </label>
-                <InputTextArea id="requestdetails" class="form-control" placeholder="REQUEST DETAILS" @bind-Value="requestfile.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;" />
+                
+                <InputTextArea id="requestdetails" class="form-control"  placeholder="REQUEST DETAILS" @bind-Value="requestfile.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;">
+                    @((MarkupString)requestfile.Requestdetails)
+                    </InputTextArea>
                 <ValidationMessage For="@(() => requestfile.Requestdetails)" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">

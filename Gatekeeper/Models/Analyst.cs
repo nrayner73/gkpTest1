@@ -7,6 +7,8 @@ public partial class Analyst
 {
     public int Id { get; set; }
 
+    public string? Regno { get; set; }
+
     public string? Localname { get; set; }
 
     public string? Displayname { get; set; }

@@ -7,11 +7,15 @@ public partial class Mytask
 {
     public int Id { get; set; }
 
+    public int Fileid { get; set; }
+
     public int Taskid { get; set; }
 
     public string? Assignby { get; set; }
 
     public DateTime? Assigndate { get; set; }
+
+    public int? Taskstatusid { get; set; }
 
     public DateTime? Closedate { get; set; }
 

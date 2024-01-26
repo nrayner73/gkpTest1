@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
-using Gatekeeper.Interfaces;
+using Gatekeeper.Interfaces.Lookups;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices.Lookups
 {
     public class LkProcessingdeficiencyService : ILkProcessingdeficiencyService
     {
@@ -20,7 +20,7 @@ namespace Gatekeeper.Services
             return await _context.LkProcessingdeficiencies
                     .ToListAsync();
         }
-    
+
         public async Task<LkProcessingdeficiency> GetLkProcessingdeficiencyById(int id)
         {
             return await _context.LkProcessingdeficiencies
@@ -33,13 +33,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return lkprocessingdeficiency;
         }
-        public async System.Threading.Tasks.Task UpdateLkProcessingdeficiency(LkProcessingdeficiency lkprocessingdeficiency)
+        public async Task UpdateLkProcessingdeficiency(LkProcessingdeficiency lkprocessingdeficiency)
         {
             _context.LkProcessingdeficiencies.Update(lkprocessingdeficiency);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteLkProcessingdeficiency(LkProcessingdeficiency lkprocessingdeficiency)
+        public async Task DeleteLkProcessingdeficiency(LkProcessingdeficiency lkprocessingdeficiency)
         {
             _context.LkProcessingdeficiencies.Remove(lkprocessingdeficiency);
             await _context.SaveChangesAsync();

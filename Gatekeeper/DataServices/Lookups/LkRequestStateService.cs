@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
-using Gatekeeper.Interfaces;
+using Gatekeeper.Interfaces.Lookups;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices.Lookups
 {
     public class LkRequestStateService : ILkRequestStateService
     {
@@ -33,13 +33,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return lkrequeststate;
         }
-        public async System.Threading.Tasks.Task UpdateLkRequestState(LkRequeststate lkrequeststate)
+        public async Task UpdateLkRequestState(LkRequeststate lkrequeststate)
         {
             _context.LkRequeststates.Update(lkrequeststate);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteLkRequestState(LkRequeststate lkrequeststate)
+        public async Task DeleteLkRequestState(LkRequeststate lkrequeststate)
         {
             _context.LkRequeststates.Remove(lkrequeststate);
             await _context.SaveChangesAsync();

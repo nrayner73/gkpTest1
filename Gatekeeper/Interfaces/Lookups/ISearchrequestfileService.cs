@@ -5,6 +5,6 @@ namespace Gatekeeper.Interfaces.Lookups
 {
     public interface ISearchrequestfileService
     {
-       List<Searchrequestfile> GetRequestfileList();
+       List<Searchrequestfile> GetRequestfileList(Searchrequestfile searchfilter);
     }
 }

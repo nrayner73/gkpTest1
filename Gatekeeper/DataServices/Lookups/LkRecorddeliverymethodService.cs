@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
-using Gatekeeper.Interfaces;
+using Gatekeeper.Interfaces.Lookups;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices.Lookups
 {
     public class LkRecorddeliverymethodService : ILkRecorddeliverymethodService
     {
@@ -20,7 +20,7 @@ namespace Gatekeeper.Services
             return await _context.LkRecorddeliverymethods
                     .ToListAsync();
         }
-    
+
         public async Task<LkRecorddeliverymethod> GetLkRecorddeliverymethodById(int id)
         {
             return await _context.LkRecorddeliverymethods
@@ -33,13 +33,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return lkrecorddeliverymethod;
         }
-        public async System.Threading.Tasks.Task UpdateLkRecorddeliverymethod(LkRecorddeliverymethod lkrecorddeliverymethod)
+        public async Task UpdateLkRecorddeliverymethod(LkRecorddeliverymethod lkrecorddeliverymethod)
         {
             _context.LkRecorddeliverymethods.Update(lkrecorddeliverymethod);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteLkRecorddeliverymethod(LkRecorddeliverymethod lkrecorddeliverymethod)
+        public async Task DeleteLkRecorddeliverymethod(LkRecorddeliverymethod lkrecorddeliverymethod)
         {
             _context.LkRecorddeliverymethods.Remove(lkrecorddeliverymethod);
             await _context.SaveChangesAsync();

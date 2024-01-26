@@ -13,8 +13,10 @@
 
 
   <ItemGroup>
+    <PackageReference Include="Blazor.Bootstrap" Version="1.10.5" />
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
     <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />
     <PackageReference Include="LiquidTechnologies.Blazor.ModalDialog" Version="0.9.7" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.0.0" />
@@ -24,6 +26,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <Folder Include="Models\Audit\" />
   </ItemGroup>
 
 </Project>

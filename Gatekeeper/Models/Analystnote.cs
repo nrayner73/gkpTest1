@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Gatekeeper.Models;
 
@@ -11,13 +14,17 @@ public partial class Analystnote
 
     public DateTime? Enterdate { get; set; }
 
-    public string? Analyst { get; set; }
+    public int? Analystid { get; set; }
 
     public string? Notes { get; set; }
 
     public string? Timetaken { get; set; }
 
-    public string? Status { get; set; }
+    public int? Status { get; set; }
+
+    public string? Supervisornotes { get; set; }
+
+    public int? Supervisorapproved { get; set; }
 
     public DateTime? Moddate { get; set; }
 

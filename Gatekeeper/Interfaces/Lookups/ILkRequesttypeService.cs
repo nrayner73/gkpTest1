@@ -1,6 +1,6 @@
 using Gatekeeper.Models;
 
-namespace Gatekeeper.Interfaces
+namespace Gatekeeper.Interfaces.Lookups
 {
     public interface ILkRequesttypeService
     {

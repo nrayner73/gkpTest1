@@ -14,16 +14,12 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 
-@inject IDbContextFactory<AppDbContext> DbFactory
+
 @inject ISearchAnalystnoteService searchnoteService
 @inject IAnalystsService analystService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
 
-
-
-@using System.Reflection;
-@using System;
 
 @page "/analystnotes/add/{fileid:int?}"
 
@@ -62,19 +58,12 @@
     bool showpanel = true;
     bool shownotes = true;
 
-    protected async Task SaveAnalystnotesData()
-    {
-        analystnote.Moduser = userReg;
-        analystnote.Createdate = DateTime.Now;
-        analystnote.Moddate = DateTime.Now;
-        analystnote = await AnalystnoteService.CreateAnalystnote(analystnote);
-    }
 
     protected async override Task OnInitializedAsync()
     {
-        var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        // var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
+        // userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
     }
 
     protected override async Task OnParametersSetAsync()
@@ -86,21 +75,6 @@
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
         analysts = (await analystService.GetAnalystsList()).ToList();
     }
-
-
-    // protected override void OnAfterRender(bool firstRender)
-    // {
-    //     base.OnAfterRender(firstRender);
-    //     if (firstRender)
-    //     {
-    //         setTestdata = false;
-    //         JSRuntime.InvokeVoidAsync("showTopmenu");
-    //         JSRuntime.InvokeVoidAsync("changetab", "file-tab");
-
-
-    //     }
-
-    // }
 
     protected async override void OnAfterRender(bool firstRender)
     {
@@ -136,67 +110,6 @@
         searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
     }
 
-
-    private XElement getActivityLog(string type)
-    {
-
-
-        if (oanalystnote != null)
-        {
-            XElement el = new XElement("root");
-            XElement act = new XElement("Activities");
-
-            if (type == "update")
-            {
-
-
-                if (oanalystnote.Notes != analystnote.Notes)
-                {
-                    act.Add(new XElement("Activity"), "Update Notes");
-                    act.Add(new XElement("old"), oanalystnote.Notes);
-                    act.Add(new XElement("new"), oanalystnote.Notes);
-                }
-
-                if (oanalystnote.Timetaken != analystnote.Timetaken)
-                {
-                    act.Add(new XElement("Activity"), "Update Timetaken");
-                    act.Add(new XElement("old"), oanalystnote.Timetaken);
-                    act.Add(new XElement("new"), oanalystnote.Timetaken);
-                }
-
-                if (oanalystnote.Analystid != analystnote.Analystid)
-                {
-                    act.Add(new XElement("Activity"), "Update Analystid");
-                    act.Add(new XElement("old"), oanalystnote.Analystid);
-                    act.Add(new XElement("new"), oanalystnote.Analystid);
-                }
-            }
-            else if (type == "delete")
-            {
-                act.Add(new XElement("Activity"), "Delete Notes");
-                act.Add(new XElement("Id"), oanalystnote.Id);
-                act.Add(new XElement("Analystid"), oanalystnote.Analystid);
-                act.Add(new XElement("Enterdate"), oanalystnote.Enterdate);
-                act.Add(new XElement("Timetaken"), oanalystnote.Timetaken);
-                act.Add(new XElement("Status"), oanalystnote.Status);
-                act.Add(new XElement("Createdate"), oanalystnote.Createdate);
-                act.Add(new XElement("Createuser"), oanalystnote.Createuser);
-                act.Add(new XElement("Supervisorapproved"), oanalystnote.Supervisorapproved);
-                act.Add(new XElement("Supervisornotes"), oanalystnote.Supervisornotes);
-                act.Add(new XElement("Moddate"), oanalystnote.Moddate);
-                act.Add(new XElement("Moduser"), oanalystnote.Moduser);
-            }
-
-            el.Add(act);
-            return el;
-
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     private async void AuditData(string act, string type)
     {
         auditlog.AccessDate = DateTime.Now;
@@ -205,15 +118,11 @@
         auditlog.UserName = userReg;
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
-        if (type == "update")
+        auditlog.ActivityXml = auditlogService.GetAuditxml(oanalystnote, analystnote, act).ToString();
+
+        if (type == "update" || type == "delete")
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(oanalystnote, analystnote, "Update Notes").ToString();
-            //auditlog.ActivityXml = GetAuditxml(oanalystnote,analystnote);
-            //getActivityLog(type).ToString();
-        }
-        else if (type == "delete")
-        {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(oanalystnote, analystnote, "Delete Notes").ToString();
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oanalystnote, analystnote, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
@@ -283,13 +192,6 @@
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
     {
-        Type modeltype = typeof(Analystnote);
-        PropertyInfo[] properties = modeltype.GetProperties();
-        foreach (PropertyInfo property in properties)
-        {
-            Console.WriteLine("{0} = {1}", property.Name, property.GetValue(oanalystnote, null));
-
-        }
         var confirmation = await dialog.ShowAsync(
             title: "Are you sure you want to delete this?",
             message1: "This will delete the record. Once deleted can not be rolled back.",
@@ -330,8 +232,6 @@
 }
 
 <h5>Notes:</h5>
-
-<div> File Number : @FileNumber</div>
 
 <EditForm Model="@analystnote" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />

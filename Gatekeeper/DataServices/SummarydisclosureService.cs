@@ -15,11 +15,12 @@ namespace Gatekeeper.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Summarydisclosure>> GetSummarydisclosureList()
+        public async Task<IEnumerable<Summarydisclosure>> GetSummarydisclosureList(int fileid)
         {
-            return await _context.Summarydisclosures
-                    .ToListAsync();
+              return await _context.Summarydisclosures.Where(x => x.Requestid == fileid)
+                 .ToListAsync();
         }
+    
     
         public async Task<Summarydisclosure> GetSummarydisclosureById(int id)
         {

@@ -42,6 +42,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb3VudGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Disclosures/DiscloseditemAdd.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEaXNjbG9zdXJlc1xEaXNjbG9zZWRpdGVtQWRkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Disclosures/DisclosureAdd.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEaXNjbG9zdXJlc1xEaXNjbG9zdXJlQWRkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Error.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

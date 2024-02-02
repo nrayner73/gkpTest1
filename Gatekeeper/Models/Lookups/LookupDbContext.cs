@@ -25,6 +25,8 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<SearchAnalystNotes> AnalystNoteInfos { get; set; }
 
+        public virtual DbSet<DisclosedViewitem> DisclosedViewitems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -34,6 +34,9 @@ builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<IRequestfileService, RequestfileService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped <IAnalystnoteService, AnalystnoteService>();
+builder.Services.AddScoped<ISummarydisclosureService, SummarydisclosureService>();
+builder.Services.AddScoped <IDiscloseditemsService,DiscloseditemsService>();
+
 
 //Lookup
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
@@ -44,6 +47,7 @@ builder.Services.AddScoped<IAnalystsService, AnalystsService>();
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
 builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
+builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
 
 //Audit
 builder.Services.AddScoped<IAuditlogService, AuditlogService>();
@@ -53,6 +57,7 @@ builder.Services.AddScoped<IAuditlogService, AuditlogService>();
 builder.Services.AddScoped<IPersonnameService,PersonnameService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<ILkSectionsService, LkSectionsService>();
 
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
     .AddNegotiate();

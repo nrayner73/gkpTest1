@@ -77,6 +77,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Requestpayment> Requestpayments { get; set; }
 
+    public virtual DbSet<Sectionuseditem> Sectionuseditems { get; set; }
+
     public virtual DbSet<Summarydisclosure> Summarydisclosures { get; set; }
 
     public virtual DbSet<Videonote> Videonotes { get; set; }
@@ -1180,6 +1182,36 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("paytype");
             entity.Property(e => e.Requestid).HasColumnName("requestid");
+            entity.Property(e => e.Status)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("status");
+        });
+
+        modelBuilder.Entity<Sectionuseditem>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__sectionu__3213E83F86F89815");
+
+            entity.ToTable("sectionuseditems", "gkp");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Createdate)
+                .HasColumnType("datetime")
+                .HasColumnName("createdate");
+            entity.Property(e => e.Createuser)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("createuser");
+            entity.Property(e => e.Othertext)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("othertext");
+            entity.Property(e => e.Requestid).HasColumnName("requestid");
+            entity.Property(e => e.Sectionid).HasColumnName("sectionid");
+            entity.Property(e => e.Sectiontype)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("sectiontype");
             entity.Property(e => e.Status)
                 .HasMaxLength(5)
                 .IsUnicode(false)

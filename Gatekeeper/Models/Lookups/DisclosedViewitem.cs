@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Gatekeeper.Models
+namespace Gatekeeper.Models.Lookups
 {
-
-    public partial class Discloseditem
+    [Keyless]
+    public class DisclosedViewitem
     {
+
         public int Id { get; set; }
 
         public int Requestid { get; set; }
 
         public int Sectionid { get; set; }
+
+        public string? Section { get; set; }
 
         public string? Sectiontype { get; set; }
 

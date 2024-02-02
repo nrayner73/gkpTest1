@@ -143,12 +143,6 @@ D:\CSI Projects\Gatekeeper\obj\Debug\net8.0\refint\Gatekeeper.dll
 D:\CSI Projects\Gatekeeper\obj\Debug\net8.0\Gatekeeper.pdb
 D:\CSI Projects\Gatekeeper\obj\Debug\net8.0\Gatekeeper.genruntimeconfig.cache
 D:\CSI Projects\Gatekeeper\obj\Debug\net8.0\ref\Gatekeeper.dll
-D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.csproj.AssemblyReference.cache
-D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.GeneratedMSBuildEditorConfig.editorconfig
-D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.AssemblyInfoInputs.cache
-D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.AssemblyInfo.cs
-D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.csproj.CoreCompileInputs.cache
-D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.MvcApplicationPartsAssemblyInfo.cache
 D:\Projects\gatekeeper-2024\Gatekeeper\bin\Debug\net8.0\appsettings.Development.json
 D:\Projects\gatekeeper-2024\Gatekeeper\bin\Debug\net8.0\appsettings.json
 D:\Projects\gatekeeper-2024\Gatekeeper\bin\Debug\net8.0\Gatekeeper.staticwebassets.runtime.json
@@ -272,6 +266,12 @@ D:\Projects\gatekeeper-2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net6.0\
 D:\Projects\gatekeeper-2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 D:\Projects\gatekeeper-2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 D:\Projects\gatekeeper-2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.csproj.AssemblyReference.cache
+D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.AssemblyInfoInputs.cache
+D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.AssemblyInfo.cs
+D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.csproj.CoreCompileInputs.cache
+D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.MvcApplicationPartsAssemblyInfo.cache
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\staticwebassets.build.json
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\staticwebassets.development.json
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\staticwebassets\msbuild.Gatekeeper.Microsoft.AspNetCore.StaticWebAssets.props

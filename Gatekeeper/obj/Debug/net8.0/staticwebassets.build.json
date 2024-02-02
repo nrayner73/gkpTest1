@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "5zXCdaoL+77PyWBSUUFP6A9lNGTAn8jAh/ibpftDxM8=",
+  "Hash": "nfQxF3RWUwTDYNj0v4lSfZw52dQ9RxWgwOd+Wfv4IVE=",
   "Source": "Gatekeeper",
   "BasePath": "_content/Gatekeeper",
   "Mode": "Default",
@@ -340,6 +340,25 @@
       "OriginalItemSpec": "wwwroot\\favicon.png"
     },
     {
+      "Identity": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\plus-lg.svg",
+      "SourceId": "Gatekeeper",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\",
+      "BasePath": "_content/Gatekeeper",
+      "RelativePath": "plus-lg.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\plus-lg.svg"
+    },
+    {
       "Identity": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\tabs.js",
       "SourceId": "Gatekeeper",
       "SourceType": "Discovered",
@@ -357,6 +376,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\tabs.js"
+    },
+    {
+      "Identity": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\x.svg",
+      "SourceId": "Gatekeeper",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\",
+      "BasePath": "_content/Gatekeeper",
+      "RelativePath": "x.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\x.svg"
     }
   ]
 }

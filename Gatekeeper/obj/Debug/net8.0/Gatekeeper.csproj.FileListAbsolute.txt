@@ -284,6 +284,7 @@ D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Lay
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pages\AccessRequests\AccessRequestSearch.razor.rz.scp.css
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pages\AnalystNotes\AnalystNoteAdd.razor.rz.scp.css
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pages\MyTasks\MytaskSearch.razor.rz.scp.css
+D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pages\VideoNotes\VideoNoteAdd.razor.rz.scp.css
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\bundle\Gatekeeper.styles.css
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\projectbundle\Gatekeeper.bundle.scp.css
 D:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.csproj.CopyComplete

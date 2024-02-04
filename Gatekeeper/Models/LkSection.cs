@@ -16,4 +16,6 @@ public partial class LkSection
     public string? Createuser { get; set; }
 
     public string? Status { get; set; }
+
+    public int? Sortby { get; set; }
 }

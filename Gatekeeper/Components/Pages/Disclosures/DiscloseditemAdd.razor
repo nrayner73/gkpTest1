@@ -33,51 +33,71 @@
 
     bool showOthertext = false;
     #endregion
+
+    #region "Component Lifecycle"
+    protected override async Task OnParametersSetAsync()
+    {
+        // if (View_discloseditems.Count > 0)
+        // {
+        disclosuredlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "disclose").ToList();
+        sectionusedlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "redac").ToList();
+        StateHasChanged();
+        // }
+        ClearData();
+
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
 
         if (firstRender)
         {
-
-            if (View_discloseditems != null)
-            {
-                disclosuredlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "disclose").ToList();
-                sectionusedlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "redac").ToList();
-            }
-
-            ClearData();
             firstRender = false;
         }
     }
 
+    #endregion
+
+    #region "Methods"
     private void ClearData()
     {
 
+        discloseditem.Sectionid = -1;
+        sectionuseditem.Sectionid = -1;
+
         // Lkdisclosured = new List<LkSection>();
         // Lksectionused = new List<LkSection>();
+        if (sectionlist.Count > 0)
+        {
+            Lkdisclosured = sectionlist.Where(x => x.Sectiontype.ToLower() == "disclose").OrderBy(x=>x.Sortby).ToList() ;
+            Lksectionused = sectionlist.Where(x => x.Sectiontype.ToLower() == "redac").OrderBy(x => x.Sortby).ToList();
 
-        Lkdisclosured = sectionlist.Where(x => x.Sectiontype.ToLower() == "disclose").ToList();
-        Lksectionused = sectionlist.Where(x => x.Sectiontype.ToLower() == "redac").ToList();
+        }
 
         //remove disclosureAuth item from combobox so user can't add item twice
-        foreach (var item in disclosuredlist)
+        if (disclosuredlist.Count > 0)
         {
-            lksection = new LkSection();
-            lksection = sectionlist.Where(x => x.Id == item.Sectionid).FirstOrDefault();
+            foreach (var item in disclosuredlist)
+            {
+                lksection = new LkSection();
+                lksection = sectionlist.Where(x => x.Id == item.Sectionid).FirstOrDefault();
 
-            Lkdisclosured.Remove(lksection);
+                Lkdisclosured.Remove(lksection);
+            }
+            StateHasChanged();
         }
 
-        foreach (var item in sectionusedlist)
+        if (sectionusedlist.Count > 0)
         {
-            lksection = new LkSection();
-            lksection = sectionlist.Where(x => x.Id == item.Sectionid).FirstOrDefault();
-            Lksectionused.Remove(lksection);
+            foreach (var item in sectionusedlist)
+            {
+                lksection = new LkSection();
+                lksection = sectionlist.Where(x => x.Id == item.Sectionid).FirstOrDefault();
+                Lksectionused.Remove(lksection);
+            }
+            StateHasChanged();
         }
-        StateHasChanged();
-
-
     }
 
     private async Task disclosuredAuthAdd()
@@ -217,6 +237,7 @@
         return showOthertext;
 
     }
+#endregion
 }
 
 <div class="container-fluid">
@@ -235,10 +256,10 @@
                     {
                         <option value="@lktype.Id">@lktype.Section</option>
                     }
-                </InputSelect> 
+                </InputSelect>
                 <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="disclosuredAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
-               
-             
+
+
             </EditForm>
         </div>
         <div class="col-lg-1 col-md-2 col-sm-12"> <h5> &nbsp;</h5> </div>
@@ -251,14 +272,14 @@
                         <option value="@lktype.Id">@lktype.Section</option>
                     }
                 </InputSelect>
-                
+
                 <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="sectionusedAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
                 &nbsp;
                 @if (showOthertext)
                 {
                     <InputText id="othertext" @bind-Value="sectionuseditem.Othertext" />
                 }
-                
+
             </EditForm>
         </div>
     </div>
@@ -273,16 +294,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in disclosuredlist)
+                    @if (disclosuredlist != null && disclosuredlist.Count > 0)
                     {
-                        @if (item != null)
+                        @foreach (var item in disclosuredlist)
                         {
-                            <tr>
-                                <td>@item.Section</td>
-                                <td> <Button @onclick="()=>disclosuredAuthDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
-                            </tr>
-
+                            @if (item != null)
+                            {
+                                <tr>
+                                    <td>@item.Section</td>
+                                    <td> <Button @onclick="()=>disclosuredAuthDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
+                                </tr>
+                            }
                         }
+                    }
+                    else
+                    {
+
+                        <tr>
+                            <td>  </td>
+                            <td>  </td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -298,16 +329,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in sectionusedlist.ToList())
+                    @if (sectionusedlist != null && sectionusedlist.Count > 0)
                     {
-                        @if (item != null)
+                        @foreach (var item in sectionusedlist.ToList())
                         {
-                            <tr>
-                                <td>@item.Section</td>
-                                <td>@item.Othertext</td>
-                                <td> <Button @onclick="()=>sectionusedDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
-                            </tr>
+                            @if (item != null)
+                            {
+                                <tr>
+                                    <td>@item.Section</td>
+                                    <td>@item.Othertext</td>
+                                    <td> <Button @onclick="()=>sectionusedDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
+                                </tr>
+                            }
                         }
+
+                    }
+                    else
+                    {
+
+                        <tr>
+                            <td>  </td>
+                            <td>  </td>
+                        </tr>
                     }
                 </tbody>
             </table>

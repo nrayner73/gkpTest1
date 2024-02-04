@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
-@inject Blazored.SessionStorage.ISessionStorageService session
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @using Gatekeeper.Models.MenuInfo
 
 <div class="top-row ps-3 navbar navbar-dark" style="height:auto;margin-left:50px">
@@ -62,14 +62,37 @@
         selmenu = new SelectedmenuInfo();
         selmenu.Name = "Access Request";
 
-        await session.SetItemAsync("SessionSelectedMenu", selmenu);
+        await sessionStorage.SetItemAsync("SessionSelectedMenu", selmenu);
         await JSRuntime.InvokeVoidAsync("showTopmenu");
     }
 
     public async void HideMenu()
     {
-        await session.ClearAsync();
+        await sessionStorage.ClearAsync();
         await JSRuntime.InvokeVoidAsync("hideTopmenu");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string x = "test";
+     
+
+        //ClearData();
+    }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            // await sessionStorage.SetItemAsync("RQID", fileid);
+           //await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
+            //var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+
+
+            firstRender = false;
+        }
 
 
     }

@@ -17,6 +17,7 @@
 @inject IDiscloseditemsService discloseditemsService
 @inject IDisclosureViewService disclosedViewService
 @inject ILkSectionsService lksectionService
+@inject NavigationManager navigationManager
 
 @page "/disclosure/add/{fileid:int?}"
 
@@ -69,17 +70,12 @@
     private string otherTextData = string.Empty;
     #endregion
 
+    #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        var user = authstate.User;
-        var name = user.Identity.Name;
-
-        // LoadData();
-
-        // summarydisclosure = (await SummarydisclosureService.GetSummarydisclosureList(fileid)).FirstOrDefault();
-        // osummarydisclosure = summarydisclosure;
-
+        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        // var user = authstate.User;
+        // var name = user.Identity.Name;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -87,9 +83,7 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        sectionlist = (await lksectionService.GetLkSectionsList()).ToList();
 
-        //ClearData();
     }
 
     protected async override void OnAfterRender(bool firstRender)
@@ -111,20 +105,8 @@
                 //discloseditemsService.GetDiscloseditemsList();
                 sectionlist = (await lksectionService.GetLkSectionsList()).ToList();
 
-
-
-                osummarydisclosures = (await SummarydisclosureService.GetSummarydisclosureList(fileid)).ToList();
-                osummarydisclosure = summarydisclosures.FirstOrDefault();
-
-                // //get disclosure authorities items and section used items
-                // disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
-
                 discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
                 odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-
-                // summarydisclosure.Fileclosedate = DateTime.Today;
-                // summarydisclosure.Requestid = fileid;
-
 
                 LoadData();
             }
@@ -133,6 +115,7 @@
             firstRender = false;
         }
     }
+    #endregion
 
     #region "Methods"
 
@@ -169,21 +152,21 @@
         //get summary disclosure data
         summarydisclosures = (await SummarydisclosureService.GetSummarydisclosureList(fileid)).ToList();
 
-        summarydisclosure = new Summarydisclosure();
-        summarydisclosure = summarydisclosures.FirstOrDefault();
-        //osummarydisclosure = summarydisclosures.FirstOrDefault();
-
-        //osummarydisclosure = (await SummarydisclosureService.GetSummarydisclosureList(fileid)).FirstOrDefault();
-
-        if (fileid != null && fileid > 0)
+        if (summarydisclosures.Count > 0)
         {
-            disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
-            //get disclosure authorities data
-            discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+            summarydisclosure = new Summarydisclosure();
+            summarydisclosure = summarydisclosures.FirstOrDefault();
 
+            if (fileid != null && fileid > 0)
+            {
+                disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
+                //get disclosure authorities data
+                discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+
+            }
+
+              StateHasChanged();
         }
-
-        StateHasChanged();
     }
 
     protected void HandleInvalidSubmit()
@@ -194,9 +177,12 @@
 
     protected async Task HandleValidSubmit()
     {
+
+        osummarydisclosures = (await disclosedViewService.GetDisclosureSummary(fileid)).ToList();
+        osummarydisclosure = osummarydisclosures.FirstOrDefault();
+
         Saved = false;
-        // osummarydisclosures = (await SummarydisclosureService.GetSummarydisclosureList(fileid)).ToList();
-        // osummarydisclosure = summarydisclosures.FirstOrDefault();
+
 
         //check list data testing
         summarydisclosure.Moddate = DateTime.Now;
@@ -226,7 +212,7 @@
         //remove disclosure items that user deleted from the list
         foreach (var item in odiscloseditemsData)
         {
-            discloseditem = discloseditemsData.Where(x => x.Id == item.Id).FirstOrDefault();
+            discloseditem = discloseditemsData.Where(x => x.Sectionid == item.Sectionid && x.Requestid == item.Requestid).FirstOrDefault();
 
             if (discloseditem == null)
             {
@@ -238,14 +224,13 @@
         foreach (var item in discloseditemsData)
         {
             discloseditem = new Discloseditem();
-            discloseditem = await DiscloseditemService.GetDiscloseditemsById(item.Sectionid);
+            discloseditem = await DiscloseditemService.GetDiscloseditemsBySectionId(item.Sectionid, item.Requestid);
 
-            //if skip section item that already exist in the table
+            //skip any section item that already exists in the table
             if (discloseditem == null)
             {
                 await DiscloseditemService.CreateDiscloseditems(item);
             }
-
         }
 
         StatusClass = "alert-success";
@@ -257,9 +242,12 @@
         alertMessageShow = false;
         Saved = true;
 
+
+        navigationManager.NavigateTo($"/disclosure/add/{fileid}", true);
+
         // LoadData();
         //  summarydisclosure = new Summarydisclosure();
-        StateHasChanged();
+        //  StateHasChanged();
     }
 
     private async Task AuditData(string act, string type)
@@ -272,6 +260,7 @@
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
         // auditlog.ActivityXml = auditlogService.GetAuditxml(osummarydisclosure, summarydisclosure, act).ToString();
+
 
         if (type == "update" || type == "delete")
         {
@@ -288,7 +277,6 @@
     #endregion
 
 }
-
 
 
 <EditForm Model="@summarydisclosure" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">

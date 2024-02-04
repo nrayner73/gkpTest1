@@ -34,6 +34,7 @@ builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<IRequestfileService, RequestfileService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped <IAnalystnoteService, AnalystnoteService>();
+builder.Services.AddScoped<IVideonoteService, VideonoteService>();
 builder.Services.AddScoped<ISummarydisclosureService, SummarydisclosureService>();
 builder.Services.AddScoped <IDiscloseditemsService,DiscloseditemsService>();
 
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IAnalystsService, AnalystsService>();
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
 builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
+builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
 builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
 
 //Audit

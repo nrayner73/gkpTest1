@@ -26,5 +26,17 @@ namespace Gatekeeper.DataServices.Lookups
 
             return items;
         }
+
+        public async Task<IEnumerable<Summarydisclosure>> GetDisclosureSummary(int fileid)
+        {
+            SqlParameter parms = new SqlParameter { ParameterName = "@fileid", Value = fileid == 0 ? (object)DBNull.Value : fileid };
+            IEnumerable<Summarydisclosure> items = new List<Summarydisclosure>();
+
+            items = _context?.Summarydisclosures.FromSqlRaw("Execute [gkp].[GetDisclosureSummary] @fileid", parms).ToList();
+
+            return items;
+            
+
+        }
     }
 }

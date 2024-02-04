@@ -89,3 +89,7 @@ build_metadata.AdditionalFiles.CssScope = b-l5pgvhum4i
 [D:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/MyTasks/MytaskSearch.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNeVRhc2tzXE15dGFza1NlYXJjaC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-cnhds8r9c9
+
+[D:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/VideoNotes/VideoNoteAdd.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xWaWRlb05vdGVzXFZpZGVvTm90ZUFkZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-60pe458clh

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
+using Gatekeeper.Models.Lookups;
+using Microsoft.Data.SqlClient;
 
 namespace Gatekeeper.Services
 {
@@ -17,8 +19,8 @@ namespace Gatekeeper.Services
 
         public async Task<IEnumerable<Summarydisclosure>> GetSummarydisclosureList(int fileid)
         {
-              return await _context.Summarydisclosures.Where(x => x.Requestid == fileid)
-                 .ToListAsync();
+            return await _context.Summarydisclosures.Where(x => x.Requestid == fileid)
+               .ToListAsync();
         }
     
     

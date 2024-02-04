@@ -79,10 +79,12 @@ namespace Gatekeeper.DataServices.Audit
                                 //act.Add(new XElement("property"),prop1.Name);
                                 act.Add(new XElement("old"), prop1.GetValue(oldObj));
                                 act.Add(new XElement("new"), prop2.GetValue(newObj));
+                                el.Add(act);
+                                break;
                             }
-                            el.Add(act);
+                            
 
-                            break;
+                            
                         }
 
                     }

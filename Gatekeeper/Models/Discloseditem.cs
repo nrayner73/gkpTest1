@@ -22,5 +22,7 @@ namespace Gatekeeper.Models
         public string? Createuser { get; set; }
 
         public string? Status { get; set; }
+
+       
     }
 }

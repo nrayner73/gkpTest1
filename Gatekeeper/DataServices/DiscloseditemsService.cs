@@ -23,11 +23,17 @@ namespace Gatekeeper.Services
             return await _context.Discloseditems.Where(x => x.Requestid == fileid)
                     .ToListAsync();
         }
-    
+
+        public async Task<Discloseditem> GetDiscloseditemsBySectionId(int sectionid,int fileid)
+        {
+            return await _context.Discloseditems
+                .FirstOrDefaultAsync(x => x.Sectionid == sectionid && x.Requestid == fileid);
+        }
+
         public async Task<Discloseditem> GetDiscloseditemsById(int id)
         {
             return await _context.Discloseditems
-                .FirstOrDefaultAsync(x => x.Sectionid == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Discloseditem> CreateDiscloseditems(Discloseditem discloseditems)

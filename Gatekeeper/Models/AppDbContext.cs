@@ -235,6 +235,7 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(5)
                 .IsUnicode(false)
                 .HasColumnName("status");
+           
         });
 
         modelBuilder.Entity<Extension>(entity =>
@@ -677,6 +678,7 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(5)
                 .IsUnicode(false)
                 .HasColumnName("status");
+            entity.Property(e => e.Sortby).HasColumnName("sortby");
         });
 
         modelBuilder.Entity<Locationitem>(entity =>
@@ -1292,10 +1294,7 @@ public partial class AppDbContext : DbContext
             entity.ToTable("videonotes", "gkp");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Analyst)
-                .HasMaxLength(150)
-                .IsUnicode(false)
-                .HasColumnName("analyst");
+            entity.Property(e => e.Analystid).HasColumnName("analystid");
             entity.Property(e => e.Createdate)
                 .HasColumnType("datetime")
                 .HasColumnName("createdate");

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Gatekeeper.Models;
 
-public partial class LkStreettype
+public partial class LkPaymenttype
 {
     public int Id { get; set; }
 
@@ -14,4 +14,6 @@ public partial class LkStreettype
     public string? Createuser { get; set; }
 
     public string? Status { get; set; }
+
+    public int? Sortby { get; set; }
 }

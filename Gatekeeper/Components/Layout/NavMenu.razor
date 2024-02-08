@@ -27,27 +27,13 @@
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Request
             </NavLink>
         </div>
-
-           <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="ShowMenu" href="/accessrequests/add">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Admins
-            </NavLink>
-        </div>
-
         <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="#">
+            <NavLink class="nav-link" @onclick="HideMenu" href="/analyst/add">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Analysts
             </NavLink>
         </div>
-
         <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="#">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Choices Data
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="#">
+            <NavLink class="nav-link" @onclick="HideMenu" href="/holiday/add">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Holidays
             </NavLink>
         </div>
@@ -74,7 +60,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        string x = "test";
+        
      
 
         //ClearData();

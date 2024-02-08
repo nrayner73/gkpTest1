@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
-using Gatekeeper.Interfaces.Lookups;
+using Microsoft.Data.SqlClient;
+using Gatekeeper.Interfaces;
 
-namespace Gatekeeper.DataServices.Lookups
+namespace Gatekeeper.DataServices
 {
     public class HolidayService : IHolidayService
     {
@@ -15,10 +16,22 @@ namespace Gatekeeper.DataServices.Lookups
             _context = context;
         }
 
-        public async Task<IEnumerable<Holiday>> GetHolidayList()
+        public async Task<IEnumerable<Holiday>> GetHolidayList(int year)
         {
-            return await _context.Holidays
-                    .ToListAsync();
+            List<Holiday> items = new List<Holiday>();
+            if (year > 0 )
+            {
+                items = await _context.Holidays
+                        .ToListAsync();
+            }
+            else
+            {
+                items = await _context.Holidays.Where(x => ((DateTime)x.Holidaydate).Year == year)
+                       .ToListAsync();
+
+            }
+
+            return items;
         }
 
         public async Task<Holiday> GetHolidayById(int id)
@@ -27,6 +40,18 @@ namespace Gatekeeper.DataServices.Lookups
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<IEnumerable<Holiday>> CopyLastYearHoliday(string regno)
+        {
+
+            SqlParameter parms = new SqlParameter { ParameterName = "@regno", Value = regno == "" ? DBNull.Value : regno };
+            List<Holiday> items = new List<Holiday>();
+            //GetDisclosureitems
+
+            items = _context?.Holidays.FromSqlRaw("Execute [gkp].[CreateHolidayFromLastYear] @regno", parms).ToList();
+
+            return items;
+
+        }
         public async Task<Holiday> CreateHoliday(Holiday holiday)
         {
             _context.Holidays.Add(holiday);

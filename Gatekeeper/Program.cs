@@ -11,6 +11,7 @@ using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Gatekeeper.Interfaces.Audit;
 using Gatekeeper.DataServices.Audit;
+using Gatekeeper.DataServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,19 +38,25 @@ builder.Services.AddScoped <IAnalystnoteService, AnalystnoteService>();
 builder.Services.AddScoped<IVideonoteService, VideonoteService>();
 builder.Services.AddScoped<ISummarydisclosureService, SummarydisclosureService>();
 builder.Services.AddScoped <IDiscloseditemsService,DiscloseditemsService>();
-
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IRequestfeeService, RequestfeeService>();
+builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
+builder.Services.AddScoped<IHolidayService, HolidayService>();
 
 //Lookup
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
 builder.Services.AddScoped<ILkRecorddeliverymethodService, LkRecorddeliverymethodService>();
+builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
+builder.Services.AddScoped<ILkSectionsService, LkSectionsService>();
+builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
+
 builder.Services.AddScoped<IAnalystsService, AnalystsService>();
-builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
-builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
-builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
-builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
+
 builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
+builder.Services.AddScoped<ISearchRequestfeeService, SearchRequestfeeService>();
+builder.Services.AddScoped<ISearchExtensionService, SearchExtensionService>();
 
 //Audit
 builder.Services.AddScoped<IAuditlogService, AuditlogService>();
@@ -59,7 +66,13 @@ builder.Services.AddScoped<IAuditlogService, AuditlogService>();
 builder.Services.AddScoped<IPersonnameService,PersonnameService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
-builder.Services.AddScoped<ILkSectionsService, LkSectionsService>();
+builder.Services.AddScoped<IViewHolidayService,ViewHolidayService>();
+
+builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
+builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
+builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
+builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
+builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
 
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
     .AddNegotiate();

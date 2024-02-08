@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Gatekeeper.Models;
+namespace GateKeeper.Models;
 
 public partial class LkMytaskstatus
 {

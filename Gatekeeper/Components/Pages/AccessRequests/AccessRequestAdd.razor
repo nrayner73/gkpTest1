@@ -21,6 +21,7 @@
 
 
 @code {
+    #region "Parameters"
     bool otherreason = false;
     bool setTestdata = false;
     [Parameter]
@@ -48,8 +49,9 @@
     private string? SuccessMessage { get; set; }
     public List<Holiday>? holidays { get; set; } = new List<Holiday>();
 
+    #endregion
 
-
+    #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
         DisplayTab(1);
@@ -69,8 +71,6 @@
         holidays = await context.Holidays.ToListAsync();
         if (fileid > 0)
         {
-
-
             string pattern = "&%23160;";
             Regex defaultRegex = new Regex(pattern);
             MatchCollection matches;
@@ -128,7 +128,9 @@
             firstRender = false;
         }
     }
+    #endregion
 
+    #region "Methods"
     private void FillData()
     {
         setTestdata = true;
@@ -451,6 +453,7 @@
     }
     #endregion
 
+    #endregion
 }
 
 <h5>Access Request</h5>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
-
+using GateKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gatekeeper.Models;
@@ -17,6 +16,7 @@ public partial class AppDbContext : DbContext
     {
     }
 
+
     public virtual DbSet<Analyst> Analysts { get; set; }
 
     public virtual DbSet<Analystnote> Analystnotes { get; set; }
@@ -26,6 +26,8 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Discloseditem> Discloseditems { get; set; }
 
     public virtual DbSet<Extension> Extensions { get; set; }
+
+    public virtual DbSet<Requestfee> Requestfees { get; set; }
 
     public virtual DbSet<Holiday> Holidays { get; set; }
 
@@ -37,9 +39,9 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<LkMytaskstatus> LkMytaskstatuses { get; set; }
 
-    public virtual DbSet<LkNametype> LkNametypes { get; set; }
-
     public virtual DbSet<LkPage> LkPages { get; set; }
+
+    public virtual DbSet<LkPaymenttype> LkPaymenttypes { get; set; }
 
     public virtual DbSet<LkProcessingdeficiency> LkProcessingdeficiencies { get; set; }
 
@@ -61,27 +63,22 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Locationitem> Locationitems { get; set; }
 
-    public virtual DbSet<Mytask> Mytasks { get; set; }
-
     public virtual DbSet<Oipc> Oipcs { get; set; }
 
     public virtual DbSet<OipcItem> OipcItems { get; set; }
 
     public virtual DbSet<Pageitem> Pageitems { get; set; }
 
+    public virtual DbSet<Payment> Payments { get; set; }
+
     public virtual DbSet<Person> People { get; set; }
 
-    public virtual DbSet<Requestfee> Requestfees { get; set; }
-
     public virtual DbSet<Requestfile> Requestfiles { get; set; }
-
-    public virtual DbSet<Requestpayment> Requestpayments { get; set; }
-
-    public virtual DbSet<Sectionuseditem> Sectionuseditems { get; set; }
 
     public virtual DbSet<Summarydisclosure> Summarydisclosures { get; set; }
 
     public virtual DbSet<Videonote> Videonotes { get; set; }
+
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -179,7 +176,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<AuditLog>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__AuditLog__3214EC271696DFF0");
+            entity.HasKey(e => e.Id).HasName("PK__AuditLog__3214EC275E2C8827");
 
             entity.ToTable("AuditLog", "gkp");
 
@@ -235,7 +232,6 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(5)
                 .IsUnicode(false)
                 .HasColumnName("status");
-           
         });
 
         modelBuilder.Entity<Extension>(entity =>
@@ -257,6 +253,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("extensiondate");
             entity.Property(e => e.Extensionid).HasColumnName("extensionid");
+            entity.Property(e => e.Sectionid).HasColumnName("sectionid");
             entity.Property(e => e.Moddate)
                 .HasColumnType("datetime")
                 .HasColumnName("moddate");
@@ -265,10 +262,46 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("moduser");
             entity.Property(e => e.Requestid).HasColumnName("requestid");
-            entity.Property(e => e.Section)
-                .HasMaxLength(50)
+            entity.Property(e => e.Status)
+                .HasMaxLength(5)
                 .IsUnicode(false)
-                .HasColumnName("section");
+                .HasColumnName("status");
+        });
+
+        modelBuilder.Entity<Requestfee>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__fee__3213E83FAB103AD9");
+
+            entity.ToTable("fee", "gkp");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Createdate)
+                .HasColumnType("datetime")
+                .HasColumnName("createdate");
+            entity.Property(e => e.Createuser)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("createuser");
+            entity.Property(e => e.Description)
+                .HasMaxLength(1000)
+                .IsUnicode(false)
+                .HasColumnName("description");
+            entity.Property(e => e.Estimatedcost)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("estimatedcost");
+            entity.Property(e => e.Feewaived).HasColumnName("feewaived");
+            entity.Property(e => e.Finalcost)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("finalcost");
+            entity.Property(e => e.Moddate)
+                .HasColumnType("datetime")
+                .HasColumnName("moddate");
+            entity.Property(e => e.Moduser)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("moduser");
+            entity.Property(e => e.Requested).HasColumnName("requested");
+            entity.Property(e => e.Requestid).HasColumnName("requestid");
             entity.Property(e => e.Status)
                 .HasMaxLength(5)
                 .IsUnicode(false)
@@ -405,29 +438,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("status");
         });
 
-        modelBuilder.Entity<LkNametype>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__lk_namet__3213E83F2F03F15E");
 
-            entity.ToTable("lk_nametype", "gkp");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Createdate)
-                .HasColumnType("datetime")
-                .HasColumnName("createdate");
-            entity.Property(e => e.Createuser)
-                .HasMaxLength(45)
-                .IsUnicode(false)
-                .HasColumnName("createuser");
-            entity.Property(e => e.Detail)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("detail");
-            entity.Property(e => e.Status)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .HasColumnName("status");
-        });
 
         modelBuilder.Entity<LkPage>(entity =>
         {
@@ -447,6 +458,31 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("detail");
+            entity.Property(e => e.Status)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("status");
+        });
+
+        modelBuilder.Entity<LkPaymenttype>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__lk_payme__3213E83F16B5CFFF");
+
+            entity.ToTable("lk_paymenttype", "gkp");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Createdate)
+                .HasColumnType("datetime")
+                .HasColumnName("createdate");
+            entity.Property(e => e.Createuser)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("createuser");
+            entity.Property(e => e.Detail)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("detail");
+            entity.Property(e => e.Sortby).HasColumnName("sortby");
             entity.Property(e => e.Status)
                 .HasMaxLength(5)
                 .IsUnicode(false)
@@ -654,7 +690,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<LkSection>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__lk_secti__3213E83FD90F3B71");
+            entity.HasKey(e => e.Id).HasName("PK__lk_secti__3213E83F603F4AB9");
 
             entity.ToTable("lk_sections", "gkp");
 
@@ -674,11 +710,11 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("sectiontype");
+            entity.Property(e => e.Sortby).HasColumnName("sortby");
             entity.Property(e => e.Status)
                 .HasMaxLength(5)
                 .IsUnicode(false)
                 .HasColumnName("status");
-            entity.Property(e => e.Sortby).HasColumnName("sortby");
         });
 
         modelBuilder.Entity<Locationitem>(entity =>
@@ -705,65 +741,6 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(5)
                 .IsUnicode(false)
                 .HasColumnName("status");
-        });
-
-        modelBuilder.Entity<Mytask>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__mytasks__3213E83F670898E0");
-
-            entity.ToTable("mytasks", "gkp");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Approveby)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("approveby");
-            entity.Property(e => e.Approvedate)
-                .HasColumnType("datetime")
-                .HasColumnName("approvedate");
-            entity.Property(e => e.Assignby)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("assignby");
-            entity.Property(e => e.Assigndate)
-                .HasColumnType("datetime")
-                .HasColumnName("assigndate");
-            entity.Property(e => e.Closedate)
-                .HasColumnType("datetime")
-                .HasColumnName("closedate");
-            entity.Property(e => e.Createtime)
-                .HasColumnType("datetime")
-                .HasColumnName("createtime");
-            entity.Property(e => e.Createuser)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("createuser");
-            entity.Property(e => e.Fileid).HasColumnName("fileid");
-            entity.Property(e => e.Moddate)
-                .HasColumnType("datetime")
-                .HasColumnName("moddate");
-            entity.Property(e => e.Moduser)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("moduser");
-            entity.Property(e => e.Mytaskstatus)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("mytaskstatus");
-            entity.Property(e => e.Notes)
-                .HasMaxLength(2000)
-                .IsUnicode(false)
-                .HasColumnName("notes");
-            entity.Property(e => e.Remarks)
-                .HasMaxLength(1000)
-                .IsUnicode(false)
-                .HasColumnName("remarks");
-            entity.Property(e => e.Status)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .HasColumnName("status");
-            entity.Property(e => e.Taskid).HasColumnName("taskid");
-            entity.Property(e => e.Taskstatusid).HasColumnName("taskstatusid");
         });
 
         modelBuilder.Entity<Oipc>(entity =>
@@ -924,6 +901,49 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("status");
         });
 
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__payment__3213E83FBDED3C0B");
+
+            entity.ToTable("payment", "gkp");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Authorization)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("authorization");
+            entity.Property(e => e.Createdate)
+                .HasColumnType("datetime")
+                .HasColumnName("createdate");
+            entity.Property(e => e.Createuser)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("createuser");
+            entity.Property(e => e.Description)
+                .HasMaxLength(1000)
+                .IsUnicode(false)
+                .HasColumnName("description");
+            entity.Property(e => e.Moddate)
+                .HasColumnType("datetime")
+                .HasColumnName("moddate");
+            entity.Property(e => e.Moduser)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("moduser");
+            entity.Property(e => e.Payamount)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("payamount");
+            entity.Property(e => e.Paymentdate)
+                .HasColumnType("datetime")
+                .HasColumnName("paymentdate");
+            entity.Property(e => e.Paytypeid).HasColumnName("paytypeid");
+            entity.Property(e => e.Requestid).HasColumnName("requestid");
+            entity.Property(e => e.Status)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("status");
+        });
+
         modelBuilder.Entity<Person>(entity =>
         {
             entity.ToTable("person", "gkp");
@@ -1026,9 +1046,9 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Requestfee>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__requestf__3213E83FD6EF6FAC");
+            entity.HasKey(e => e.Id).HasName("PK__requestf__3213E83F8549B947");
 
-            entity.ToTable("requestfees", "gkp");
+            entity.ToTable("requestfee", "gkp");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Createdate)
@@ -1038,16 +1058,16 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(45)
                 .IsUnicode(false)
                 .HasColumnName("createuser");
-            entity.Property(e => e.Descp)
-                .HasMaxLength(250)
+            entity.Property(e => e.Description)
+                .HasMaxLength(1000)
                 .IsUnicode(false)
-                .HasColumnName("descp");
-            entity.Property(e => e.Feewaived)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .HasColumnName("feewaived");
+                .HasColumnName("description");
+            entity.Property(e => e.Estimatedcost)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("estimatedcost");
+            entity.Property(e => e.Feewaived).HasColumnName("feewaived");
             entity.Property(e => e.Finalcost)
-                .HasColumnType("decimal(5, 2)")
+                .HasColumnType("decimal(10, 2)")
                 .HasColumnName("finalcost");
             entity.Property(e => e.Moddate)
                 .HasColumnType("datetime")
@@ -1056,11 +1076,8 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(45)
                 .IsUnicode(false)
                 .HasColumnName("moduser");
+            entity.Property(e => e.Requested).HasColumnName("requested");
             entity.Property(e => e.Requestid).HasColumnName("requestid");
-            entity.Property(e => e.Requesting)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .HasColumnName("requesting");
             entity.Property(e => e.Status)
                 .HasMaxLength(5)
                 .IsUnicode(false)
@@ -1069,7 +1086,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Requestfile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__requestf__3213E83F79D2D2DF");
+            entity.HasKey(e => e.Id).HasName("PK__requestf__3213E83FA409D11E");
 
             entity.ToTable("requestfiles", "gkp");
 
@@ -1088,6 +1105,9 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("createuser");
+            entity.Property(e => e.Feepayment)
+                .IsUnicode(false)
+                .HasColumnName("feepayment");
             entity.Property(e => e.Filenumber)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -1143,81 +1163,6 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("timeframe");
             entity.Property(e => e.Yearid).HasColumnName("yearid");
-        });
-
-        modelBuilder.Entity<Requestpayment>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__requestp__3213E83F0B947A39");
-
-            entity.ToTable("requestpayments", "gkp");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Createdate)
-                .HasColumnType("datetime")
-                .HasColumnName("createdate");
-            entity.Property(e => e.Createuser)
-                .HasMaxLength(45)
-                .IsUnicode(false)
-                .HasColumnName("createuser");
-            entity.Property(e => e.Descp)
-                .HasMaxLength(250)
-                .IsUnicode(false)
-                .HasColumnName("descp");
-            entity.Property(e => e.Finalcost)
-                .HasColumnType("decimal(5, 2)")
-                .HasColumnName("finalcost");
-            entity.Property(e => e.Moddate)
-                .HasColumnType("datetime")
-                .HasColumnName("moddate");
-            entity.Property(e => e.Moduser)
-                .HasMaxLength(45)
-                .IsUnicode(false)
-                .HasColumnName("moduser");
-            entity.Property(e => e.Payamount)
-                .HasColumnType("decimal(5, 2)")
-                .HasColumnName("payamount");
-            entity.Property(e => e.Paydate)
-                .HasColumnType("datetime")
-                .HasColumnName("paydate");
-            entity.Property(e => e.Paytype)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("paytype");
-            entity.Property(e => e.Requestid).HasColumnName("requestid");
-            entity.Property(e => e.Status)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .HasColumnName("status");
-        });
-
-        modelBuilder.Entity<Sectionuseditem>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__sectionu__3213E83F86F89815");
-
-            entity.ToTable("sectionuseditems", "gkp");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Createdate)
-                .HasColumnType("datetime")
-                .HasColumnName("createdate");
-            entity.Property(e => e.Createuser)
-                .HasMaxLength(45)
-                .IsUnicode(false)
-                .HasColumnName("createuser");
-            entity.Property(e => e.Othertext)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("othertext");
-            entity.Property(e => e.Requestid).HasColumnName("requestid");
-            entity.Property(e => e.Sectionid).HasColumnName("sectionid");
-            entity.Property(e => e.Sectiontype)
-                .HasMaxLength(45)
-                .IsUnicode(false)
-                .HasColumnName("sectiontype");
-            entity.Property(e => e.Status)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .HasColumnName("status");
         });
 
         modelBuilder.Entity<Summarydisclosure>(entity =>
@@ -1289,7 +1234,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Videonote>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__videonot__3213E83F4658DEA1");
+            entity.HasKey(e => e.Id).HasName("PK__videonot__3213E83F278A7061");
 
             entity.ToTable("videonotes", "gkp");
 
@@ -1326,8 +1271,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("timetaken");
         });
 
-   
-
+       
         OnModelCreatingPartial(modelBuilder);
     }
 

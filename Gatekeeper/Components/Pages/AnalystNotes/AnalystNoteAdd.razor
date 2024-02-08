@@ -229,6 +229,30 @@
             // do something
         }
     }
+
+    private void ClearData()
+    {
+        analystnote = new Analystnote();    
+
+    }
+
+
+    private void FillData()
+    {
+       // analystnote.Id = 1;
+        analystnote.Requestid = fileid;
+        analystnote.Enterdate = DateTime.Now;
+        analystnote.Analystid = 1;
+        analystnote.Notes = "notes";
+        analystnote.Timetaken = "2.5";
+        analystnote.Status = 1;
+        analystnote.Supervisornotes = "supervisornotes";
+        analystnote.Supervisorapproved = 1;
+        analystnote.Moddate = DateTime.Now;
+        analystnote.Moduser = userReg;
+        analystnote.Createdate = DateTime.Now;
+        analystnote.Createuser = userReg;
+    }
     #endregion
 }
 
@@ -304,8 +328,8 @@
 
     <br />
 
-    <button type="button" class="btn btn-primary">Fill Data</button>
-    <button type="button" class="btn btn-primary">Add New</button>
+    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData">>Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm>
 

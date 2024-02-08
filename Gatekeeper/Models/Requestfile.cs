@@ -12,8 +12,6 @@ public partial class Requestfile
 
     public int? Yearid { get; set; }
 
-   
-
     public string? Filenumber { get; set; }
 
     [Required(ErrorMessage = "Request date is required")]
@@ -34,8 +32,7 @@ public partial class Requestfile
     public int? Recorddeliverymethodid { get; set; }
 
     public int? Processingdeficiency { get; set; }
-
-  
+      
     public int? Personid { get; set; }
 
     [Required(ErrorMessage = "Analyst is required")]
@@ -57,6 +54,8 @@ public partial class Requestfile
     public DateTime? Archivedate { get; set; }
 
     public string? Oipccomment { get; set; }
+
+    public string? Feepayment { get; set; }
 
     public string? Remarks { get; set; }
 

@@ -1,0 +1,359 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorBootstrap
+@using System.Reflection;
+@using System;
+
+
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@inject ILkPaymenttypeService paymentTypeService
+@inject ISearchPaymentService searchpaymentService
+@inject IAnalystsService analystService
+@inject IRequestfileService requestFileService
+@inject IAuditlogService auditlogService
+@inject NavigationManager navigationManager
+
+
+@code {
+    #region "Variables"
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    [Parameter]
+    public string savetype { get; set; } = string.Empty;
+    private string FileNumber = string.Empty;
+    private bool alertMessageShow = false;
+
+    [Parameter]
+    public int fileid { get; set; }
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    [Inject]
+    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+
+    [Inject]
+    private IPaymentService PaymentService { get; set; }
+    [Parameter]
+    public Payment payment { get; set; } = new Payment();
+    private Payment opayment { get; set; } = new Payment();
+    [Parameter]
+    public List<Payment> payments { get; set; } = new List<Payment>();
+
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    [Parameter]
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    [Parameter]
+    public List<LkPaymenttype>? paymenttype { get; set; } = new List<LkPaymenttype>();
+
+    //Data Grid -- Blazor QuickGrid
+    // private IQueryable<SearchPayment> searchpayments;
+
+    [Parameter]
+    public List<SearchPayment> searchpayments { get; set; } = new List<SearchPayment>();
+
+    #endregion
+
+
+    #region "Component Lifecycle"
+    protected async override Task OnInitializedAsync()
+    {
+        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        // var user = authstate.User;
+        // var name = user.Identity.Name;
+        //      payments = (await PaymentService.GetPaymentList()).ToList();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
+        // userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        // analysts = (await analystService.GetAnalystsList()).ToList();
+        // paymenttype = (await paymentTypeService.GetLkPaymenttypeList()).ToList();
+    }
+
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+
+            //     savetype = string.Empty;
+            var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+            if (RQID != "0" && RQID != null)
+            {
+                fileid = Int32.Parse(RQID);
+                //requestfile = await requestFileService.GetRequestfileById(fileid);
+                // FileNumber = requestfile.Filenumber.ToString();
+
+                LoadData();
+                payment.Requestid = fileid;
+                payment.Paymentdate = DateTime.Now;
+
+            }
+
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+    #endregion
+
+    #region "Methods"
+
+    private void LoadData()
+    {
+        // searchpayments = new List<SearchPayment>();
+        // searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
+       
+        
+    }
+
+
+    protected async Task HandleValidSubmit()
+    {
+        // Saved = false;
+
+        // payment.Moddate = DateTime.Now;
+        // payment.Moduser = userReg;
+
+        // if (savetype == "update")
+        // {
+        //     await PaymentService.UpdatePayment(payment);
+        //     await AuditData("Update Payment", "update");
+        // }
+        // else
+        // {
+        //     payment.Createdate = DateTime.Now;
+        //     payment.Createuser = userReg;
+        //     await PaymentService.CreatePayment(payment);
+        //     await AuditData("Create Payment", "create");
+
+        // }
+
+        // StatusClass = "alert-success";
+        // Message = "Data updated successfully";
+        // alertMessageShow = true;
+        // await InvokeAsync(() => StateHasChanged());
+        // await Task.Delay(1000);
+
+        // alertMessageShow = false;
+        // Saved = true;
+        // navigationManager.NavigateTo($"/payment/add/{fileid}", true);
+        // //LoadData();
+        // //payment = new Payment();
+        // //StateHasChanged();
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+        auditlog.ActivityXml = auditlogService.GetAuditxml(opayment, payment, act).ToString();
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(opayment, payment, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+
+
+    private async void UpdateData(int id)
+    {
+        savetype = "";
+        if (id > 0)
+        {
+            savetype = "update";
+           
+            await PaymentService.UpdatePayment(payment);
+            await AuditData("Update Payment", "update");
+           GetData(id);
+        }
+    }
+
+    private async void GetData(int id)
+    {
+        if (id != null && id > 0)
+        {
+            opayment = await PaymentService.GetPaymentById(id);
+            payment = await PaymentService.GetPaymentById(id);
+            StateHasChanged();
+        }
+    }
+
+    private ConfirmDialog dialog = default!;
+    private async Task ShowConfirmationAsync(int id)
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Are you sure you want to delete this?",
+            message1: "This will delete the record. Once deleted can not be rolled back.",
+            message2: "Do you want to proceed?");
+
+        if (confirmation)
+        {
+            if (id != null && id > 0)
+            {
+                payment = await PaymentService.GetPaymentById(id);
+                await PaymentService.DeletePayment(payment);
+                AuditData("Delete Payment", "delete");
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data deleted successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+
+            navigationManager.NavigateTo($"/Feepayment/add/", true);
+
+            //LoadData();
+           // StateHasChanged();
+        }
+        else
+        {
+            // do something
+        }
+    }
+
+    private void FillData()
+    {
+        
+        // payment.Id = 1;
+        payment.Requestid = fileid;
+        payment.Description = "description";
+        payment.Paymentdate = DateTime.Now;
+        payment.Paytypeid = 1;
+        payment.Authorization = "authorization";
+        payment.Payamount = 100;
+        payment.Createdate = DateTime.Now;
+        payment.Createuser = userReg;
+        payment.Moddate = DateTime.Now;
+        payment.Moduser = userReg;
+    }
+
+    #endregion
+
+}
+
+<EditForm Model="@payment" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container-fluid">
+        <div class="row">
+           
+            <div class="col-lg-2 col-md-2 col-sm-12">
+                <label for="lbdescription">
+                Payment Description:
+                </label>
+                <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="payment.Description" />
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12">
+                <label for="lbpaymentdate">
+                    Payment Date:
+                </label>
+                <InputDate id="paymentdate" class="form-control" placeholder="PAYMENT DATE" @bind-Value="payment.Paymentdate" />
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12">
+                <label for="lbpaytypeid">
+                    Pay Type:
+                </label>
+                <InputSelect id="paytypeid" class="form-control" placeholder="PAY TYPE" @bind-Value="payment.Paytypeid" >
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in paymenttype)
+                    {
+                        <option value="@lktype.Id">@lktype.Detail</option>
+                    }
+                    </InputSelect>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12">
+                <label for="lbauthorization">
+                    Authorization:
+                </label>
+                <InputText id="authorization" class="form-control" placeholder="AUTHORIZATION" @bind-Value="payment.Authorization" />
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12">
+                <label for="lbpayamount">
+                    Pay Amount:
+                </label>
+                <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @bind-Value="payment.Payamount" />
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+<br />
+
+<ConfirmDialog @ref="dialog" />
+
+<table class="table table-striped">
+    <thead class="table-warning">
+        <tr>
+            <th scope="col">Payment Description</th>
+            <th scope="col">Payment Date</th>
+            <th scope="col">Pay Type</th>
+            <th scope="col">Authorization</th>
+            <th scope="col">Pay Amount</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (searchpayments != null)
+        {
+            @foreach (var item in searchpayments)
+            {
+                @if (item != null)
+                {
+                    <tr>
+                        <td>@item.Description</td>
+                        <td>@item.Paymentdate</td>
+                        <td>@item.Paytype</td>
+                        <td>@item.Authorization</td>
+                        <td>@item.Payamount</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(item.Id))">Edit</button>
+                            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                        </td>
+                    </tr>
+                }
+            }
+        }
+        else
+        {
+            <tr>
+                <td>  </td>
+                <td>  </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+

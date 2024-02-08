@@ -50,6 +50,7 @@ function changetab(elname) {
     document.getElementById("payment-tab").classList.remove("active");
     document.getElementById("disclosure-tab").classList.remove("active");
     document.getElementById("video-tab").classList.remove("active");
+    document.getElementById("extension-tab").classList.remove("active");
     document.getElementById("other-tab").classList.remove("active");
     document.getElementById(elname).classList.toggle("active");
     document.getElementById(elname).removeAttribute('aria-current');

@@ -31,6 +31,14 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<Summarydisclosure> Summarydisclosures { get; set; }
 
+        public virtual DbSet<SearchPayment> PaymentInfos { get; set; }
+
+        public virtual DbSet<SearchRequestfee> RequestfeeInfos { get; set; }
+
+        public virtual DbSet<SearchExtension> ExtensionInfos { get; set; }
+
+        public virtual DbSet<HolidayView> HolidayInfos { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

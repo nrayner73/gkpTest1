@@ -1,0 +1,29 @@
+[b-c731o5n56r] th.country-name {
+    width: 14rem;
+}
+[b-c731o5n56r] .col-width {
+    min-width: 32em;
+    max-width: 32em;
+}
+
+
+/* Subtle stripe effect */
+[b-c731o5n56r] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-c731o5n56r] tbody tr {
+    height: 1.8rem;
+}
+
+.page-size-chooser[b-c731o5n56r] {
+    display: flex;
+    align-items: revert;
+    margin-bottom: 1rem;
+}
+
+page-size-chooser select[b-c731o5n56r] {
+  margin: 0 1rem;
+  padding: 0.25rem 0.5rem;
+}

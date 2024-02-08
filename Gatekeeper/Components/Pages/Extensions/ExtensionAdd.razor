@@ -1,0 +1,452 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorBootstrap
+@using System.Reflection;
+@using System;
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@inject ILkExtensionsService lkextensionService
+@inject ILkSectionsService lksectionService
+@inject ISearchExtensionService searchextensionService
+@inject IAnalystsService analystService
+@inject IRequestfileService requestFileService
+@inject IAuditlogService auditlogService
+@inject NavigationManager navigationManager
+
+
+
+@page "/extension/add/{fileid:int?}"
+
+@code {
+    #region "Variables"
+
+
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    private string savetype = string.Empty;
+    private string FileNumber = string.Empty;
+    private bool alertMessageShow = false;
+    private int? extDays = 0;
+    private string? oDuedate = string.Empty;
+
+
+    [Parameter]
+    public int fileid { get; set; }
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    [Inject]
+    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+
+    [Inject]
+    private IExtensionsService ExtensionsService { get; set; }
+    private Extension extension { get; set; } = new Extension();
+    private Extension oextension { get; set; } = new Extension();
+    private List<Extension> extensions { get; set; } = new List<Extension>();
+
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    public List<Holiday>? holidays { get; set; } = new List<Holiday>();
+
+
+    //Lookup
+    public List<LkSection> lksectionlist { get; set; } = new List<LkSection>();
+    public List<LkExtension> lkextensionlist { get; set; } = new List<LkExtension>();
+
+
+    //Data Grid -- Blazor QuickGrid
+    private IQueryable<SearchExtension> searchextensions;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+    QuickGrid<Searchrequestfile>? grid;
+    #endregion
+
+
+    #region "Component Lifecycle"
+    protected async override Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity.Name;
+
+        extensions = (await ExtensionsService.GetExtensionsList(fileid)).ToList();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        analysts = (await analystService.GetAnalystsList()).ToList();
+        lksectionlist = (await lksectionService.GetLkSectionsList()).Where(x => x.Sectiontype.ToLower() == "extension").ToList();
+        lkextensionlist = (await lkextensionService.GetLkExtensionsList()).ToList();
+        holidays = await context.Holidays.ToListAsync();
+    }
+
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("changetab", "extension-tab");
+
+
+            savetype = string.Empty;
+            var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+            if (RQID != "0" && RQID != null)
+            {
+                fileid = Int32.Parse(RQID);
+                requestfile = await requestFileService.GetRequestfileById(fileid);
+                FileNumber = requestfile.Filenumber.ToString();
+                //searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
+                LoadData();
+                // extensions.Enterdate = DateTime.Today;
+                //extensions.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
+                extension.Requestid = fileid;
+
+            }
+
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+    #endregion
+    #region "Methods"
+
+    private void LoadData()
+    {
+        searchextensions = searchextensionService.GetExtensionList(fileid).AsQueryable<SearchExtension>();
+    }
+
+    public void setDuedate()
+    {
+
+        if (requestfile.Receivedate != null)
+        {
+            List<DateTime> dateRange1 = new List<DateTime>();
+            List<DateTime> dateRange2 = new List<DateTime>();
+
+            DateTime dueDate = (DateTime)requestfile.Receivedate;
+            DateTime setDate;
+
+            dueDate = ((DateTime)requestfile.Receivedate).AddDays(30 + (int)extDays);
+
+            for (int i = 1; i < 11; i++)
+            {
+                setDate = dueDate.AddDays(i);
+                if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
+                {
+                    dateRange1.Add(setDate);
+                    dateRange2.Add(setDate);
+                }
+            }
+
+            //Remove holidays
+            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == ((DateTime)requestfile.Receivedate).Year);
+
+            foreach (var item in thisYearHolidays)
+            {
+                foreach (var dt in dateRange1)
+                {
+                    int y = dateRange1.IndexOf(dt);
+                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
+                    {
+                        dateRange2.RemoveAt(y);
+                    }
+                }
+            }
+
+            requestfile.Requestduedate = dateRange2.FirstOrDefault();
+            // var rtype = requesttypes.Where(x => x.Id == requestfile.Requesttypeid);
+            // filenumberDisplay = ((DateTime)requestfile.Receivedate).Year + "-" + rtype + "=" + requestfile.Id;
+        }
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        Saved = false;
+
+        extension.Moddate = DateTime.Now;
+        extension.Moduser = userReg;
+
+        if (savetype == "update")
+        {
+            await ExtensionsService.UpdateExtensions(extension);
+            await AuditData("Update Extensions", "update");
+        }
+        else
+        {
+            extension.Createdate = DateTime.Now;
+            extension.Createuser = userReg;
+            await ExtensionsService.CreateExtensions(extension);
+            await AuditData("Create Extensions", "create");
+
+        }
+
+        extDays = 0;
+        foreach (var item in extensions)
+        {
+            if (item.Dayamount != null && item.Dayamount != 0)
+            {
+                extDays = extDays + item.Dayamount;
+            }
+
+        }
+
+        requestfile = await requestFileService.GetRequestfileById(fileid);
+        setDuedate();
+        await requestFileService.UpdateRequestfile(requestfile);
+        //  await AuditData("Update Extensions - Modify Due Date", "updateduedate");
+
+        StatusClass = "alert-success";
+        Message = "Data updated successfully";
+        alertMessageShow = true;
+        await InvokeAsync(() => StateHasChanged());
+        await Task.Delay(1000);
+
+        alertMessageShow = false;
+        Saved = true;
+
+        navigationManager.NavigateTo($"/extension/add", true);
+        // LoadData();
+        // extension = new Extension();
+        // StateHasChanged();
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+        auditlog.ActivityXml = auditlogService.GetAuditxml(oextension, extensions, act).ToString();
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oextension, extensions, act).ToString();
+        }
+        else if (type == "updateduedate")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oDuedate,requestfile.Requestduedate.ToString(), act).ToString();
+
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+
+
+    private async void UpdateData(int id)
+    {
+        savetype = "";
+        if (id > 0)
+        {
+            savetype = "update";
+            GetData(id);
+        }
+    }
+
+    private async void GetData(int id)
+    {
+        if (id != null && id > 0)
+        {
+            oextension = await ExtensionsService.GetExtensionsById(id);
+            extension = await ExtensionsService.GetExtensionsById(id);
+            StateHasChanged();
+        }
+    }
+
+    private ConfirmDialog dialog = default!;
+    private async Task ShowConfirmationAsync(int id)
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Are you sure you want to delete this?",
+            message1: "This will delete the record. Once deleted can not be rolled back.",
+            message2: "Do you want to proceed?");
+
+        if (confirmation)
+        {
+            if (id != null && id > 0)
+            {
+                extension = await ExtensionsService.GetExtensionsById(id);
+                await ExtensionsService.DeleteExtensions(extension);
+                AuditData("Delete Extensions", "delete");
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data deleted successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+
+            navigationManager.NavigateTo($"/extension/add", true);
+
+            LoadData();
+            StateHasChanged();
+        }
+        else
+        {
+            // do something
+        }
+    }
+
+    private void ClearData()
+    {
+        extension = new Extension();    
+    }
+
+    private void FillData()
+    {
+
+
+        extension.Requestid = fileid;
+        extension.Extensionid = 1;
+        extension.Sectionid = 72;
+        extension.Extensiondate = DateTime.Now;
+        extension.Dayamount = 1;
+        extension.Createdate = DateTime.Now;
+        extension.Createuser = userReg;
+        extension.Moddate = DateTime.Now;
+        extension.Moduser = userReg;
+        //   extension.Status = "status";
+    }
+
+
+
+    #endregion
+
+}
+
+@if (alertMessageShow)
+{
+    <br />
+    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
+}
+
+<h5>Extensions</h5>
+
+<EditForm Model="@extension" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbfileid">
+                    File Number:
+                </label>
+                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbextensionid">
+                    Extension:
+                </label>
+                <InputSelect id="extensionid" class="form-control" placeholder="EXTENSIONID" @bind-Value="extension.Extensionid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in lkextensionlist)
+                    {
+                        <option value="@lktype.Id">@lktype.Detail</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbsection">
+                    Section:
+                </label>
+                <InputSelect id="section" class="form-control" placeholder="SECTION" @bind-Value="extension.Sectionid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in lksectionlist)
+                    {
+                        <option value="@lktype.Id">@lktype.Section</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbextensiondate">
+                    Extension Date:
+                </label>
+                <InputDate id="extensiondate" class="form-control" placeholder="EXTENSIONDATE" @bind-Value="extension.Extensiondate" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbdayamount">
+                    Day Amount:
+                </label>
+                <InputNumber id="dayamount" class="form-control" placeholder="DAYAMOUNT" @bind-Value="extension.Dayamount" />
+            </div>
+
+
+        </div>
+    </div>
+
+    <hr />
+
+    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    <button type="button" class="btn btn-primary">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+
+</EditForm>
+
+
+<br />
+
+<div class="row" style="width:100%;padding-bottom: 1em;">
+
+    <div class="col-lg-5" style="float:left">
+        <div class="page-size-chooser">
+            Items per page:
+            <select @bind="@pagination.ItemsPerPage">
+                <option>3</option>
+                <option>5</option>
+                <option>10</option>
+            </select>
+
+        </div>
+    </div>
+    <div class="col-lg-2" style="float:revert">
+        <div class="page-size-chooser">
+        </div>
+    </div>
+</div>
+
+<ConfirmDialog @ref="dialog" />
+
+<div class="grid" tabindex="-1">
+    <QuickGrid Items="@searchextensions" Virtualize="true" Pagination="@pagination">
+        <PropertyColumn Property="@(r => r.Extension)" Title="Extension" Sortable="true" class="col-width" />
+        <PropertyColumn Property="@(r => r.Section)" Title="Section" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Extensiondate)" Title="Extension Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Dayamount)" Title="Day Amount" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
+            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />
+

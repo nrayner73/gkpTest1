@@ -3,21 +3,21 @@ using System.Collections.Generic;
 
 namespace Gatekeeper.Models;
 
-public partial class Requestpayment
+public partial class Payment
 {
     public int Id { get; set; }
 
     public int? Requestid { get; set; }
 
-    public string? Descp { get; set; }
+    public string? Description { get; set; }
 
-    public string? Paytype { get; set; }
+    public DateTime? Paymentdate { get; set; }
 
-    public DateTime? Paydate { get; set; }
+    public int? Paytypeid { get; set; }
+
+    public string? Authorization { get; set; }
 
     public decimal? Payamount { get; set; }
-
-    public decimal? Finalcost { get; set; }
 
     public DateTime? Createdate { get; set; }
 

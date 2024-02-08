@@ -1,0 +1,374 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorBootstrap
+@using System.Reflection;
+@using System;
+
+@inject IViewHolidayService searchholidayService
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@inject IAnalystsService analystService
+@inject IRequestfileService requestFileService
+@inject IAuditlogService auditlogService
+@inject NavigationManager navigationManager
+
+@page "/holiday/add"
+
+
+@code {
+    #region "Variables"
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    private string savetype = string.Empty;
+    private string FileNumber = string.Empty;
+    private bool alertMessageShow = false;
+
+    [Parameter]
+    public int fileid { get; set; }
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    [Inject]
+    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+
+    [Inject]
+    private IHolidayService HolidaysService { get; set; }
+    private Holiday holiday { get; set; } = new Holiday();
+    private Holiday oholiday { get; set; } = new Holiday();
+    private List<Holiday> holidays { get; set; } = new List<Holiday>();
+
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+
+
+    //Data Grid -- Blazor QuickGrid
+    private IQueryable<HolidayView> searchholidays;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+
+    string nameFilter;
+    //int minMedals;
+    //int maxMedals = 120;
+
+    //bool showpanel = true;
+    bool showid = false;
+    #endregion
+
+
+    #region "Component Lifecycle"
+    protected async override Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity.Name;
+
+        holidays = (await HolidaysService.GetHolidayList(-1)).ToList();
+        LoadData();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        analysts = (await analystService.GetAnalystsList()).ToList();
+    }
+
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            //JSRuntime.InvokeVoidAsync("showTopmenu");
+            //JSRuntime.InvokeVoidAsync("changetab", "note-tab");
+
+
+            savetype = string.Empty;
+          //  LoadData();
+            // var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+            // if (RQID != "0" && RQID != null)
+            // {
+            //     fileid = Int32.Parse(RQID);
+            //     requestfile = await requestFileService.GetRequestfileById(fileid);
+            //     FileNumber = requestfile.Filenumber.ToString();
+            //     //searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
+            //     LoadData();
+            //     //holidays.Enterdate = DateTime.Today;
+            //     //holidays.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
+            //     //holidays.Requestid = fileid;
+
+            // }
+
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+    #endregion
+
+    #region "Methods"
+
+    IQueryable<HolidayView> FilteredYear
+    {
+        get
+        {
+            //var result = searchholidays?.Where(c => c.Medals.Total <= maxMedals);
+
+            var result = searchholidays;
+
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                result = result.Where(c => c.HolidayYear.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+                     
+
+            return result;
+        }
+    }
+
+    private  async void LoadData()
+    {
+        searchholidays = searchholidayService.GetHolidayList(null).AsQueryable<HolidayView>();
+
+        //(await HolidaysService.GetHolidayList(-1)).AsQueryable<Holiday>();
+        //holidaysService.GetHolidaysList(fileid).AsQueryable<Holiday>();
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        Saved = false;
+
+        holiday.Moddate = DateTime.Now;
+        holiday.Moduser = userReg;
+
+        if (savetype == "update")
+        {
+            await HolidaysService.UpdateHoliday(holiday);
+            await AuditData("Update Holidays", "update");
+        }
+        else
+        {
+            holiday.Createdate = DateTime.Now;
+            holiday.Createuser = userReg;
+            await HolidaysService.CreateHoliday(holiday);
+            await AuditData("Create Holidays", "create");
+
+        }
+
+        StatusClass = "alert-success";
+        Message = "Data updated successfully";
+        alertMessageShow = true;
+        await InvokeAsync(() => StateHasChanged());
+        await Task.Delay(1000);
+
+        alertMessageShow = false;
+        Saved = true;
+        navigationManager.NavigateTo($"/holidays", true);
+        //LoadData();
+        //holidays = new Holidays();
+        //StateHasChanged();
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+        auditlog.ActivityXml = auditlogService.GetAuditxml(oholiday, holiday, act).ToString();
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oholiday, holiday, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    private async void UpdateData(int id)
+    {
+        savetype = "";
+        if (id > 0)
+        {
+            savetype = "update";
+            GetData(id);
+        }
+    }
+
+    private async void GetData(int id)
+    {
+        if (id != null && id > 0)
+        {
+            oholiday = await HolidaysService.GetHolidayById(id);
+            holiday = await HolidaysService.GetHolidayById(id);
+            StateHasChanged();
+        }
+    }
+
+    private ConfirmDialog dialog = default!;
+    private async Task ShowConfirmationAsync(int id)
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Are you sure you want to delete this?",
+            message1: "This will delete the record. Once deleted can not be rolled back.",
+            message2: "Do you want to proceed?");
+
+        if (confirmation)
+        {
+            if (id != null && id > 0)
+            {
+                holiday = await HolidaysService.GetHolidayById(id);
+                await HolidaysService.DeleteHoliday(holiday);
+                AuditData("Delete Holidays", "delete");
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data deleted successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+
+            navigationManager.NavigateTo($"/holidays/add/{fileid}", true);
+
+            LoadData();
+            StateHasChanged();
+        }
+        else
+        {
+            // do something
+        }
+    }
+
+    private void ClearData()
+    {
+        holiday = new Holiday();
+
+    }
+
+    private async void CopyLastYear()
+    {
+        await HolidaysService.CopyLastYearHoliday(userReg);
+        LoadData();
+        StateHasChanged();
+    }
+
+    private void FillData()
+    {
+        holiday.Holidayname = "holidayname";
+        holiday.Holidaydate = DateTime.Now;
+        holiday.Moddate = DateTime.Now;
+        holiday.Moduser = userReg;
+        holiday.Createdate = DateTime.Now;
+        holiday.Createuser = userReg;
+        holiday.Status = "status";
+    }
+    #endregion
+}
+
+@if (alertMessageShow)
+{
+    <br />
+    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
+}
+
+<h5>Holiday:</h5>
+
+<EditForm Model="@holiday" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbholidayname">
+                    Holiday Name:
+                </label>
+                <InputText id="holidayname" class="form-control" placeholder="HOLIDAYNAME" @bind-Value="holiday.Holidayname" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbholidaydate">
+                    Holiday Date:
+                </label>
+                <InputDate id="holidaydate" class="form-control" placeholder="HOLIDAYDATE" @bind-Value="holiday.Holidaydate" />
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="button" class="btn btn-primary" @onclick="CopyLastYear">Create from Last Year Holiday</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+
+</EditForm>
+
+<br />
+
+<div class="row" style="width:100%;padding-bottom: 1em;">
+    <div class="col-lg-5" style="float:left">
+        Show:
+        <label><input type="checkbox" @bind="showid" /> ID Column</label>
+    </div>
+    <div class="col-lg-5" style="float:left">
+        <div class="page-size-chooser">
+            Items per page:
+            <select @bind="@pagination.ItemsPerPage">
+                <option>3</option>
+                <option>5</option>
+                <option>10</option>
+            </select>
+
+        </div>
+    </div>
+    <div class="col-lg-2" style="float:revert">
+        <div class="page-size-chooser">
+        </div>
+    </div>
+</div>
+
+<ConfirmDialog @ref="dialog" />
+
+<div class="grid">
+    <QuickGrid Items="@FilteredYear" Virtualize="true" Pagination="@pagination">
+        @if (showid)
+        {
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
+        }
+        <PropertyColumn Property="@(c => c.HolidayYear)" Title="Year" Sortable="true" Class="filter-name">
+            <ColumnOptions>
+                <div class="search-box">
+                    <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Holiday year..." />
+                </div>
+            </ColumnOptions>
+        </PropertyColumn>
+        
+        <PropertyColumn Property="@(r => r.Holidayname)" Title="Holiday Name" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Holidaydate)" Title="Holiday Date" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
+            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />

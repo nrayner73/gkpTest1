@@ -1,10 +1,11 @@
 using Gatekeeper.Models;
 
-namespace Gatekeeper.Interfaces.Lookups
+namespace Gatekeeper.Interfaces
 {
     public interface IHolidayService
     {
-        Task<IEnumerable<Holiday>> GetHolidayList();
+        Task<IEnumerable<Holiday>> GetHolidayList(int year);
+        Task<IEnumerable<Holiday>> CopyLastYearHoliday(string regno);
         Task<Holiday> GetHolidayById(int id);
         Task<Holiday> CreateHoliday(Holiday holiday);
         Task UpdateHoliday(Holiday holiday);

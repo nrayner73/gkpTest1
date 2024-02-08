@@ -10,7 +10,7 @@ public partial class Videonote
 
     public DateTime? Enterdate { get; set; }
 
-    public string? Analyst { get; set; }
+    public int? Analystid { get; set; }
 
     public string? Notes { get; set; }
 

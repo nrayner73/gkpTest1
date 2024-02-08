@@ -1,0 +1,359 @@
+﻿@using BlazorBootstrap
+@code {
+    #region "Variables"
+    [Inject]
+    private IDiscloseditemsService DiscloseditemsService { get; set; }
+
+    [Parameter]
+    public string userReg { get; set; }
+
+    [Parameter]
+    public Requestfile requestfile { get; set; } = new Requestfile();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+
+    [Parameter]
+    public List<LkSection> sectionlist { get; set; } = new List<LkSection>();
+    [Parameter]
+    public List<Discloseditem> File_discloseditems { get; set; } = new List<Discloseditem>();
+    [Parameter]
+    public List<DisclosedViewitem> View_discloseditems { get; set; } = new List<DisclosedViewitem>();
+
+    private LkSection lksection { get; set; } = new LkSection();
+    private Discloseditem discloseditem { get; set; } = new Discloseditem();
+    private Discloseditem sectionuseditem { get; set; } = new Discloseditem();
+
+    // public List<LkSection> disclosuredlist { get; set; } = new List<LkSection>();
+    // public List<LkSection> sectionusedlist { get; set; } = new List<LkSection>();
+
+    public List<DisclosedViewitem> disclosuredlist { get; set; } = new List<DisclosedViewitem>();
+    public List<DisclosedViewitem> sectionusedlist { get; set; } = new List<DisclosedViewitem>();
+
+    public List<LkSection> Lkdisclosured { get; set; } = new List<LkSection>();
+    public List<LkSection> Lksectionused { get; set; } = new List<LkSection>();
+
+    bool showOthertext = false;
+    #endregion
+
+    #region "Component Lifecycle"
+    protected override async Task OnParametersSetAsync()
+    {
+        // if (View_discloseditems.Count > 0)
+        // {
+        disclosuredlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "disclose").ToList();
+        sectionusedlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "redac").ToList();
+        StateHasChanged();
+        // }
+        ClearData();
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            firstRender = false;
+        }
+    }
+
+    #endregion
+
+    #region "Methods"
+    private void ClearData()
+    {
+
+        discloseditem.Sectionid = -1;
+        sectionuseditem.Sectionid = -1;
+
+        // Lkdisclosured = new List<LkSection>();
+        // Lksectionused = new List<LkSection>();
+        if (sectionlist.Count > 0)
+        {
+            Lkdisclosured = sectionlist.Where(x => x.Sectiontype.ToLower() == "disclose").OrderBy(x=>x.Sortby).ToList() ;
+            Lksectionused = sectionlist.Where(x => x.Sectiontype.ToLower() == "redac").OrderBy(x => x.Sortby).ToList();
+
+        }
+
+        //remove disclosureAuth item from combobox so user can't add item twice
+        if (disclosuredlist.Count > 0)
+        {
+            foreach (var item in disclosuredlist)
+            {
+                lksection = new LkSection();
+                lksection = sectionlist.Where(x => x.Id == item.Sectionid).FirstOrDefault();
+
+                Lkdisclosured.Remove(lksection);
+            }
+            StateHasChanged();
+        }
+
+        if (sectionusedlist.Count > 0)
+        {
+            foreach (var item in sectionusedlist)
+            {
+                lksection = new LkSection();
+                lksection = sectionlist.Where(x => x.Id == item.Sectionid).FirstOrDefault();
+                Lksectionused.Remove(lksection);
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task disclosuredAuthAdd()
+    {
+
+        var item = new LkSection();
+        if (discloseditem != null)
+        {
+            item = sectionlist.Where(x => x.Id == discloseditem.Sectionid).FirstOrDefault();
+
+            if (item != null)
+            {
+                DisclosedViewitem _vitem = new DisclosedViewitem();
+                _vitem.Sectionid = item.Id;
+                _vitem.Requestid = requestfile.Id;
+                _vitem.Sectiontype = item.Sectiontype;
+                _vitem.Section = item.Section;
+                _vitem.Createdate = DateTime.Now;
+                _vitem.Createuser = userReg;
+
+                Discloseditem _ditem = new Discloseditem();
+                _ditem.Sectionid = item.Id;
+                _ditem.Requestid = requestfile.Id;
+                _ditem.Sectiontype = item.Sectiontype;
+                _ditem.Createdate = DateTime.Now;
+                _ditem.Createuser = userReg;
+
+                File_discloseditems.Add(_ditem);
+
+                disclosuredlist.Add(_vitem);
+                //  Lkdisclosured.Remove(item);
+
+                discloseditem = new Discloseditem();
+                discloseditem.Sectionid = -1;
+
+                ClearData();
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task sectionusedAuthAdd()
+    {
+        var item = new LkSection();
+        if (sectionuseditem != null)
+        {
+            item = sectionlist.Where(x => x.Id == sectionuseditem.Sectionid).FirstOrDefault();
+
+            if (item != null)
+            {
+
+                DisclosedViewitem _vitem = new DisclosedViewitem();
+                _vitem.Sectionid = item.Id;
+                _vitem.Requestid = requestfile.Id;
+                _vitem.Sectiontype = item.Sectiontype;
+                _vitem.Section = item.Section;
+                _vitem.Othertext = sectionuseditem.Othertext;
+                _vitem.Createdate = DateTime.Now;
+                _vitem.Createuser = userReg;
+
+                Discloseditem _ditem = new Discloseditem();
+                _ditem.Sectionid = item.Id;
+                _ditem.Requestid = requestfile.Id;
+                _ditem.Sectiontype = item.Sectiontype;
+                _ditem.Othertext = sectionuseditem.Othertext;
+                _ditem.Createdate = DateTime.Now;
+                _ditem.Createuser = userReg;
+
+
+                File_discloseditems.Add(_ditem);
+                sectionusedlist.Add(_vitem);
+                //Lksectionused.Remove(item);
+
+                sectionuseditem = new Discloseditem();
+                sectionuseditem.Sectionid = -1;
+
+                ClearData();
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void disclosuredAuthDelete(int id)
+    {
+        if (id > 0)
+        {
+            Discloseditem _ditem = new Discloseditem();
+            _ditem = File_discloseditems.Where(x => x.Id == id).FirstOrDefault();
+
+            DisclosedViewitem _vitem = new DisclosedViewitem();
+            _vitem = View_discloseditems.Where(x => x.Id == id).FirstOrDefault();
+
+
+            if (_ditem != null)
+            {
+                // Lkdisclosured.Add(sectionlist.Where(x => x.Id == id).FirstOrDefault());
+                disclosuredlist.Remove(_vitem);
+                File_discloseditems.Remove(_ditem);
+            }
+            ClearData();
+            StateHasChanged();
+        }
+    }
+
+
+    private void sectionusedDelete(int id)
+    {
+        if (id > 0)
+        {
+            Discloseditem _ditem = new Discloseditem();
+            _ditem = File_discloseditems.Where(x => x.Id == id).FirstOrDefault();
+
+            DisclosedViewitem _vitem = new DisclosedViewitem();
+            _vitem = View_discloseditems.Where(x => x.Id == id).FirstOrDefault();
+
+            if (_ditem != null)
+            {
+                // Lksectionused.Add(sectionlist.Where(x => x.Id == id).FirstOrDefault());
+                sectionusedlist.Remove(_vitem);
+                File_discloseditems.Remove(_ditem);
+
+            }
+            ClearData();
+            StateHasChanged();
+        }
+    }
+
+    private bool OtherText()
+    {
+        //sectionuseditem.Sectionid
+        showOthertext = false;
+        if (sectionuseditem.Sectionid == 71)
+        {
+            showOthertext = true;
+        }
+
+        return showOthertext;
+
+    }
+#endregion
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12"> <span style="font-weight:bold">Authority to disclosure:</span> </div>
+        <div class="col-lg-6 col-md-6 col-sm-12"><span style="font-weight:bold">Section used:</span></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-12">
+            <EditForm Model="@discloseditem">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <InputSelect id="disclosureitem" class="form-select d-inline" style="width:250px;" @bind-Value="discloseditem.Sectionid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in Lkdisclosured)
+                    {
+                        <option value="@lktype.Id">@lktype.Section</option>
+                    }
+                </InputSelect>
+                <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="disclosuredAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
+
+
+            </EditForm>
+        </div>
+        <div class="col-lg-1 col-md-2 col-sm-12"> <h5> &nbsp;</h5> </div>
+        <div class="col-lg-5 col-md-5 col-sm-12">
+            <EditForm Model="@sectionuseditem">
+                <InputSelect id="sectionuseditem" class="form-select d-inline" style="width:250px;" onchange="@OtherText()" @bind-Value="sectionuseditem.Sectionid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in Lksectionused)
+                    {
+                        <option value="@lktype.Id">@lktype.Section</option>
+                    }
+                </InputSelect>
+
+                <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="sectionusedAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
+                &nbsp;
+                @if (showOthertext)
+                {
+                    <InputText id="othertext" @bind-Value="sectionuseditem.Othertext" />
+                }
+
+            </EditForm>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+
+                        <th scope="col">Section</th>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (disclosuredlist != null && disclosuredlist.Count > 0)
+                    {
+                        @foreach (var item in disclosuredlist)
+                        {
+                            @if (item != null)
+                            {
+                                <tr>
+                                    <td>@item.Section</td>
+                                    <td> <Button @onclick="()=>disclosuredAuthDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
+                                </tr>
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        <tr>
+                            <td>  </td>
+                            <td>  </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-1 col-md-2 col-sm-12"> <h5> &nbsp;</h5> </div>
+        <div class="col-lg-5 col-md-5 col-sm-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Section</th>
+                        <th scope="col">Other</th>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (sectionusedlist != null && sectionusedlist.Count > 0)
+                    {
+                        @foreach (var item in sectionusedlist.ToList())
+                        {
+                            @if (item != null)
+                            {
+                                <tr>
+                                    <td>@item.Section</td>
+                                    <td>@item.Othertext</td>
+                                    <td> <Button @onclick="()=>sectionusedDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
+                                </tr>
+                            }
+                        }
+
+                    }
+                    else
+                    {
+
+                        <tr>
+                            <td>  </td>
+                            <td>  </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

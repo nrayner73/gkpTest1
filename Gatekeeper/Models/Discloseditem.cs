@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 
 namespace Gatekeeper.Models
@@ -21,5 +22,7 @@ namespace Gatekeeper.Models
         public string? Createuser { get; set; }
 
         public string? Status { get; set; }
+
+       
     }
 }

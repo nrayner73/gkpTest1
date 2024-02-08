@@ -13,8 +13,10 @@
     public Person person { get; set; } = new Person();
     [Parameter]
     public EventCallback OnCancel { get; set; }
+
     [Parameter]
     public EventCallback<bool> OnSubmit { get; set; }
+    
     #region TypeAhead Parameters
     public List<PersonName>? personnames { get; set; } = new List<PersonName>();
     private PersonName selectedpersonname;

@@ -1,0 +1,360 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@using BlazorBootstrap
+
+@inject IAnalystsService analystService
+@inject IRequestfileService requestFileService
+@inject IAuditlogService auditlogService
+@inject IDiscloseditemsService discloseditemsService
+@inject IDisclosureViewService disclosedViewService
+@inject ILkSectionsService lksectionService
+@inject NavigationManager navigationManager
+
+@page "/disclosure/add/{fileid:int?}"
+
+@code {
+    #region "Variables"
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    private string savetype = string.Empty;
+    private string FileNumber = string.Empty;
+    private bool alertMessageShow = false;
+
+    [Parameter]
+    public int fileid { get; set; }
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    [Inject]
+    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+
+    [Inject]
+    private ISummarydisclosureService SummarydisclosureService { get; set; }
+
+    private Summarydisclosure summarydisclosure { get; set; } = new Summarydisclosure();
+    private Summarydisclosure osummarydisclosure { get; set; } = new Summarydisclosure();
+
+    private List<Summarydisclosure> summarydisclosures { get; set; } = new List<Summarydisclosure>();
+    private List<Summarydisclosure> osummarydisclosures { get; set; } = new List<Summarydisclosure>();
+
+    [Inject]
+    private IDiscloseditemsService DiscloseditemService { get; set; }
+
+    private List<LkSection> sectionlist { get; set; } = new List<LkSection>();
+
+
+    private List<DisclosedViewitem> disclosedViewData { get; set; } = new List<DisclosedViewitem>();
+
+    private List<Discloseditem> discloseditemsData { get; set; } = new List<Discloseditem>();
+    private List<Discloseditem> odiscloseditemsData { get; set; } = new List<Discloseditem>();
+
+    // private List<Discloseditem> sectionuseditemsData { get; set; } = new List<Discloseditem>();
+    // private List<Discloseditem> osectionuseditemsData { get; set; } = new List<Discloseditem>();
+
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+
+    private string otherTextData = string.Empty;
+    #endregion
+
+    #region "Component Lifecycle"
+    protected async override Task OnInitializedAsync()
+    {
+        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        // var user = authstate.User;
+        // var name = user.Identity.Name;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+
+    }
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("changetab", "disclosure-tab");
+
+            savetype = string.Empty;
+            var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+            if (RQID != "0" && RQID != null)
+            {
+                fileid = Int32.Parse(RQID);
+                requestfile = await requestFileService.GetRequestfileById(fileid);
+                FileNumber = requestfile.Filenumber.ToString();
+
+                //discloseditemsService.GetDiscloseditemsList();
+                sectionlist = (await lksectionService.GetLkSectionsList()).ToList();
+
+                discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+                odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+
+                LoadData();
+            }
+
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+    #endregion
+
+    #region "Methods"
+
+    private async void ClearData()
+    {
+        summarydisclosure = new Summarydisclosure();
+        discloseditemsData = new List<Discloseditem>();
+
+
+        LoadData();
+        StateHasChanged();
+    }
+
+    private void FillData()
+    {
+        summarydisclosure.Requestid = fileid;
+        summarydisclosure.Fileclosedate = DateTime.Now;
+        summarydisclosure.Pagesidentified = "100";
+        summarydisclosure.Pagesdisclosed = "50";
+        summarydisclosure.Videoidentified = "500";
+        summarydisclosure.Videodisclosed = "300";
+        summarydisclosure.Audioidentified = "1000";
+        summarydisclosure.Audiodisclosed = "800";
+        summarydisclosure.Remarks = "Test Data";
+        summarydisclosure.Moddate = DateTime.Now;
+        summarydisclosure.Moduser = userReg;
+        summarydisclosure.Createdate = DateTime.Now;
+        summarydisclosure.Createuser = userReg;
+    }
+
+
+    private async void LoadData()
+    {
+        //get summary disclosure data
+        summarydisclosures = (await SummarydisclosureService.GetSummarydisclosureList(fileid)).ToList();
+
+        if (summarydisclosures.Count > 0)
+        {
+            summarydisclosure = new Summarydisclosure();
+            summarydisclosure = summarydisclosures.FirstOrDefault();
+
+            if (fileid != null && fileid > 0)
+            {
+                disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
+                //get disclosure authorities data
+                discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+
+            }
+
+              StateHasChanged();
+        }
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+
+        osummarydisclosures = (await disclosedViewService.GetDisclosureSummary(fileid)).ToList();
+        osummarydisclosure = osummarydisclosures.FirstOrDefault();
+
+        Saved = false;
+
+
+        //check list data testing
+        summarydisclosure.Moddate = DateTime.Now;
+        summarydisclosure.Moduser = userReg;
+
+        savetype = "create";
+        if (summarydisclosures.Count > 0)
+        {
+            savetype = "update";
+        }
+
+        if (savetype == "update")
+        {
+            await SummarydisclosureService.UpdateSummarydisclosure(summarydisclosure);
+            await AuditData("Update Summarydisclosure", "update");
+        }
+        else
+        {
+            summarydisclosure.Createdate = DateTime.Now;
+            summarydisclosure.Createuser = userReg;
+            await SummarydisclosureService.CreateSummarydisclosure(summarydisclosure);
+            await AuditData("Create Summarydisclosure", "create");
+        }
+
+        Discloseditem discloseditem = new Discloseditem();
+        // DisclosedViewitem disclosedViewitem = new DisclosedViewitem();
+        //remove disclosure items that user deleted from the list
+        foreach (var item in odiscloseditemsData)
+        {
+            discloseditem = discloseditemsData.Where(x => x.Sectionid == item.Sectionid && x.Requestid == item.Requestid).FirstOrDefault();
+
+            if (discloseditem == null)
+            {
+                await DiscloseditemService.DeleteDiscloseditems(item);
+            }
+        }
+
+        //insert new disclosureitem
+        foreach (var item in discloseditemsData)
+        {
+            discloseditem = new Discloseditem();
+            discloseditem = await DiscloseditemService.GetDiscloseditemsBySectionId(item.Sectionid, item.Requestid);
+
+            //skip any section item that already exists in the table
+            if (discloseditem == null)
+            {
+                await DiscloseditemService.CreateDiscloseditems(item);
+            }
+        }
+
+        StatusClass = "alert-success";
+        Message = "Data updated successfully";
+        alertMessageShow = true;
+        await InvokeAsync(() => StateHasChanged());
+        await Task.Delay(1000);
+
+        alertMessageShow = false;
+        Saved = true;
+
+
+        navigationManager.NavigateTo($"/disclosure/add/{fileid}", true);
+
+        // LoadData();
+        //  summarydisclosure = new Summarydisclosure();
+        //  StateHasChanged();
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+        // auditlog.ActivityXml = auditlogService.GetAuditxml(osummarydisclosure, summarydisclosure, act).ToString();
+
+
+        if (type == "update" || type == "delete")
+        {
+            if (auditlogService.GetAuditxml(osummarydisclosure, summarydisclosure, act) != null)
+            {
+                auditlog.ActivityXml = auditlogService.GetAuditxml(osummarydisclosure, summarydisclosure, act).ToString();
+
+            }
+
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+    #endregion
+
+}
+
+
+<EditForm Model="@summarydisclosure" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    @if (alertMessageShow)
+    {
+        <br />
+        <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
+    }
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbenterdate">
+                    File Number:
+                </label>
+                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbfileclosedate">
+                    Date file close:
+                </label>
+                <InputDate id="fileclosedate" class="form-control" placeholder="FILE CLOSE DATE" @bind-Value="summarydisclosure.Fileclosedate" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbpagesidentified">
+                    Pages identified:
+                </label>
+                <InputText id="pagesidentified" class="form-control" placeholder="PAGES IDENTIFIED" @bind-Value="summarydisclosure.Pagesidentified" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbpagesdisclosed">
+                    Pages disclosed:
+                </label>
+                <InputText id="pagesdisclosed" class="form-control" placeholder="PAGES DISCLOSED" @bind-Value="summarydisclosure.Pagesdisclosed" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbvideoidentified">
+                    Video identified:
+                </label>
+                <InputText id="videoidentified" class="form-control" placeholder="VIDEO IDENTIFIED" @bind-Value="summarydisclosure.Videoidentified" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbvideodisclosed">
+                    Video disclosed:
+                </label>
+                <InputText id="videodisclosed" class="form-control" placeholder="VIDEO DISCLOSED" @bind-Value="summarydisclosure.Videodisclosed" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbaudioidentified">
+                    Audio identified:
+                </label>
+                <InputText id="audioidentified" class="form-control" placeholder="AUDIO IDENTIFIED" @bind-Value="summarydisclosure.Audioidentified" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbaudiodisclosed">
+                    Audio disclosed:
+                </label>
+                <InputText id="audiodisclosed" class="form-control" placeholder="AUDIO DISCLOSED" @bind-Value="summarydisclosure.Audiodisclosed" />
+            </div>
+
+            <div class="col-lg-8 col-md-8 col-sm-12">
+                <label for="lbremarks">
+                    Remarks:
+                </label>
+                <InputTextArea id="remarks" class="form-control" placeholder="REMARKS" @bind-Value="summarydisclosure.Remarks" row="15" col="150" style="min-height: 130px; overflow:auto;" />
+            </div>
+        </div>
+    </div>
+    <br />
+    <DiscloseditemAdd userReg="@userReg" requestfile="requestfile" sectionlist="sectionlist" File_discloseditems="discloseditemsData" View_discloseditems="disclosedViewData"></DiscloseditemAdd>
+    <br />
+
+    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData">>Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+
+
+

@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
-@inject Blazored.SessionStorage.ISessionStorageService session
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @using Gatekeeper.Models.MenuInfo
 
 <div class="top-row ps-3 navbar navbar-dark" style="height:auto;margin-left:50px">
@@ -27,27 +27,13 @@
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Request
             </NavLink>
         </div>
-
-           <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="ShowMenu" href="/accessrequests/add">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Admins
-            </NavLink>
-        </div>
-
         <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="#">
+            <NavLink class="nav-link" @onclick="HideMenu" href="/analyst/add">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Analysts
             </NavLink>
         </div>
-
         <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="#">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Choices Data
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="#">
+            <NavLink class="nav-link" @onclick="HideMenu" href="/holiday/add">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Holidays
             </NavLink>
         </div>
@@ -62,14 +48,37 @@
         selmenu = new SelectedmenuInfo();
         selmenu.Name = "Access Request";
 
-        await session.SetItemAsync("SessionSelectedMenu", selmenu);
+        await sessionStorage.SetItemAsync("SessionSelectedMenu", selmenu);
         await JSRuntime.InvokeVoidAsync("showTopmenu");
     }
 
     public async void HideMenu()
     {
-        await session.ClearAsync();
+        await sessionStorage.ClearAsync();
         await JSRuntime.InvokeVoidAsync("hideTopmenu");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        
+     
+
+        //ClearData();
+    }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            // await sessionStorage.SetItemAsync("RQID", fileid);
+           //await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
+            //var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+
+
+            firstRender = false;
+        }
 
 
     }

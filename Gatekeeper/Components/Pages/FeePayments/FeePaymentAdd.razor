@@ -1,0 +1,383 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorBootstrap
+@using System.Reflection;
+@using System;
+@using Gatekeeper.Models;
+
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject ISearchRequestfeeService searchrequestfeeService
+@inject IAnalystsService analystService
+@inject IRequestfileService requestFileService
+@inject IAuditlogService auditlogService
+@inject NavigationManager navigationManager
+
+@inject ILkPaymenttypeService paymentTypeService
+@inject ISearchPaymentService searchpaymentService
+
+
+@page "/feepayment/add/{fileid:int?}"
+
+@code {
+
+    #region "Variables"
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    private string savetype = string.Empty;
+    private string FileNumber = string.Empty;
+    private bool alertMessageShow = false;
+
+    [Parameter]
+    public int fileid { get; set; }
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    [Inject]
+    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+
+    [Inject]
+    private IPaymentService PaymentService { get; set; }
+    private Payment payment { get; set; } = new Payment();
+    private Payment opayment { get; set; } = new Payment();
+    private List<Payment> payments { get; set; } = new List<Payment>();
+
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    public List<LkPaymenttype>? paymenttype { get; set; } = new List<LkPaymenttype>();
+
+
+    [Inject]
+    private IRequestfeeService RequestfeeService { get; set; }
+
+    private Requestfee requestfee { get; set; } = new Requestfee();
+    private Requestfee orequestfee { get; set; } = new Requestfee();
+    private List<Requestfee> requestfees { get; set; } = new List<Requestfee>();
+
+
+    // private IQueryable<SearchRequestfee> searchrequestfees;
+    // private IQueryable<SearchPayment> searchpayments;
+    private List<SearchRequestfee> searchrequestfees = new List<SearchRequestfee>();
+    private List<SearchPayment> searchpayments = new List<SearchPayment>();
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+
+
+
+    #endregion
+
+    #region "Component Lifecycle"
+    protected async override Task OnInitializedAsync()
+    {
+        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        // var user = authstate.User;
+        // var name = user.Identity.Name;
+
+        // requestfees = (await RequestfeeService.GetRequestfeeList()).ToList();
+        // payments = (await PaymentService.GetPaymentList()).ToList();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        analysts = (await analystService.GetAnalystsList()).ToList();
+        paymenttype = (await paymentTypeService.GetLkPaymenttypeList()).ToList();
+
+
+        if (fileid > 0 || requestfile.Id > 0)
+        {
+            requestfile = await requestFileService.GetRequestfileById(fileid);
+            FileNumber = requestfile.Filenumber.ToString();
+            LoadData();
+            StateHasChanged();
+        }
+    }
+
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("changetab", "payment-tab");
+
+
+            savetype = string.Empty;
+
+            if (fileid == 0 || fileid == null)
+            {
+                var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+                if (RQID != "0" && RQID != null)
+                {
+                    fileid = Int32.Parse(RQID);
+                    if (requestfile.Id == 0 && FileNumber == "")
+                    {
+                        requestfile = await requestFileService.GetRequestfileById(fileid);
+                        FileNumber = requestfile.Filenumber.ToString();
+
+                    }
+                }
+                LoadData();
+            }
+            else
+            {
+                //  requestfile = await requestFileService.GetRequestfileById(fileid);
+                // FileNumber = requestfile.Filenumber.ToString();
+            }
+
+
+
+            requestfee.Requestid = fileid;
+
+            payment.Requestid = fileid;
+            payment.Paymentdate = DateTime.Now;
+
+
+
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+    #endregion
+
+
+    private void LoadData()
+    {
+        // searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).AsQueryable<SearchRequestfee>();
+        // searchpayments = searchpaymentService.GetPaymentList(fileid).AsQueryable<SearchPayment>();
+
+        searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
+        searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
+        StateHasChanged();
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+
+        Saved = false;
+
+        if (fileid > 0)
+        {
+            //string notes = requestfile.Feepayment;
+            try
+            {
+                requestfile = await requestFileService.GetRequestfileById(fileid);
+                // requestfile.Feepayment = notes;
+
+                await requestFileService.UpdateRequestfile(requestfile);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+            requestfee.Moddate = DateTime.Now;
+            requestfee.Moduser = userReg;
+
+            requestfees =  (await RequestfeeService.GetRequestfeeList(fileid)).ToList();
+
+            foreach (var item in requestfees)
+            {
+                if (item.Id > 0 && (item.Description != "" && item.Description != null))
+                {
+                    await RequestfeeService.UpdateRequestfee(item);
+                    // await AuditData("Update Requestfee", "update");
+                }
+                else if (item.Id > 0 && (item.Description == "" || item.Description == null))
+                {
+                    await RequestfeeService.DeleteRequestfee(item);
+                }
+                else if (item.Requestid > 0 && item.Id == 0)
+                {
+                    if (item.Description != "" && item.Description != null)
+                    {
+                        requestfee.Createdate = DateTime.Now;
+                        requestfee.Createuser = userReg;
+                        await RequestfeeService.CreateRequestfee(item);
+                    }
+                }
+            }
+
+            if (requestfee != null )
+            {
+                if (requestfee.Id == 0)
+                {
+                    if (requestfee.Description != "" && requestfee.Description != null)
+                    {
+                        requestfee.Createdate = DateTime.Now;
+                        requestfee.Createuser = userReg;
+                        await RequestfeeService.CreateRequestfee(requestfee);
+                        //await AuditData("Update Payment", "create");
+                    }
+                }
+
+            }
+
+            payments = (await PaymentService.GetPaymentList(fileid)).ToList();
+            foreach (var item in payments)
+            {
+                if (item.Id > 0 && (item.Description != "" && item.Description != null ))
+                {
+
+                    await PaymentService.UpdatePayment(item);
+                }
+                else if (item.Id > 0 && (item.Description == "" || item.Description == null))
+                {
+                    await PaymentService.DeletePayment(item);
+                }
+                else if (item.Requestid > 0 && item.Id == 0)
+                {
+                    if (item.Description != "" && item.Description != null)
+                    {
+                        payment.Createdate = DateTime.Now;
+                        payment.Createuser = userReg;
+                        await PaymentService.CreatePayment(item);
+                    }
+
+                }
+
+                //await AuditData("Update Payment", "update");
+            }
+
+            if (payment != null)
+            {
+                if (payment.Id == 0)
+                {
+                    if (payment.Description != "" && payment.Description != null)
+                    {
+                        payment.Createdate = DateTime.Now;
+                        payment.Createuser = userReg;
+                        await PaymentService.CreatePayment(payment);
+                    }
+
+                }
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data updated successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+            navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
+        }
+
+        //LoadData();
+        //requestfee = new Requestfee();
+        //payment = new Payment();
+        //StateHasChanged();
+    }
+
+
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+        auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    private void ClearData()
+    {
+        requestfee = new Requestfee();
+    }
+
+    private void FillData()
+    {
+
+        // requestfee.Id = 1;
+        requestfee.Requestid = fileid;
+        requestfee.Description = "description";
+        requestfee.Estimatedcost = 100;
+        requestfee.Requested = "Yes";
+        requestfee.Feewaived = "Yes";
+        requestfee.Finalcost = 100;
+        requestfee.Createdate = DateTime.Now;
+        requestfee.Createuser = userReg;
+        requestfee.Moddate = DateTime.Now;
+        requestfee.Moduser = userReg;
+        // requestfee.Status = "status";
+
+
+        payment.Requestid = fileid;
+        payment.Description = "description";
+        payment.Paymentdate = DateTime.Now;
+        payment.Paytypeid = 1;
+        payment.Authorization = "authorization";
+        payment.Payamount = 100;
+        payment.Createdate = DateTime.Now;
+        payment.Createuser = userReg;
+        payment.Moddate = DateTime.Now;
+        payment.Moduser = userReg;
+        savetype = "create";
+    }
+}
+
+@if (alertMessageShow)
+{
+    <br />
+    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
+}
+<EditForm Model="@requestfile" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+
+    <RequestfeeAdd savetype="" 
+                   searchrequestfees="@searchrequestfees" 
+                   analysts="@analysts" 
+                   fileid="@fileid" 
+                   requestfile="@requestfile" 
+                   requestfees="@requestfees" 
+                   requestfee="@requestfee" />
+   
+
+    <PaymentAdd savetype="@savetype" searchpayments="@searchpayments" analysts="@analysts" fileid="@fileid" paymenttype="@paymenttype" payment="@payment" payments="@payments"></PaymentAdd>
+      <div class="col-lg-3 col-md-3 col-sm-12">
+        <label for="lbnotes">
+            Notes:
+        </label>
+        <InputTextArea id="notes" class="form-control" placeholder="NOTES" @bind-Value="requestfile.Feepayment" row="15" col="250" style="min-height: 130px; overflow:auto;" />
+    </div>
+    <br/>
+    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+
+
+
+
+
+    
+

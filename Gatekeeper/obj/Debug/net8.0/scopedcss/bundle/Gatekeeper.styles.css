@@ -266,6 +266,87 @@ main[b-bqdrc1gtje] {
     text-overflow: ellipsis;
 }
     */
+/* _content/Gatekeeper/Components/Pages/Analysts/AnalystAdd.razor.rz.scp.css */
+[b-c731o5n56r] th.country-name {
+    width: 14rem;
+}
+[b-c731o5n56r] .col-width {
+    min-width: 32em;
+    max-width: 32em;
+}
+
+
+/* Subtle stripe effect */
+[b-c731o5n56r] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-c731o5n56r] tbody tr {
+    height: 1.8rem;
+}
+
+.page-size-chooser[b-c731o5n56r] {
+    display: flex;
+    align-items: revert;
+    margin-bottom: 1rem;
+}
+
+page-size-chooser select[b-c731o5n56r] {
+  margin: 0 1rem;
+  padding: 0.25rem 0.5rem;
+}
+/* _content/Gatekeeper/Components/Pages/Extensions/ExtensionAdd.razor.rz.scp.css */
+[b-m2q7303c84] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+[b-m2q7303c84] .col-width {
+    min-width: 62em;
+    max-width: 63em;
+}
+
+/* Sticky header while scrolling
+::deep thead {
+    position: sticky;
+    top: 0;
+   
+    outline: 1px solid gray;
+    z-index: 1;
+}
+
+     */
+/* For virtualized grids, it's essential that all rows have the same known height 
+::deep tr {
+    height: 30px;
+    border-bottom: 0.5px solid silver;
+}
+
+::deep tbody td {
+    white-space: wrap;
+    overflow: hidden;
+    max-width: 960px;
+    text-overflow: ellipsis;
+}
+    */
+/* _content/Gatekeeper/Components/Pages/Holidays/HolidayAdd.razor.rz.scp.css */
+[b-obm1x2umhb] table {
+    min-width: 100%;
+}
+
+[b-obm1x2umhb] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-obm1x2umhb] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-obm1x2umhb] tbody tr {
+    height: 1.8rem;
+}
 /* _content/Gatekeeper/Components/Pages/MyTasks/MytaskSearch.razor.rz.scp.css */
 /*.grid {
     height: 25rem;
@@ -308,4 +389,15 @@ main[b-bqdrc1gtje] {
 .flagblue[b-cnhds8r9c9] {
     font-weight: 200;
     color: blue;
+}
+/* _content/Gatekeeper/Components/Pages/VideoNotes/VideoNoteAdd.razor.rz.scp.css */
+[b-60pe458clh] tr:nth-child(even) {
+    background: #d8d8d8;
+
+}
+
+
+[b-60pe458clh] .col-width {
+    min-width: 63em;
+    max-width: 63em;
 }

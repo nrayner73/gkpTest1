@@ -4680,11 +4680,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
+      "projectUniqueName": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
       "projectName": "Gatekeeper",
-      "projectPath": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
+      "projectPath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
       "packagesPath": "C:\\Users\\pol11067\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\gatekeeper-2024\\Gatekeeper\\obj\\",
+      "outputPath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

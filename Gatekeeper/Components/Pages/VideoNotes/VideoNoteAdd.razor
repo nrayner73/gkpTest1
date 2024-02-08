@@ -1,0 +1,356 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using BlazorBootstrap
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using System.Reflection;
+@using System;
+
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@inject ISearchVideonoteService searchnoteService
+@inject IAnalystsService analystService
+@inject IRequestfileService requestFileService
+@inject IAuditlogService auditlogService
+@inject NavigationManager navigationManager
+
+@page "/videonotes/add/{fileid:int?}"
+
+
+@code {
+    #region "Variables"
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    private string savetype = string.Empty;
+    private string FileNumber = string.Empty;
+    private bool alertMessageShow = false;
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    [Inject]
+    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+
+    [Parameter]
+    public int fileid { get; set; }
+
+    [Inject]
+    private IAnalystnoteService AnalystnoteService { get; set; }
+    [Inject]
+    private IVideonoteService VideonotesService { get; set; }
+    private Videonote videonote { get; set; } = new Videonote();
+    private Videonote ovideonote { get; set; } = new Videonote();
+    private List<Videonote> videonotes { get; set; } = new List<Videonote>();
+
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+
+
+    // Data Grid -- Blazor QuickGrid
+    private IQueryable<SearchVideoNotes> searchvideonotes;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+    //QuickGrid<SearchVideoNotes>? grid;
+
+    bool showpanel = true;
+    bool shownotes = true;
+    #endregion
+
+
+    #region "Component Lifecycle"
+    protected async override Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity.Name;
+
+        videonotes = (await VideonotesService.GetVideonoteList(fileid)).ToList();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        analysts = (await analystService.GetAnalystsList()).ToList();
+    }
+
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("changetab", "video-tab");
+
+
+            savetype = string.Empty;
+            var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+            if (RQID != "0" && RQID != null)
+            {
+                fileid = Int32.Parse(RQID);
+                requestfile = await requestFileService.GetRequestfileById(fileid);
+                FileNumber = requestfile.Filenumber.ToString();
+                //searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
+                LoadData();
+                videonote.Enterdate = DateTime.Today;
+                //videonotes.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
+                videonote.Requestid = fileid;
+
+            }
+
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+    #endregion
+    #region "Methods"
+
+    private void LoadData()
+    {
+        searchvideonotes = searchnoteService.GetVideotnoteList(fileid).AsQueryable<SearchVideoNotes>();
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        Saved = false;
+
+        videonote.Moddate = DateTime.Now;
+        videonote.Moduser = userReg;
+
+        if (savetype == "update")
+        {
+            await VideonotesService.UpdateVideonote(videonote);
+          await  AuditData("Update Videonotes", "update");
+        }
+        else
+        {
+            videonote.Createdate = DateTime.Now;
+            videonote.Createuser = userReg;
+            await VideonotesService.CreateVideonote(videonote);
+           await AuditData("Create Videonotes", "create");
+
+        }
+
+        StatusClass = "alert-success";
+        Message = "Data updated successfully";
+        alertMessageShow = true;
+        await InvokeAsync(() => StateHasChanged());
+        await Task.Delay(1000);
+
+        alertMessageShow = false;
+        Saved = true;
+
+        videonote = new Videonote();
+        navigationManager.NavigateTo($"/videonotes/add/{fileid}", true);
+
+        //LoadData();
+        
+        //StateHasChanged();
+    }
+
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+        auditlog.ActivityXml = auditlogService.GetAuditxml(ovideonote, videonote, act).ToString();
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(ovideonote, videonote, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+
+    protected async Task SaveVideonotesData()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var username = user.Identity.Name;
+        // videonotes = await VideonotesService.CreateVideonotes(videonotes);
+        //videonotes.{firstuppercolname} = videonotes.{fieldname};
+
+        videonote.Moduser = username;
+        videonote.Createdate = DateTime.Now;
+        videonote.Moddate = DateTime.Now;
+        videonote = await VideonotesService.CreateVideonote(videonote);
+    }
+
+    private async void UpdateData(int id)
+    {
+        savetype = "";
+        if (id > 0)
+        {
+            savetype = "update";
+            GetData(id);
+        }
+    }
+
+    private async void GetData(int id)
+    {
+        if (id != null && id > 0)
+        {
+            ovideonote = await VideonotesService.GetVideonoteById(id);
+            videonote = await VideonotesService.GetVideonoteById(id);
+            StateHasChanged();
+        }
+    }
+
+    private ConfirmDialog dialog = default!;
+    private async Task ShowConfirmationAsync(int id)
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Are you sure you want to delete this?",
+            message1: "This will delete the record. Once deleted can not be rolled back.",
+            message2: "Do you want to proceed?");
+
+        if (confirmation)
+        {
+            if (id != null && id > 0)
+            {
+                videonote = await VideonotesService.GetVideonoteById(id);
+                await VideonotesService.DeleteVideonote(videonote);
+                AuditData("Delete Analyst Note", "delete");
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data deleted successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+
+            LoadData();
+            StateHasChanged();
+        }
+        else
+        {
+            // do something
+        }
+    }
+    #endregion
+}
+
+<h5>VideoNote</h5>
+
+<EditForm Model="@videonote" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbfileid">
+                    File Number:
+                </label>
+                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbenterdate">
+                    Enterdate:
+                </label>
+                <InputDate id="enterdate" class="form-control" placeholder="ENTERDATE" @bind-Value="videonote.Enterdate" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbanalyst">
+                    Analyst:
+                </label>
+                <InputSelect id="analyst" class="form-control" placeholder="ANALYST" @bind-Value="videonote.Analystid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in analysts)
+                    {
+                        <option value="@lktype.Id">@lktype.Displayname</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbtimetaken">
+                    Timetaken:
+                </label>
+                <InputText id="timetaken" class="form-control" placeholder="TIMETAKEN" @bind-Value="videonote.Timetaken" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbnotes">
+                    Notes:
+                </label>
+                <InputTextArea id="notes" class="form-control" placeholder="NOTES" @bind-Value="videonote.Notes" row="15" col="250" style="min-height: 130px; overflow:auto;" />
+            </div>
+
+        </div>
+    </div>
+
+    <hr />
+    <button type="button" class="btn btn-primary">Fill Data</button>
+    <button type="button" class="btn btn-primary">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+
+
+</EditForm>
+
+<br />
+
+<div class="row" style="width:100%;padding-bottom: 1em;">
+    <div class="col-lg-5" style="float:left">
+        Show:
+        <label><input type="checkbox" @bind="shownotes" /> Notes</label>
+
+    </div>
+    <div class="col-lg-5" style="float:left">
+        <div class="page-size-chooser">
+            Items per page:
+            <select @bind="@pagination.ItemsPerPage">
+                <option>3</option>
+                <option>5</option>
+                <option>10</option>
+            </select>
+
+        </div>
+    </div>
+    <div class="col-lg-2" style="float:revert">
+        <div class="page-size-chooser">
+        </div>
+    </div>
+</div>
+
+<ConfirmDialog @ref="dialog" />
+
+
+<div class="grid" tabindex="-1">
+    <QuickGrid Items="@searchvideonotes" Virtualize="true" Pagination="@pagination">
+        @if (shownotes)
+        {
+            <PropertyColumn Property="@(r => r.Notes)" Title="Notes" Sortable="true" class="col-width" />
+        }
+
+        <PropertyColumn Property="@(r => r.Timetaken)" Title="Time Taken" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Enterdate)" Title="Enter Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Analyst)" Title="Analyst" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
+            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />

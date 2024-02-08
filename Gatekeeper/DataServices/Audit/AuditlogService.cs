@@ -30,53 +30,69 @@ namespace Gatekeeper.DataServices.Audit
         public XElement GetAuditxml(object oldObj, object newObj, string type)
         {
 
-            Type oldtype = oldObj.GetType();
-            Type newtype = newObj.GetType();
-            
-            PropertyInfo[] oldprops = oldtype.GetProperties();
-            PropertyInfo[] newprops = newtype.GetProperties();
-
             XElement el = null;
-            XElement act = null;
+          
 
-            if (oldprops != newObj)
+            if (oldObj != null && newObj != null)
             {
-                 el = new XElement("root");
-                 act = new XElement("Activities");
-                act.Add(new XElement("Activity"), type);
-            }
 
-            foreach (PropertyInfo prop1 in oldprops)
-            {
-                foreach (PropertyInfo prop2 in newprops)
+                Type oldtype = oldObj.GetType();
+                Type newtype = newObj.GetType();
+
+                PropertyInfo[] oldprops = oldtype.GetProperties();
+                PropertyInfo[] newprops = newtype.GetProperties();
+
+              
+                XElement act = null;
+
+                if (oldprops != newObj)
                 {
-                    if (prop1.Name == prop2.Name)
-                    {
-                        if (prop1.GetValue(oldObj) != prop2.GetValue(oldObj))
-                        {
-                            act.Add(new XElement("property"),prop1.Name);
-                            act.Add(new XElement("old"), prop1.GetValue(oldObj));
-                            act.Add(new XElement("new"), prop2.GetValue(oldObj));
-                        }
-                    }       
+
+                    el = new XElement("root");
+                    el.Add(new XElement("Activity"), type);
+                    //el.Add(new XElement("Activities"));
+                    // act = new XElement("Activities");
+                    //act.Add(new XElement("Activity"), type);
                 }
-                el.Add(act);
 
-                return el;
+                foreach (PropertyInfo prop1 in oldprops)
+                {
+                    foreach (PropertyInfo prop2 in newprops)
+                    {
+                        if (prop1.Name == prop2.Name)
+                        {
+                            string value1 = "";
+                            if (prop1.GetValue(oldObj) != null)
+                            {
+                                value1 = prop1.GetValue(oldObj).ToString();
+                            }
 
+                            string value2 = "";
+                            if (prop2.GetValue(newObj) != null)
+                            {
+                                value2 = prop2.GetValue(newObj).ToString();
+                            }
+                            //if (prop1.GetValue(oldObj) != prop2.GetValue(newObj))
+                            if (value1 != value2)
+                            {
+                                act = new XElement(prop1.Name);
+                                //act.Add(new XElement("property"),prop1.Name);
+                                act.Add(new XElement("old"), prop1.GetValue(oldObj));
+                                act.Add(new XElement("new"), prop2.GetValue(newObj));
+                                el.Add(act);
+                                break;
+                            }
+                            
 
+                            
+                        }
+
+                    }
+
+                }
             }
 
-
-
-            
-
-
-
-
-
-
-            throw new NotImplementedException();
+            return el;
         }
     }
 }

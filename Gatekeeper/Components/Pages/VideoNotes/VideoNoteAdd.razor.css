@@ -1,0 +1,10 @@
+﻿::deep tr:nth-child(even) {
+    background: #d8d8d8;
+
+}
+
+
+::deep .col-width {
+    min-width: 63em;
+    max-width: 63em;
+}

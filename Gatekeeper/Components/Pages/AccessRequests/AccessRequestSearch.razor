@@ -11,7 +11,7 @@
 
 @code {
 
-
+    #region "Variables"
     // private List<string> header = new List<string>();
     private IRequestfileService RequestfileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
@@ -41,6 +41,10 @@
     private PersonName personname { get; set; } = new PersonName();
     #endregion
 
+    #endregion
+
+
+    #region  "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
         //LoadData();
@@ -84,7 +88,9 @@
         }
     }
 
+    #endregion
 
+    #region "Methods"
     private void ClearSearch()
     {
         POIselectedpersonname = null;
@@ -142,6 +148,7 @@
     {
         return await Task.FromResult(personnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
     }
+    #endregion
 }
 
 <EditForm Model="@fileInfo">

@@ -113,10 +113,8 @@
                 fileid = Int32.Parse(RQID);
                 requestfile = await requestFileService.GetRequestfileById(fileid);
                 FileNumber = requestfile.Filenumber.ToString();
-                //searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
+                
                 LoadData();
-                // extensions.Enterdate = DateTime.Today;
-                //extensions.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
                 extension.Requestid = fileid;
 
             }

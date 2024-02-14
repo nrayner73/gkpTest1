@@ -60,13 +60,15 @@
     protected async override Task OnParametersSetAsync()
     {
 
+       // using var context = new AppDbContext();
+        
 
         using var context = DbFactory.CreateDbContext();
         requesttypes = await context.LkRequesttypes.ToListAsync();
 
         persons = await context.People.ToListAsync();
         requestfiles = await context.Requestfiles.ToListAsync();
-
+        //requestfiles = await requestFileService.GetRequestfileList(null);
 
         holidays = await context.Holidays.ToListAsync();
         if (fileid > 0)
@@ -83,11 +85,8 @@
             requestfile.Intakenotes = _intakeNotes.ToString().Replace("&%23160;","");
             requestfile.Requestdetails = _requestDetails.ToString().Replace("&%23160;", "");
 
-
             person = persons.Where(p => p.Id == requestfile.Personid).FirstOrDefault();
         }
-
-
 
         if (requestfile.Yearid == 0 || requestfile.Yearid is null)
         {

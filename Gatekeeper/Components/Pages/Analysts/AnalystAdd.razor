@@ -356,13 +356,16 @@
 
         </div>
     </div>
-    <div class="col-lg-2" style="float:revert">
+    <div class="col-lg-12" style="float:revert; border-bottom:double;">
         <div class="page-size-chooser">
+         
         </div>
+        <Paginator State="@pagination"/>
     </div>
 </div>
 
 <ConfirmDialog @ref="dialog" />
+
 
 
 <div class="grid" tabindex="-1">
@@ -379,4 +382,4 @@
     </QuickGrid>
 </div>
 
-<Paginator State="@pagination" />
+

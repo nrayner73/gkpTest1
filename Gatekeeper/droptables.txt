@@ -1,0 +1,126 @@
+﻿USE [CPSAPPL1]
+GO
+/****** Object:  Table [gkp].[videonotes]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[videonotes]') AND type in (N'U'))
+DROP TABLE [gkp].[videonotes]
+GO
+/****** Object:  Table [gkp].[summarydisclosure]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[summarydisclosure]') AND type in (N'U'))
+DROP TABLE [gkp].[summarydisclosure]
+GO
+/****** Object:  Table [gkp].[requestfiles]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[requestfiles]') AND type in (N'U'))
+DROP TABLE [gkp].[requestfiles]
+GO
+/****** Object:  Table [gkp].[requestfee]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[requestfee]') AND type in (N'U'))
+DROP TABLE [gkp].[requestfee]
+GO
+/****** Object:  Table [gkp].[person]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[person]') AND type in (N'U'))
+DROP TABLE [gkp].[person]
+GO
+/****** Object:  Table [gkp].[payment]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[payment]') AND type in (N'U'))
+DROP TABLE [gkp].[payment]
+GO
+/****** Object:  Table [gkp].[pageitems]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[pageitems]') AND type in (N'U'))
+DROP TABLE [gkp].[pageitems]
+GO
+/****** Object:  Table [gkp].[oipc_items]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[oipc_items]') AND type in (N'U'))
+DROP TABLE [gkp].[oipc_items]
+GO
+/****** Object:  Table [gkp].[oipc]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[oipc]') AND type in (N'U'))
+DROP TABLE [gkp].[oipc]
+GO
+/****** Object:  Table [gkp].[locationitems]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[locationitems]') AND type in (N'U'))
+DROP TABLE [gkp].[locationitems]
+GO
+/****** Object:  Table [gkp].[lk_sections]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_sections]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_sections]
+GO
+/****** Object:  Table [gkp].[lk_reviewtypes]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_reviewtypes]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_reviewtypes]
+GO
+/****** Object:  Table [gkp].[lk_requesttypes]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_requesttypes]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_requesttypes]
+GO
+/****** Object:  Table [gkp].[lk_requeststate]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_requeststate]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_requeststate]
+GO
+/****** Object:  Table [gkp].[lk_recorddeliverymethod]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_recorddeliverymethod]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_recorddeliverymethod]
+GO
+/****** Object:  Table [gkp].[lk_reasongroup]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_reasongroup]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_reasongroup]
+GO
+/****** Object:  Table [gkp].[lk_reason]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_reason]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_reason]
+GO
+/****** Object:  Table [gkp].[lk_province]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_province]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_province]
+GO
+/****** Object:  Table [gkp].[lk_processingdeficiency]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_processingdeficiency]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_processingdeficiency]
+GO
+/****** Object:  Table [gkp].[lk_paymenttype]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_paymenttype]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_paymenttype]
+GO
+/****** Object:  Table [gkp].[lk_pages]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_pages]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_pages]
+GO
+/****** Object:  Table [gkp].[lk_mytaskstatus]    Script Date: 2024/02/12 2:38:10 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_mytaskstatus]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_mytaskstatus]
+GO
+/****** Object:  Table [gkp].[lk_locationsearch]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_locationsearch]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_locationsearch]
+GO
+/****** Object:  Table [gkp].[lk_extensions]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_extensions]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_extensions]
+GO
+/****** Object:  Table [gkp].[lk_city]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[lk_city]') AND type in (N'U'))
+DROP TABLE [gkp].[lk_city]
+GO
+/****** Object:  Table [gkp].[holidays]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[holidays]') AND type in (N'U'))
+DROP TABLE [gkp].[holidays]
+GO
+/****** Object:  Table [gkp].[extensions]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[extensions]') AND type in (N'U'))
+DROP TABLE [gkp].[extensions]
+GO
+/****** Object:  Table [gkp].[discloseditems]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[discloseditems]') AND type in (N'U'))
+DROP TABLE [gkp].[discloseditems]
+GO
+/****** Object:  Table [gkp].[AuditLog]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[AuditLog]') AND type in (N'U'))
+DROP TABLE [gkp].[AuditLog]
+GO
+/****** Object:  Table [gkp].[analystnote]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[analystnote]') AND type in (N'U'))
+DROP TABLE [gkp].[analystnote]
+GO
+/****** Object:  Table [gkp].[analyst]    Script Date: 2024/02/12 2:38:11 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[gkp].[analyst]') AND type in (N'U'))
+DROP TABLE [gkp].[analyst]
+GO

@@ -9,7 +9,7 @@
 
         public int? Extensionid { get; set; }
 
-        public string Extension { get; set; }
+        public string? Extension { get; set; }
 
         public int? Sectionid { get; set; }
 

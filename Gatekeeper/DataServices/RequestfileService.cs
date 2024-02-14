@@ -83,14 +83,11 @@ namespace Gatekeeper.Services
             //        .ToListAsync();
         }
 
+
         public async Task<Requestfile> GetRequestfileById(int id)
         {
-            
-                return await _context.Requestfiles
+            return await _context.Requestfiles
                 .FirstOrDefaultAsync(x => x.Id == id);
-           
-            //return await _context.Requestfiles
-            //    .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Requestfile> CreateRequestfile(Requestfile requestfile)

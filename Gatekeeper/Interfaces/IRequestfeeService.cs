@@ -1,5 +1,4 @@
 using Gatekeeper.Models;
-using GateKeeper.Models;
 
 namespace Gatekeeper.Interfaces
 {

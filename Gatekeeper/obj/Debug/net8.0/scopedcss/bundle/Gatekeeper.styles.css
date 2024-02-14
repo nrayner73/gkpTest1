@@ -296,6 +296,10 @@ page-size-chooser select[b-c731o5n56r] {
   margin: 0 1rem;
   padding: 0.25rem 0.5rem;
 }
+
+border-bottom[b-c731o5n56r] {
+border-bottom:double;
+}
 /* _content/Gatekeeper/Components/Pages/Extensions/ExtensionAdd.razor.rz.scp.css */
 [b-m2q7303c84] tr:nth-child(even) {
     background: #d8d8d8;
@@ -355,6 +359,11 @@ page-size-chooser select[b-c731o5n56r] {
 */
 [b-cnhds8r9c9] th.full-name {
     width: 14rem;
+}
+
+[b-cnhds8r9c9] .col-width {
+    min-width: 30em;
+    max-width: 30em;
 }
 
 /* Subtle stripe effect */

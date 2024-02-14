@@ -15,7 +15,7 @@
 
 
 @code {
-
+    #region "Variable"
     private IRequestfileService RequestfileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
 
@@ -28,6 +28,7 @@
     // QuickGrid<Searchmytask>? grid1;
     bool showpanel = false;
     bool showyear = false;
+    bool showid = false;
     string userReg = string.Empty;
 
     #region Lookup Parameters
@@ -44,6 +45,10 @@
     private PersonName personname { get; set; } = new PersonName();
     #endregion
 
+    #endregion
+
+
+    #region  "Component Lifecycle"
     protected async override Task OnParametersSetAsync()
     {
         if (requesttypes.Count == 0)
@@ -80,6 +85,9 @@
         }
     }
 
+    #endregion
+
+    #region "Methods"
     private void LoadData()
     {
 
@@ -129,7 +137,7 @@
 
     private void goToAddPage()
     {
-        navigationManager.NavigateTo("/accessrequests/add");
+        navigationManager.NavigateTo($"/accessrequests/add",true);
     }
 
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
@@ -154,6 +162,7 @@
 
         return _color;
     }
+    #endregion
 
 }
 
@@ -178,18 +187,7 @@
                     <InputText id="referencenumber" class="form-control" @bind-Value="fileInfo.Referencenumber" />
                 </div>
 
-                <div class="col-lg-2 col-md-3 col-sm-12">
-                    <label>
-                        Analyst:
-                    </label>
-                    <InputSelect id="analystassignedid" class="form-control" placeholder="ANALYST" @bind-Value="fileInfo.Analystassignedid">
-                        <option value="-1">All...</option>
-                        @foreach (var lktype in analysts)
-                        {
-                            <option value="@lktype.Id">@lktype.Displayname</option>
-                        }
-                    </InputSelect>
-                </div>
+              
 
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label for="lbrequesttypeid">
@@ -313,6 +311,8 @@
 <div class="row" style="width:100%;">
     <div class="col-lg-5" style="float:left">
         Show:
+        <label><input type="checkbox" @bind="showid" /> Record Id</label>
+        &nbsp;&nbsp;&nbsp;
         <label><input type="checkbox" @bind="showyear" /> Year</label>
         &nbsp;&nbsp;&nbsp;
         <label><input type="checkbox" @bind="showpanel" /> Search Panel</label>
@@ -332,7 +332,7 @@
     </div>
     <div class="col-lg-2" style="float:revert">
         <div class="page-size-chooser">
-            <button type="button" class="btn btn-warning">Add New</button>
+            <button type="button" class="btn btn-warning" @onclick="goToAddPage">Add New</button>
         </div>
     </div>
 
@@ -341,16 +341,22 @@
 
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchmytaskfiles" Virtualize="true" Pagination="@pagination">
+        @if (showid)
+        {
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
+        }
+
         @if (showyear)
         {
             <PropertyColumn Property="@(r => r.Fileyear)" Title="Year" Sortable="true" />
         }
-        <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
+
+        
         <PropertyColumn Property="@(r => r.Filenumber)" Title="File Number" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requesttype)" Title="Request Type" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" class="col-width" />
         <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Person Of Request" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
         <TemplateColumn Title="Status">

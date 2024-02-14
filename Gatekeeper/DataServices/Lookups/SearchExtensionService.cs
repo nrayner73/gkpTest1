@@ -16,12 +16,17 @@ namespace Gatekeeper.DataServices.Lookups
         public List<SearchExtension> GetExtensionList(int fileid)
         {
             SqlParameter parms = new SqlParameter { ParameterName = "@fileid", Value = fileid == 0 ? DBNull.Value : fileid };
-            List<SearchExtension> items = new List<SearchExtension>();
-            items = _context?.ExtensionInfos.FromSqlRaw("Execute [gkp].[GetExtension] @fileid", parms).ToList();
 
-            return items;
+            List<SearchExtension> notes = new List<SearchExtension>();
+            notes =  _context?.ExtensionInfos.FromSqlRaw("Execute [gkp].[GetExtension] @fileid",parms).ToList();
+
+            return notes;
+
+
+
+
         }
 
-        
+
     }
 }

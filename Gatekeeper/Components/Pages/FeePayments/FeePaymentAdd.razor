@@ -14,7 +14,7 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject ISearchRequestfeeService searchrequestfeeService
 @inject IAnalystsService analystService
-@inject IRequestfileService requestFileService
+@inject IRequestfileService requestFileService 
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
 
@@ -96,10 +96,10 @@
 
         if (fileid > 0 || requestfile.Id > 0)
         {
-            requestfile = await requestFileService.GetRequestfileById(fileid);
-            FileNumber = requestfile.Filenumber.ToString();
-            LoadData();
-            StateHasChanged();
+            // requestfile = await requestFileService.GetRequestfileById(fileid);
+            // FileNumber = requestfile.Filenumber.ToString();
+            // LoadData();
+            // StateHasChanged();
         }
     }
 
@@ -193,29 +193,34 @@
             requestfee.Moddate = DateTime.Now;
             requestfee.Moduser = userReg;
 
-            requestfees =  (await RequestfeeService.GetRequestfeeList(fileid)).ToList();
+            // requestfees =  (await RequestfeeService.GetRequestfeeList(fileid)).ToList();
 
-            foreach (var item in requestfees)
-            {
-                if (item.Id > 0 && (item.Description != "" && item.Description != null))
-                {
-                    await RequestfeeService.UpdateRequestfee(item);
-                    // await AuditData("Update Requestfee", "update");
-                }
-                else if (item.Id > 0 && (item.Description == "" || item.Description == null))
-                {
-                    await RequestfeeService.DeleteRequestfee(item);
-                }
-                else if (item.Requestid > 0 && item.Id == 0)
-                {
-                    if (item.Description != "" && item.Description != null)
-                    {
-                        requestfee.Createdate = DateTime.Now;
-                        requestfee.Createuser = userReg;
-                        await RequestfeeService.CreateRequestfee(item);
-                    }
-                }
-            }
+            // if (true)
+            // {
+
+            // }
+
+            // foreach (var item in requestfees)
+            // {
+            //     if (item.Id > 0 && (item.Description != "" && item.Description != null))
+            //     {
+            //         await RequestfeeService.UpdateRequestfee(item);
+            //         // await AuditData("Update Requestfee", "update");
+            //     }
+            //     else if (item.Id > 0 && (item.Description == "" || item.Description == null))
+            //     {
+            //         await RequestfeeService.DeleteRequestfee(item);
+            //     }
+            //     else if (item.Requestid > 0 && item.Id == 0)
+            //     {
+            //         if (item.Description != "" && item.Description != null)
+            //         {
+            //             requestfee.Createdate = DateTime.Now;
+            //             requestfee.Createuser = userReg;
+            //             await RequestfeeService.CreateRequestfee(item);
+            //         }
+            //     }
+            // }
 
             if (requestfee != null )
             {
@@ -226,37 +231,54 @@
                         requestfee.Createdate = DateTime.Now;
                         requestfee.Createuser = userReg;
                         await RequestfeeService.CreateRequestfee(requestfee);
-                        //await AuditData("Update Payment", "create");
+                        await AuditData("Create Payment", "create");
                     }
                 }
-
-            }
-
-            payments = (await PaymentService.GetPaymentList(fileid)).ToList();
-            foreach (var item in payments)
-            {
-                if (item.Id > 0 && (item.Description != "" && item.Description != null ))
+                else
                 {
-
-                    await PaymentService.UpdatePayment(item);
-                }
-                else if (item.Id > 0 && (item.Description == "" || item.Description == null))
-                {
-                    await PaymentService.DeletePayment(item);
-                }
-                else if (item.Requestid > 0 && item.Id == 0)
-                {
-                    if (item.Description != "" && item.Description != null)
+                    if (requestfee.Description != "" && requestfee.Description != null)
                     {
-                        payment.Createdate = DateTime.Now;
-                        payment.Createuser = userReg;
-                        await PaymentService.CreatePayment(item);
+                        requestfee.Moddate = DateTime.Now;
+                        requestfee.Moduser = userReg;
+                        await RequestfeeService.UpdateRequestfee(requestfee);
+                        await AuditData("Create Payment", "create");
+
                     }
+
+
 
                 }
 
-                //await AuditData("Update Payment", "update");
+
+
+
             }
+
+            // payments = (await PaymentService.GetPaymentList(fileid)).ToList();
+            // foreach (var item in payments)
+            // {
+            //     if (item.Id > 0 && (item.Description != "" && item.Description != null ))
+            //     {
+
+            //         await PaymentService.UpdatePayment(item);
+            //     }
+            //     else if (item.Id > 0 && (item.Description == "" || item.Description == null))
+            //     {
+            //         await PaymentService.DeletePayment(item);
+            //     }
+            //     else if (item.Requestid > 0 && item.Id == 0)
+            //     {
+            //         if (item.Description != "" && item.Description != null)
+            //         {
+            //             payment.Createdate = DateTime.Now;
+            //             payment.Createuser = userReg;
+            //             await PaymentService.CreatePayment(item);
+            //         }
+
+            //     }
+
+            //     await AuditData("Update Payment", "update");
+            // }
 
             if (payment != null)
             {
@@ -268,8 +290,19 @@
                         payment.Createuser = userReg;
                         await PaymentService.CreatePayment(payment);
                     }
-
                 }
+                else
+                {
+                    if (payment.Description != "" && payment.Description != null)
+                    {
+                        payment.Moddate = DateTime.Now;
+                        payment.Moduser = userReg;
+                        await PaymentService.UpdatePayment(payment);
+                    }
+                    
+                
+                }
+
             }
 
             StatusClass = "alert-success";
@@ -280,13 +313,13 @@
 
             alertMessageShow = false;
             Saved = true;
-            navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
+           // navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
         }
 
-        //LoadData();
-        //requestfee = new Requestfee();
-        //payment = new Payment();
-        //StateHasChanged();
+        LoadData();
+        requestfee = new Requestfee();
+        payment = new Payment();
+        StateHasChanged();
     }
 
 

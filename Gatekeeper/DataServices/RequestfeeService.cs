@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
-using GateKeeper.Models;
+using Gatekeeper.Models;
 
 namespace Gatekeeper.Services
 {

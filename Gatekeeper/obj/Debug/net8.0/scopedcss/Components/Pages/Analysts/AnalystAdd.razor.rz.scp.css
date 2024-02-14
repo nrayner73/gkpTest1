@@ -27,3 +27,7 @@ page-size-chooser select[b-c731o5n56r] {
   margin: 0 1rem;
   padding: 0.25rem 0.5rem;
 }
+
+border-bottom[b-c731o5n56r] {
+border-bottom:double;
+}

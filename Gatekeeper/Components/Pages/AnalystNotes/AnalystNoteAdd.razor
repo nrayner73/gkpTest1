@@ -116,17 +116,21 @@
 
     private async Task AuditData(string act, string type)
     {
+        auditlog = new AuditLog();
+
         auditlog.AccessDate = DateTime.Now;
         auditlog.RegNo = userReg;
         auditlog.Sdate = DateTime.Now;
         auditlog.UserName = userReg;
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
-        auditlog.ActivityXml = auditlogService.GetAuditxml(oanalystnote, analystnote, act).ToString();
 
         if (type == "update" || type == "delete")
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(oanalystnote, analystnote, act).ToString();
+            // private Analystnote oanalystnote { get; set; } = new Analystnote();
+            var onote = searchanalystnotes.Where(x => x.Id == analystnote.Id).FirstOrDefault();
+
+          //  auditlog.ActivityXml = auditlogService.GetAuditxml(onote, analystnote, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
@@ -219,7 +223,7 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/analystnotes/add/{fileid}", true);
+            navigationManager.NavigateTo($"/analystnotes/add/", true);
 
             LoadData();
             StateHasChanged();
@@ -329,7 +333,7 @@
     <br />
 
     <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
-    <button type="button" class="btn btn-primary" @onclick="ClearData">>Add New</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm>
 

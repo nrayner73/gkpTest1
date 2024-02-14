@@ -16,7 +16,7 @@
 @inject ILkPaymenttypeService paymentTypeService
 @inject ISearchPaymentService searchpaymentService
 @inject IAnalystsService analystService
-@inject IRequestfileService requestFileService
+@inject IRequestfileService requestFileService 
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
 
@@ -95,7 +95,7 @@
             if (RQID != "0" && RQID != null)
             {
                 fileid = Int32.Parse(RQID);
-                //requestfile = await requestFileService.GetRequestfileById(fileid);
+                // requestfile = await requestFileService.GetRequestfileById(fileid);
                 // FileNumber = requestfile.Filenumber.ToString();
 
                 LoadData();
@@ -114,8 +114,8 @@
 
     private void LoadData()
     {
-        // searchpayments = new List<SearchPayment>();
-        // searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
+         searchpayments = new List<SearchPayment>();
+         searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
        
         
     }
@@ -123,37 +123,37 @@
 
     protected async Task HandleValidSubmit()
     {
-        // Saved = false;
+        Saved = false;
 
-        // payment.Moddate = DateTime.Now;
-        // payment.Moduser = userReg;
+        payment.Moddate = DateTime.Now;
+        payment.Moduser = userReg;
 
-        // if (savetype == "update")
-        // {
-        //     await PaymentService.UpdatePayment(payment);
-        //     await AuditData("Update Payment", "update");
-        // }
-        // else
-        // {
-        //     payment.Createdate = DateTime.Now;
-        //     payment.Createuser = userReg;
-        //     await PaymentService.CreatePayment(payment);
-        //     await AuditData("Create Payment", "create");
+        if (savetype == "update")
+        {
+            await PaymentService.UpdatePayment(payment);
+            await AuditData("Update Payment", "update");
+        }
+        else
+        {
+            payment.Createdate = DateTime.Now;
+            payment.Createuser = userReg;
+            await PaymentService.CreatePayment(payment);
+            await AuditData("Create Payment", "create");
 
-        // }
+        }
 
-        // StatusClass = "alert-success";
-        // Message = "Data updated successfully";
-        // alertMessageShow = true;
-        // await InvokeAsync(() => StateHasChanged());
-        // await Task.Delay(1000);
+        StatusClass = "alert-success";
+        Message = "Data updated successfully";
+        alertMessageShow = true;
+        await InvokeAsync(() => StateHasChanged());
+        await Task.Delay(1000);
 
-        // alertMessageShow = false;
-        // Saved = true;
-        // navigationManager.NavigateTo($"/payment/add/{fileid}", true);
-        // //LoadData();
-        // //payment = new Payment();
-        // //StateHasChanged();
+        alertMessageShow = false;
+        Saved = true;
+        navigationManager.NavigateTo($"/payment/add/{fileid}", true);
+        //LoadData();
+        //payment = new Payment();
+        //StateHasChanged();
     }
 
     private async Task AuditData(string act, string type)
@@ -231,10 +231,10 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/Feepayment/add/", true);
+          //  navigationManager.NavigateTo($"/Feepayment/add/", true);
 
-            //LoadData();
-           // StateHasChanged();
+            LoadData();
+            StateHasChanged();
         }
         else
         {

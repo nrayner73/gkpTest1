@@ -4,6 +4,7 @@ using Gatekeeper.Models;
 using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Gatekeeper.DataServices.Lookups
 {
@@ -17,6 +18,8 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task<IEnumerable<DisclosedViewitem>> GetDiscloseditemsList(int fileid)
         {
+
+         //   SqlParameter parms = new SqlParameter { ParameterName = "@regno", Value = regno == "" ? DBNull.Value : regno };
 
             SqlParameter parms = new SqlParameter { ParameterName = "@fileid", Value = fileid == 0 ? (object)DBNull.Value : fileid };
             List<DisclosedViewitem> items = new List<DisclosedViewitem>();

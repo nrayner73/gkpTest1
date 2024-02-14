@@ -42,13 +42,29 @@ namespace Gatekeeper.Models.Lookups
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AddressInfo>().HasNoKey();
+            modelBuilder.Entity<ContactInfo>().HasNoKey();
+            modelBuilder.Entity<Searchrequestfile>().HasNoKey();
+            modelBuilder.Entity<Searchmytask>().HasNoKey();
+            modelBuilder.Entity<SearchAnalystNotes>().HasNoKey();
+            modelBuilder.Entity<SearchVideoNotes>().HasNoKey();
+            modelBuilder.Entity<DisclosedViewitem>().HasNoKey();
+            modelBuilder.Entity<Summarydisclosure>().HasNoKey();
+            modelBuilder.Entity<SearchPayment>().HasNoKey();
+            modelBuilder.Entity<DisclosedViewitem>().HasNoKey();
+            modelBuilder.Entity<SearchRequestfee>().HasNoKey();
+            modelBuilder.Entity<SearchExtension>().HasNoKey();
+            modelBuilder.Entity<HolidayView>().HasNoKey();
+
+
         }
 
-            //     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            //=> optionsBuilder.UseSqlServer("Server=.\\; Database=GateKeeper;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;");
+        //     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //=> optionsBuilder.UseSqlServer("Server=.\\; Database=GateKeeper;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;");
 
-            //   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            //=> optionsBuilder.UseSqlServer(configuration.GetConnectionString("gkConnectionString"));
+        //   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //=> optionsBuilder.UseSqlServer(configuration.GetConnectionString("gkConnectionString"));
 
-        }
+    }
 }

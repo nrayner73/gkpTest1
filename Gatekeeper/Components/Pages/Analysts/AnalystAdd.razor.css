@@ -27,3 +27,7 @@ page-size-chooser select {
   margin: 0 1rem;
   padding: 0.25rem 0.5rem;
 }
+
+border-bottom {
+border-bottom:double;
+}

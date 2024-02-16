@@ -16,6 +16,7 @@ namespace Gatekeeper.Models.Lookups
         public DateOnly ? Receivedate { get; set; }
         public DateOnly ? Requestduedate { get; set; }
         public string? Referencenumber { get; set; } = string.Empty;
+        public string? Statusnote {  get; set; } = string.Empty;
         public int? Requesttypeid { get; set; }
         public string? Requesttype { get; set; } = string.Empty;
         public string? Analystassigned { get; set; } = string.Empty;

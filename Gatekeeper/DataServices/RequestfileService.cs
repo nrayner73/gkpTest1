@@ -34,6 +34,7 @@ namespace Gatekeeper.Services
                 new SqlParameter { ParameterName = "@receivedate",Value = searchfilter.Receivedate },
                 new SqlParameter { ParameterName = "@requestduedate",Value = searchfilter.Requestduedate },
                 new SqlParameter { ParameterName = "@referencenumber",Value = searchfilter.Referencenumber },
+                new SqlParameter { ParameterName = "@statusnote",Value = searchfilter.Statusnote },
                 new SqlParameter { ParameterName = "@requesttypeid",Value = searchfilter.Requesttypeid },
                 new SqlParameter { ParameterName = "@requesttype",Value = searchfilter.Requesttype },
                 new SqlParameter { ParameterName = "@analystassignedid",Value = searchfilter.Analystassignedid },
@@ -59,6 +60,7 @@ namespace Gatekeeper.Services
         " @receivefromdate, " +
         " @receivetodate, " +
         " @referencenumber, " +
+        " @statusnote, " +
         " @requesttypeid, " +
         " @requesttype, " +
         " @analystassignedid, " +

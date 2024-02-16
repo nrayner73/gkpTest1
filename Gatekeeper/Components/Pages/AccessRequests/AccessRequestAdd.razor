@@ -218,6 +218,7 @@
         requestfile.Receivedate = DateTime.Today.Date;
         setDuedate();
         requestfile.Referencenumber = "RF";
+        requestfile.Statusnote = "Status Note For";
         requestfile.Idviewed = 0;
         requestfile.Requesttypeid = 1;
         requestfile.Recorddeliverymethodid = 1;
@@ -333,6 +334,7 @@
             if (setTestdata)
             {
                 updatefile.Referencenumber = "RF " + requestfile.Filenumber;
+                updatefile.Statusnote = "Status Note For " + requestfile.Filenumber;
                 updatefile.Requestdetails = "Request Details For " + requestfile.Filenumber;
                 updatefile.Previousrequests = "Test For " + requestfile.Filenumber;
                 updatefile.Intakenotes = "Intake Notes For " + requestfile.Filenumber;

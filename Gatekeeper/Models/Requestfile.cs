@@ -20,6 +20,7 @@ public DateTime? Receivedate{ get; set; }
 public DateTime? Requestduedate{ get; set; }
 [Column(TypeName = "varchar(2000)")]
 public string? Referencenumber{ get; set; }
+public string? Statusnote {  get; set; }
 public int? Idviewed{ get; set; }
 public int? Requesttypeid{ get; set; }
 public int? Recorddeliverymethodid{ get; set; }

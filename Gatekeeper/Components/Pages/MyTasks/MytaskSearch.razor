@@ -5,11 +5,19 @@
 @using System.Drawing;
 @inject AuthenticationStateProvider authenticationProvider
 @inject ISearchmytaskService searchmytaskService
-@inject Blazored.SessionStorage.ISessionStorageService session
+
 @inject IJSRuntime JSRuntime
 @inject NavigationManager navigationManager
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
+
+@inject IRequestfileService requestFileService
+
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject LoginState loginState;
+@inject AppState appState;
+
+
 @page "/"
 @page "/mytasks/search"
 
@@ -135,9 +143,27 @@
 
     }
 
-    private void goToAddPage()
+    private void goToAddPage(int fileid)
     {
+        setSession(fileid);
         navigationManager.NavigateTo($"/accessrequests/add",true);
+    }
+
+      private async Task setSession(int fileid)
+    {
+        //  Requestfile requestfile = new Requestfile();
+       
+
+        if (fileid > 0)
+        {
+            requestfile = await requestFileService.GetRequestfileById(fileid);
+            await sessionStorage.SetItemAsync("RQID", requestfile.Id);
+            await sessionStorage.SetItemAsync("objFileRequest", requestfile);
+
+            loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
+            requestfile = loginState.Requestfile;
+        }
+        
     }
 
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
@@ -332,7 +358,7 @@
     </div>
     <div class="col-lg-2" style="float:revert">
         <div class="page-size-chooser">
-            <button type="button" class="btn btn-warning" @onclick="goToAddPage">Add New</button>
+            <button type="button" class="btn btn-warning" @onclick="()=>goToAddPage(0)">Add New</button>
         </div>
     </div>
 
@@ -370,7 +396,7 @@
             }
         </TemplateColumn>
         <TemplateColumn Title="Actions">
-            <a href="@($"/accessrequests/add/{context.Id}")" class="btn btn-outline-primary">
+            <a @onclick="()=>goToAddPage(context.Id)"  class="btn btn-outline-primary">
                 <i class="fas fa-edit">Edit</i>
             </a>
         </TemplateColumn>

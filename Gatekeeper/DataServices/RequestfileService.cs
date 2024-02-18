@@ -86,8 +86,14 @@ namespace Gatekeeper.Services
 
         public async Task<Requestfile> GetRequestfileById(int id)
         {
-            return await _context.Requestfiles
+            Requestfile requestfile = new Requestfile();
+
+            if (_context.Requestfiles != null)
+            {
+                requestfile = await _context.Requestfiles
                 .FirstOrDefaultAsync(x => x.Id == id);
+            }
+            return requestfile;
         }
 
         public async Task<Requestfile> CreateRequestfile(Requestfile requestfile)

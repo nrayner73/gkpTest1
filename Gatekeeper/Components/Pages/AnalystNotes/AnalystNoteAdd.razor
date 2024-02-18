@@ -17,7 +17,12 @@
 @inject IAnalystsService analystService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
+
 @inject NavigationManager navigationManager
+@inject AppState appState
+@implements IDisposable
+@inject LoginState loginState;
+
 
 @page "/analystnotes/add/{fileid:int?}"
 
@@ -56,25 +61,38 @@
 
     bool showpanel = true;
     bool shownotes = true;
+
+
+
     #endregion
 
 
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        // var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        // var user = authState.User;
-        // userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        loginState.OnChange += StateHasChanged;
+
+        if (loginState.gFileId > 0)
+        {
+            fileid = (int)loginState.gFileId;
+            FileNumber = loginState.gFileNumber;
+            LoadData();
+            StateHasChanged();
+        }
+
+    }
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
     {
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        //var user = authState.User;
-        //AuthenticationState user = authState.User;
         user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        analysts = (await analystService.GetAnalystsList()).ToList();
+      
     }
 
     protected async override void OnAfterRender(bool firstRender)
@@ -91,14 +109,25 @@
             if (RQID != "0" && RQID != null)
             {
                 fileid = Int32.Parse(RQID);
-                requestfile = await requestFileService.GetRequestfileById(fileid);
-                FileNumber = requestfile.Filenumber.ToString();
-                //searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
+                if (loginState.gFileId == 0)
+                {
+                    loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
+                }
+                requestfile = loginState.Requestfile;
+
+
+                //requestfile = await requestFileService.GetRequestfileById(fileid);
+                //FileNumber = requestfile.Filenumber.ToString();
+                // loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
+
+                // FileNumber = loginState.Requestfile.Filenumber;
+                // loginState.OnChange += StateHasChanged;
+                analysts = (await analystService.GetAnalystsList()).ToList();
                 LoadData();
                 analystnote.Enterdate = DateTime.Today;
                 analystnote.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
                 analystnote.Requestid = fileid;
-
+                
             }
 
             StateHasChanged();
@@ -130,7 +159,7 @@
             // private Analystnote oanalystnote { get; set; } = new Analystnote();
             var onote = searchanalystnotes.Where(x => x.Id == analystnote.Id).FirstOrDefault();
 
-          //  auditlog.ActivityXml = auditlogService.GetAuditxml(onote, analystnote, act).ToString();
+            //  auditlog.ActivityXml = auditlogService.GetAuditxml(onote, analystnote, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
@@ -171,7 +200,7 @@
 
         alertMessageShow = false;
         Saved = true;
-
+        navigationManager.NavigateTo($"/analystnotes/add/{fileid}", true);
         LoadData();
         analystnote = new Analystnote();
         StateHasChanged();
@@ -223,7 +252,7 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/analystnotes/add/", true);
+            navigationManager.NavigateTo($"/analystnotes/add/{fileid}", true);
 
             LoadData();
             StateHasChanged();
@@ -236,14 +265,14 @@
 
     private void ClearData()
     {
-        analystnote = new Analystnote();    
+        analystnote = new Analystnote();
 
     }
 
 
     private void FillData()
     {
-       // analystnote.Id = 1;
+        // analystnote.Id = 1;
         analystnote.Requestid = fileid;
         analystnote.Enterdate = DateTime.Now;
         analystnote.Analystid = 1;
@@ -266,8 +295,10 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Notes:</h5>
+<h5>Notes: @loginState.gFileNumber</h5>
 
+
+My Messagte: @appState.myMessage
 <EditForm Model="@analystnote" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />

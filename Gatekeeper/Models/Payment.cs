@@ -19,8 +19,8 @@ public string? Description{ get; set; }
 public string? Authorization{ get; set; }
 public int? Paytypeid{ get; set; }
 public DateTime? Paymentdate{ get; set; }
-public int? Payamount{ get; set; }
-public int? Finalcost{ get; set; }
+public decimal? Payamount{ get; set; }
+public decimal? Finalcost{ get; set; }
 public DateTime? Createdate{ get; set; }
 [Column(TypeName = "varchar(45)")]
 public string? Createuser{ get; set; }

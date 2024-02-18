@@ -1,6 +1,11 @@
 ﻿@inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inherits LayoutComponentBase
+
+@inject LoginState loginState;
+@implements IDisposable
 
 <nav class="navbar .navbar-collapse  bg-body-tertiary" >
         <div class="container-fluid">
@@ -31,6 +36,23 @@
     </nav>
 
 @code {
+    private string? userReg;
+    protected async override Task OnInitializedAsync()
+    {
+        loginState.OnChange += StateHasChanged;
 
+        if (loginState.gFileId > 0)
+        {
+            var x = loginState.gFileId;
+        }
+      
+
+    }
+
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
+    }
 
 }

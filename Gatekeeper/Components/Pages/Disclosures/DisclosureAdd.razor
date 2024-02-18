@@ -19,6 +19,11 @@
 @inject ILkSectionsService lksectionService
 @inject NavigationManager navigationManager
 
+@inject AppState appState
+@implements IDisposable
+@inject LoginState loginState;
+
+
 @page "/disclosure/add/{fileid:int?}"
 
 @code {
@@ -73,9 +78,27 @@
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        // var user = authstate.User;
-        // var name = user.Identity.Name;
+        loginState.OnChange += StateHasChanged;
+
+        if (loginState.gFileId > 0)
+        {
+            fileid = (int)loginState.gFileId;
+            FileNumber = loginState.gFileNumber;
+
+
+        }
+        if (sectionlist.Count == 0)
+        {
+            sectionlist = (await lksectionService.GetLkSectionsList()).ToList();
+        }
+
+        // LoadData();
+    }
+
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -83,7 +106,9 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-
+        discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+        odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+        disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
     }
 
     protected async override void OnAfterRender(bool firstRender)
@@ -96,17 +121,25 @@
 
             savetype = string.Empty;
             var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+            var objRequest = await sessionStorage.GetItemAsync<Requestfile>("objFileRequest");
+
             if (RQID != "0" && RQID != null)
             {
                 fileid = Int32.Parse(RQID);
-                requestfile = await requestFileService.GetRequestfileById(fileid);
-                FileNumber = requestfile.Filenumber.ToString();
+
+               // if (loginState.gFileId == 0 && loginState.gFileId != null)
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
+                {
+                    loginState.SetLogin(objRequest);
+                }
+
+                // requestfile = loginState.Requestfile;
+                FileNumber = objRequest.Filenumber;
 
                 //discloseditemsService.GetDiscloseditemsList();
-                sectionlist = (await lksectionService.GetLkSectionsList()).ToList();
 
-                discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-                odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+
+                
 
                 LoadData();
             }
@@ -147,7 +180,7 @@
     }
 
 
-    private async void LoadData()
+    private async Task LoadData()
     {
         //get summary disclosure data
         summarydisclosures = (await SummarydisclosureService.GetSummarydisclosureList(fileid)).ToList();
@@ -159,13 +192,26 @@
 
             if (fileid != null && fileid > 0)
             {
+
                 disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
-                //get disclosure authorities data
-                discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+                // if (discloseditemsData.Count == 0)
+                // {
+                //     discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+                // }
+                
+                
+
+                // discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+                // odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+
+
+                // disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
+                // //get disclosure authorities data
+                // discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
 
             }
 
-              StateHasChanged();
+            StateHasChanged();
         }
     }
 
@@ -178,8 +224,8 @@
     protected async Task HandleValidSubmit()
     {
 
-        osummarydisclosures = (await disclosedViewService.GetDisclosureSummary(fileid)).ToList();
-        osummarydisclosure = osummarydisclosures.FirstOrDefault();
+        //osummarydisclosures = (await disclosedViewService.GetDisclosureSummary(fileid)).ToList();
+        //  osummarydisclosure = osummarydisclosures.FirstOrDefault();
 
         Saved = false;
 
@@ -197,6 +243,7 @@
         if (savetype == "update")
         {
             await SummarydisclosureService.UpdateSummarydisclosure(summarydisclosure);
+
             await AuditData("Update Summarydisclosure", "update");
         }
         else
@@ -223,12 +270,16 @@
         //insert new disclosureitem
         foreach (var item in discloseditemsData)
         {
-            discloseditem = new Discloseditem();
-            discloseditem = await DiscloseditemService.GetDiscloseditemsBySectionId(item.Sectionid, item.Requestid);
 
+            Discloseditem odiscloseditem = new Discloseditem();
+
+            odiscloseditem = await DiscloseditemService.GetDiscloseditemsBySectionId(item.Sectionid, fileid);
+
+            
             //skip any section item that already exists in the table
-            if (discloseditem == null)
+            if (odiscloseditem == null)
             {
+                item.Requestid = fileid;
                 await DiscloseditemService.CreateDiscloseditems(item);
             }
         }

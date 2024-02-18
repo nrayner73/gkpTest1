@@ -15,7 +15,15 @@ namespace Gatekeeper.DataServices.Lookups
             _context = context;
         }
 
-        public List<Searchrequestfile> GetRequestfileList(Searchrequestfile searchfilter)
+        public Searchrequestfile GetRequestfileById(int fileid)
+        {
+            Searchrequestfile? requestfile = new Searchrequestfile();
+
+            requestfile = _context?.RequestfileInfos.FromSqlRaw("EXECUTE [gkp].[SearchRequestFiles] @id", fileid).FirstOrDefault();
+
+            return requestfile;
+        }
+            public List<Searchrequestfile> GetRequestfileList(Searchrequestfile searchfilter)
         {
             List<SqlParameter> parms = new List<SqlParameter>
             {

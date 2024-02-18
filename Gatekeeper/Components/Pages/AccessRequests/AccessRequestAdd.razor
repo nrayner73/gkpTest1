@@ -13,14 +13,21 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
 @inject IPersonService personService
-@inject IRequestfileService requestFileService
+
 @inject IJSRuntime JSRuntime
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject LoginState loginState;
+@inject AppState appState;
+@inject NavigationManager navigationManager
 
 @page "/accessrequests/add/{fileid:int?}"
 
 
 @code {
+    public string Data { get; set; } = "Data from grand parent component.";
+    public string Data1 { get; set; } = "First data.";
+    public string Data2 { get; set; } = "Second data.";
+
     #region "Parameters"
     bool otherreason = false;
     bool setTestdata = false;
@@ -35,7 +42,7 @@
 
 
     [Inject]
-    private IRequestfileService RequestfileService { get; set; }
+    private IRequestfileService requestFileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
     private Requestfile Sessionrequestfile { get; set; } = new Requestfile();
     private List<Requestfile>? requestfiles { get; set; } = new List<Requestfile>();
@@ -49,6 +56,7 @@
     private string? SuccessMessage { get; set; }
     public List<Holiday>? holidays { get; set; } = new List<Holiday>();
 
+
     #endregion
 
     #region "Component Lifecycle"
@@ -60,14 +68,11 @@
     protected async override Task OnParametersSetAsync()
     {
 
-       // using var context = new AppDbContext();
-        
-
         using var context = DbFactory.CreateDbContext();
         requesttypes = await context.LkRequesttypes.ToListAsync();
 
         persons = await context.People.ToListAsync();
-        requestfiles = await context.Requestfiles.ToListAsync();
+         requestfiles = await context.Requestfiles.ToListAsync();
         //requestfiles = await requestFileService.GetRequestfileList(null);
 
         holidays = await context.Holidays.ToListAsync();
@@ -77,7 +82,8 @@
             Regex defaultRegex = new Regex(pattern);
             MatchCollection matches;
 
-            requestfile = requestfiles.Where(r => r.Id == fileid).FirstOrDefault();
+            loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
+            requestfile = loginState.Requestfile;
 
             var _intakeNotes = HtmlUtilities.ConvertToPlainText(requestfile.Intakenotes);
             var _requestDetails = HtmlUtilities.ConvertToPlainText(requestfile.Requestdetails);
@@ -108,17 +114,43 @@
     {
         if (firstRender)
         {
+
             if (fileid > 0)
             {
                 await sessionStorage.SetItemAsync("RQID", fileid);
+                await sessionStorage.SetItemAsync("objFileRequest", requestfile);
+                loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
+
+                appState.myMessage = fileid.ToString();
+                //requestfile = await requestFileService.GetRequestfileById(fileid);
+                // loginState.SetLogin(fileid.ToString(), requestfile.Filenumber.ToString());
+
             }
             else
             {
                 var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+
                 if (RQID != "0" && RQID != null)
                 {
                     fileid = Int32.Parse(RQID);
-                    requestfile = await requestFileService.GetRequestfileById(fileid);
+                   
+                    //  navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
+                    if (loginState.gFileId == 0 || loginState.gFileId == null)
+                    {
+                        loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
+                    }
+                  
+
+                    //loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
+                    requestfile = loginState.Requestfile;
+
+                    // if (requestfile.Id == 0)
+                    // {
+                    //     requestfile = new Requestfile();
+                    //     requestfile = await requestFileService.GetRequestfileById(fileid);
+                    //     loginState.SetLogin(fileid.ToString(), requestfile.Filenumber.ToString());
+                    // }
+                    
                 }
             }
             setTestdata = false;
@@ -227,7 +259,11 @@
 
                     await requestFileService.CreateRequestfile(requestfile);
                     UpdateFileNumber(requestfile.Id);
-                    await session.SetItemAsync("SessioRequestFile", requestfile);
+                    //await session.SetItemAsync("SessioRequestFile", requestfile);
+
+                    await sessionStorage.SetItemAsync("RQID", requestfile.Id);
+                    await sessionStorage.SetItemAsync("objFileRequest", requestfile);
+                    loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
 
                     // await JSRuntime.InvokeVoidAsync("alert", "Data saved successfully");
                     SuccessMessage = "Data saved successfully";
@@ -455,7 +491,18 @@
     #endregion
 }
 
+<CascadingValue Value="Data">
+    <Parent />
+</CascadingValue>
+
+<CascadingValue Value="Data1">
+    <CascadingValue Value="Data2" Name="CascadeParam2">
+        <Parent />
+    </CascadingValue>
+</CascadingValue>
+
 <h5>Access Request</h5>
+
 
 <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">

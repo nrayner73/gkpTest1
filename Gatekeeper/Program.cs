@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Authentication.Negotiate;
 using Gatekeeper.Interfaces.Audit;
 using Gatekeeper.DataServices.Audit;
 using Gatekeeper.DataServices;
+using Gatekeeper.Classes;
+using Microsoft.Data.SqlClient;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +28,14 @@ builder.Services.AddBlazoredSessionStorage();
 
 // Gatekeeper Services
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("gkConnectionString")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("gkConnectionString"));
+    options.EnableSensitiveDataLogging();
+}
+);
+
+SqlConnectionStringBuilder Sqlbuilder = new SqlConnectionStringBuilder();
+Sqlbuilder.ConnectionString = builder.Configuration.GetConnectionString("gkConnectionString");
 
 builder.Services.AddDbContextFactory<LookupDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("gkConnectionString")));
@@ -74,6 +84,11 @@ builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
 builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
 builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
 builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
+
+
+builder.Services.AddScoped<AppState>();
+builder.Services.AddScoped<LoginState>();
+
 
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
     .AddNegotiate();

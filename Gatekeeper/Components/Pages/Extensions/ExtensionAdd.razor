@@ -21,7 +21,9 @@
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
 
-
+@inject AppState appState
+@implements IDisposable
+@inject LoginState loginState;
 
 @page "/extension/add/{fileid:int?}"
 
@@ -80,6 +82,15 @@
         var user = authstate.User;
         var name = user.Identity.Name;
 
+        loginState.OnChange += StateHasChanged;
+
+        if (loginState.gFileId > 0)
+        {
+            fileid = (int)loginState.gFileId;
+            FileNumber = loginState.gFileNumber;
+
+
+        }
         extensions = (await ExtensionsService.GetExtensionsList(fileid)).ToList();
     }
 
@@ -108,11 +119,24 @@
 
             savetype = string.Empty;
             var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+            var objRequest = await sessionStorage.GetItemAsync<Requestfile>("objFileRequest");
             if (RQID != "0" && RQID != null)
             {
                 fileid = Int32.Parse(RQID);
-                requestfile = await requestFileService.GetRequestfileById(fileid);
-                FileNumber = requestfile.Filenumber.ToString();
+                requestfile = objRequest;
+
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
+                {
+                    loginState.SetLogin(objRequest);
+                }
+
+                // requestfile = loginState.Requestfile;
+                FileNumber = objRequest.Filenumber;
+
+                fileid = Int32.Parse(RQID);
+          
+                //await requestFileService.GetRequestfileById(fileid);
+                
                 
                 LoadData();
                 extension.Requestid = fileid;
@@ -123,6 +147,12 @@
             firstRender = false;
         }
     }
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
+    }
+
     #endregion
     #region "Methods"
 

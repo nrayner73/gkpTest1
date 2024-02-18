@@ -15,19 +15,48 @@ namespace Gatekeeper.Services
 
         public DiscloseditemsService(AppDbContext context)
         {
+
+            //_context.Database.CloseConnection();
+            //_context.Database.OpenConnection();
+      
             _context = context;
+
+            
+
+
         }
+
+       
 
         public async Task<IEnumerable<Discloseditem>> GetDiscloseditemsList(int fileid)
         {
-            return await _context.Discloseditems.Where(x => x.Requestid == fileid)
+            List<Discloseditem> discloseditems = new List<Discloseditem>();
+
+           var items =  await _context.Discloseditems
                     .ToListAsync();
+
+            if (fileid > 0)
+            {
+                discloseditems = items.Where(x=>x.Requestid.Equals(fileid)).ToList();
+            }
+
+          //  _context.Entry(discloseditems).Reload();
+
+            return discloseditems;
         }
 
         public async Task<Discloseditem> GetDiscloseditemsBySectionId(int sectionid,int fileid)
         {
-            return await _context.Discloseditems
+            Discloseditem discloseditem = new Discloseditem();
+
+            discloseditem = await _context.Discloseditems
                 .FirstOrDefaultAsync(x => x.Sectionid == sectionid && x.Requestid == fileid);
+
+           // _context.Entry(discloseditem).Reload();
+
+            return discloseditem;
+
+
         }
 
         public async Task<Discloseditem> GetDiscloseditemsById(int id)

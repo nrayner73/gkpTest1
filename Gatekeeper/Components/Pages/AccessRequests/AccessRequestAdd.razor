@@ -73,8 +73,7 @@
 
         persons = await context.People.ToListAsync();
          requestfiles = await context.Requestfiles.ToListAsync();
-        //requestfiles = await requestFileService.GetRequestfileList(null);
-
+     
         holidays = await context.Holidays.ToListAsync();
         if (fileid > 0)
         {
@@ -105,7 +104,6 @@
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
 
         SuccessMessage = "";
-        // Sessionrequestfile = await session.GetItemAsync<Requestfile>("SessionRequestFile");
 
     }
 
@@ -122,8 +120,7 @@
                 loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
 
                 appState.myMessage = fileid.ToString();
-                //requestfile = await requestFileService.GetRequestfileById(fileid);
-                // loginState.SetLogin(fileid.ToString(), requestfile.Filenumber.ToString());
+
 
             }
             else
@@ -139,18 +136,7 @@
                     {
                         loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
                     }
-                  
-
-                    //loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
                     requestfile = loginState.Requestfile;
-
-                    // if (requestfile.Id == 0)
-                    // {
-                    //     requestfile = new Requestfile();
-                    //     requestfile = await requestFileService.GetRequestfileById(fileid);
-                    //     loginState.SetLogin(fileid.ToString(), requestfile.Filenumber.ToString());
-                    // }
-                    
                 }
             }
             setTestdata = false;

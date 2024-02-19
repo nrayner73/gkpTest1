@@ -9,6 +9,10 @@
 @implements IDisposable
 
 
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager navigationManager
+
+
 <style>
     .required {
         color: red;
@@ -54,19 +58,18 @@
         margin-left: 500px
     }
 
- 
-
 </style>
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
+    @if (canAccess)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
     <main>
         <div class="top-row">
             <div>
-              
             </div>
             <div class="col-7 align-self-start">
                 <TopMenu></TopMenu>
@@ -94,26 +97,33 @@
 @code {
 
 
-
-
+    private bool canAccess = false;
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     private string? userReg;
     protected async override Task OnInitializedAsync()
     {
+        using var context = DbFactory.CreateDbContext();
+
         loginState.OnChange += StateHasChanged;
 
-        if (loginState.gFileId >0)
-        {
-            var x = loginState.gFileId;
-        }
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         var nameUser = user.Identity?.Name;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        // session.SetItemAsStringAsync("SessionUser", userReg);
+        analysts = await context.Analysts.Where(x => x.Regno.Contains(userReg) && !x.Status.Contains("del")).ToListAsync();
+
+        if (analysts.Count > 0)
+        {
+            canAccess = true;
+        }
+        else
+        {
+            canAccess = false;
+        }
 
     }
 
-      public void Dispose()
+    public void Dispose()
     {
         loginState.OnChange -= StateHasChanged;
     }
@@ -124,10 +134,10 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-           // await sessionStorage.SetItemAsync("RQID", fileid);
+            // await sessionStorage.SetItemAsync("RQID", fileid);
             await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
             var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-  
+
 
             firstRender = false;
         }

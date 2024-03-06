@@ -20,8 +20,10 @@ namespace Gatekeeper.DataServices
         {
             List<ProcessingDeficiency> items = new List<ProcessingDeficiency>();
 
-            items = await _context.ProcessingDeficiencies.ToListAsync();
-
+            if(false)
+            {
+                items = await _context.ProcessingDeficiencies.ToListAsync();
+            }
 
             return items;
         }

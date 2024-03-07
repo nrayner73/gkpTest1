@@ -145,9 +145,10 @@ C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\scopedcss\Components\P
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\scopedcss\Components\Pages\VideoNotes\VideoNoteAdd.razor.rz.scp.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\scopedcss\bundle\Gatekeeper.styles.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\scopedcss\projectbundle\Gatekeeper.bundle.scp.css
-C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\Gatekeeper.csproj.CopyComplete
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\Gatekeeper.dll
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\refint\Gatekeeper.dll
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\Gatekeeper.pdb
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\Gatekeeper.genruntimeconfig.cache
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\ref\Gatekeeper.dll
+C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\scopedcss\Components\Layout\TopMenu.razor.rz.scp.css
+C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\Gatekeeper.csproj.Up2Date

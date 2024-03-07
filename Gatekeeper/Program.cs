@@ -34,6 +34,7 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 }
 );
 
+
 SqlConnectionStringBuilder Sqlbuilder = new SqlConnectionStringBuilder();
 Sqlbuilder.ConnectionString = builder.Configuration.GetConnectionString("gkConnectionString");
 
@@ -54,6 +55,8 @@ builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
 
 //Lookup
+builder.Services.AddScoped<ILookupService,LookupDataService>();
+
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();

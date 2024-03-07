@@ -34,16 +34,11 @@ function hideTopmenu() {
         var topmenu = document.getElementById("fileTabs");
         topmenu.style.display = "none";
     }
-
-
-
 }
 
 function changetab(elname) {
 
-   
-
-   // alert(elname);
+  /*  alert(elname);*/
 
     document.getElementById("file-tab").classList.remove("active");
     document.getElementById("note-tab").classList.remove("active");
@@ -55,7 +50,39 @@ function changetab(elname) {
     document.getElementById(elname).classList.toggle("active");
     document.getElementById(elname).removeAttribute('aria-current');
 
+
     
     //aria-current="page"
 }
 
+
+function activetab() {
+
+     //alert(elname);
+
+    document.getElementById("file-tab").classList.remove("disabled");
+    document.getElementById("note-tab").classList.remove("disabled");
+    document.getElementById("payment-tab").classList.remove("disabled");
+    document.getElementById("disclosure-tab").classList.remove("disabled");
+    document.getElementById("video-tab").classList.remove("disabled");
+    document.getElementById("extension-tab").classList.remove("disabled");
+    document.getElementById("other-tab").classList.remove("disabled");
+
+    //aria-current="page"
+}
+
+
+function disabledtab() {
+
+    // alert(elname);
+
+   /* document.getElementById("file-tab").classList.add("disabled");*/
+    document.getElementById("note-tab").classList.add("disabled");
+    document.getElementById("payment-tab").classList.add("disabled");
+    document.getElementById("disclosure-tab").classList.add("disabled");
+    document.getElementById("video-tab").classList.add("disabled");
+    document.getElementById("extension-tab").classList.add("disabled");
+    document.getElementById("other-tab").classList.add("disabled");
+
+    //aria-current="page"
+}

@@ -5,11 +5,6 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
-@inject LoginState loginState;
-@implements IDisposable
-
-
-@inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager navigationManager
 
 
@@ -61,25 +56,14 @@
 </style>
 
 <div class="page">
-    @if (canAccess)
-    {
+  
         <div class="sidebar">
             <NavMenu />
         </div>
-    }
+      
     <main>
         <div class="top-row">
-            <div>
-            </div>
-            <div class="col-7 align-self-start">
-                <TopMenu></TopMenu>
-            </div>
-            <div class="col-3">
-                &nbsp;
-            </div>
-            <div class="col-2  align-self-center" style="font-weight:bold">
-                <label id="lblfilenumber" style="display:content">Reg#: @userReg</label>
-            </div>
+        <TopMenu></TopMenu>
         </div>
 
         <article class="content px-4">
@@ -96,49 +80,27 @@
 
 @code {
 
-
-    private bool canAccess = false;
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     private string? userReg;
     protected async override Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-
-        loginState.OnChange += StateHasChanged;
 
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         var nameUser = user.Identity?.Name;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        analysts = await context.Analysts.Where(x => x.Regno.Contains(userReg) && !x.Status.Contains("del")).ToListAsync();
-
-        if (analysts.Count > 0)
-        {
-            canAccess = true;
-        }
-        else
-        {
-            canAccess = false;
-        }
-
+      
     }
 
-    public void Dispose()
-    {
-        loginState.OnChange -= StateHasChanged;
-    }
-
-
+   
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            // await sessionStorage.SetItemAsync("RQID", fileid);
-            await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
-            var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-
-
+            await sessionStorage.ClearAsync();
+            await JSRuntime.InvokeVoidAsync("hideTopmenu");
+          //  await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
+           // var RQID = await sessionStorage.GetItemAsync<string>("RQID");
             firstRender = false;
         }
 

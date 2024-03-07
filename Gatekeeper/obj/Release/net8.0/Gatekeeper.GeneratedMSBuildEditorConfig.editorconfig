@@ -22,10 +22,6 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/TopMenu.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcVG9wTWVudS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/AccessRequestAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBY2Nlc3NSZXF1ZXN0c1xBY2Nlc3NSZXF1ZXN0QWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -93,6 +89,10 @@ build_metadata.AdditionalFiles.CssScope = b-bqdrc1gtje
 [C:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTmF2TWVudS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-e4iuz7yxhz
+
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/TopMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcVG9wTWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-bbh6r6pxsf
 
 [C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/AccessRequestSearch.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBY2Nlc3NSZXF1ZXN0c1xBY2Nlc3NSZXF1ZXN0U2VhcmNoLnJhem9y

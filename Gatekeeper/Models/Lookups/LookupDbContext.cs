@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Gatekeeper.Models.Lookups
@@ -27,6 +27,8 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<SearchVideoNotes> VideoNoteInfos { get; set; }
 
+        public virtual DbSet<LocationViewitem> LocationViewitems { get; set; }
+
         public virtual DbSet<DisclosedViewitem> DisclosedViewitems { get; set; }
 
         public virtual DbSet<Summarydisclosure> Summarydisclosures { get; set; }
@@ -39,7 +41,8 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<HolidayView> HolidayInfos { get; set; }
 
-        public virtual DbSet<LkPaymentTypeView> LkPaymentTypeInfos { get; set; }
+        public virtual DbSet<LkSection> LkSections { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,9 +58,12 @@ namespace Gatekeeper.Models.Lookups
             modelBuilder.Entity<Summarydisclosure>().HasNoKey();
             modelBuilder.Entity<SearchPayment>().HasNoKey();
             modelBuilder.Entity<DisclosedViewitem>().HasNoKey();
+            modelBuilder.Entity<LocationViewitem>().HasNoKey();
             modelBuilder.Entity<SearchRequestfee>().HasNoKey();
             modelBuilder.Entity<SearchExtension>().HasNoKey();
             modelBuilder.Entity<HolidayView>().HasNoKey();
+            modelBuilder.Entity<LkSection>().HasNoKey();
+         
 
 
         }

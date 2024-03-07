@@ -40,7 +40,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<LkSection> LkSections { get; set; }
     public virtual DbSet<Locationitem> Locationitems { get; set; }
     public virtual DbSet<Mytask> Mytasks { get; set; }
-    public virtual DbSet<Odata> Odatas { get; set; }
     public virtual DbSet<Oipc> Oipcs { get; set; }
     public virtual DbSet<OipcItem> OipcItems { get; set; }
     public virtual DbSet<Pageitem> Pageitems { get; set; }

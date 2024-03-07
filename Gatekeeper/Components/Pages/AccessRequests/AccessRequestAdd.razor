@@ -12,7 +12,7 @@
 @inject Blazored.SessionStorage.ISessionStorageService session
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
-@inject IPersonService personService
+
 
 @inject IJSRuntime JSRuntime
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -24,6 +24,7 @@
 
 
 @code {
+
     public string Data { get; set; } = "Data from grand parent component.";
     public string Data1 { get; set; } = "First data.";
     public string Data2 { get; set; } = "Second data.";
@@ -44,11 +45,17 @@
     [Inject]
     private IRequestfileService requestFileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
+
+
+    // private Requestfile orequestfile = new Requestfile();
+
     private Requestfile Sessionrequestfile { get; set; } = new Requestfile();
+
     private List<Requestfile>? requestfiles { get; set; } = new List<Requestfile>();
     public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
 
-
+    [Inject]
+    private IPersonService personService { get; set; }
     private List<Person> persons { get; set; } =new List<Person>();
     private Person person { get; set; } = new Person();
 
@@ -71,9 +78,10 @@
         using var context = DbFactory.CreateDbContext();
         requesttypes = await context.LkRequesttypes.ToListAsync();
 
-        persons = await context.People.ToListAsync();
-         requestfiles = await context.Requestfiles.ToListAsync();
-     
+
+        // persons = await context.People.ToListAsync();
+        requestfiles = await context.Requestfiles.ToListAsync();
+
         holidays = await context.Holidays.ToListAsync();
         if (fileid > 0)
         {
@@ -84,13 +92,26 @@
             loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
             requestfile = loginState.Requestfile;
 
-            var _intakeNotes = HtmlUtilities.ConvertToPlainText(requestfile.Intakenotes);
-            var _requestDetails = HtmlUtilities.ConvertToPlainText(requestfile.Requestdetails);
+            var _intakeNotes = requestfile.Intakenotes;
+            if (!string.IsNullOrEmpty( requestfile.Intakenotes))
+            {
+                _intakeNotes = HtmlUtilities.ConvertToPlainText(requestfile.Intakenotes);
+                requestfile.Intakenotes = _intakeNotes.ToString().Replace("&%23160;", "");
+            }
 
-            requestfile.Intakenotes = _intakeNotes.ToString().Replace("&%23160;","");
-            requestfile.Requestdetails = _requestDetails.ToString().Replace("&%23160;", "");
+            var _requestDetails = requestfile.Requestdetails;
+            if (!string.IsNullOrEmpty(requestfile.Requestdetails))
+            {
+                 _requestDetails = HtmlUtilities.ConvertToPlainText(requestfile.Requestdetails);
+                requestfile.Requestdetails = _requestDetails.ToString().Replace("&%23160;", "");
+            }
 
-            person = persons.Where(p => p.Id == requestfile.Personid).FirstOrDefault();
+            
+         
+
+            person = await personService.GetPersonById((int)requestfile.Personid);
+            //persons.Where(p => p.Id == requestfile.Personid).FirstOrDefault();
+          
         }
 
         if (requestfile.Yearid == 0 || requestfile.Yearid is null)
@@ -121,7 +142,7 @@
 
                 appState.myMessage = fileid.ToString();
 
-
+                
             }
             else
             {
@@ -138,10 +159,22 @@
                     }
                     requestfile = loginState.Requestfile;
                 }
+               
             }
+
+            if (fileid > 0)
+            {
+                JSRuntime.InvokeVoidAsync("activetab");
+            }
+            else
+            {
+                JSRuntime.InvokeVoidAsync("disabledtab");
+            }
+
             setTestdata = false;
             JSRuntime.InvokeVoidAsync("showTopmenu");
             JSRuntime.InvokeVoidAsync("changetab", "file-tab");
+
             firstRender = false;
         }
     }
@@ -206,13 +239,11 @@
 
             if (person.Id != 0  && requestfile.Id != 0)
             {
-
                 person.Moduser = userReg;
                 person.Moddate = DateTime.Today;
 
                 requestfile.Moduser = userReg;
                 requestfile.Moddate = DateTime.Today;
-
 
                 await personService.UpdatePerson(person);
                 UpdateFileNumber(requestfile.Id);
@@ -222,7 +253,6 @@
             }
             else
             {
-
                 person.Moduser = userReg;
                 person.Createdby = userReg;
 
@@ -251,6 +281,16 @@
                     await sessionStorage.SetItemAsync("objFileRequest", requestfile);
                     loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
 
+
+                    if (requestfile.Id > 0)
+                    {
+                        JSRuntime.InvokeVoidAsync("activetab");
+                    }
+                    else
+                    {
+                        JSRuntime.InvokeVoidAsync("disabledtab");
+                    }
+
                     // await JSRuntime.InvokeVoidAsync("alert", "Data saved successfully");
                     SuccessMessage = "Data saved successfully";
                 }
@@ -265,8 +305,6 @@
 
     private async void UpdateFileNumber(int fileid)
     {
-
-      
         Requestfile updatefile = requestfile;
 
         var rtype = requesttypes.Where(x => x.Id == requestfile.Requesttypeid).FirstOrDefault();
@@ -278,13 +316,11 @@
 
             int year = ((DateTime)updatefile.Receivedate).Year;
             updatefile.Yearid = requestfiles.Where(x => x.Receivedate.ToString().Contains(year.ToString())).Count() + 1;
-
         }
 
         if (updatefile.Yearid != null)
         {
             updatefile.Filenumber = ((DateTime)requestfile.Receivedate).Year + "-" + rtype.Refertype + "-" + ((int)requestfile.Yearid).ToString("D4");
-
             // // Start Test Data
             if (setTestdata)
             {
@@ -299,9 +335,6 @@
        
         requestfile = updatefile;
         StateHasChanged();
-
-        
-    
     }
 
     private void ClearData()
@@ -394,9 +427,8 @@
 
     public void setDuedate()
     {
-        // var dt = e.Value;
-        /*  await Task.Delay(500) */
-        ;
+        
+
 
         if (requestfile.Receivedate != null)
         {
@@ -419,7 +451,7 @@
             }
 
             //Remove holidays
-            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == DateTime.Today.Year);
+            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == DateTime.Today.Year && x.Holidayname != null );
 
             foreach (var item in thisYearHolidays)
             {
@@ -477,15 +509,6 @@
     #endregion
 }
 
-<CascadingValue Value="Data">
-    <Parent />
-</CascadingValue>
-
-<CascadingValue Value="Data1">
-    <CascadingValue Value="Data2" Name="CascadeParam2">
-        <Parent />
-    </CascadingValue>
-</CascadingValue>
 
 <h5>Access Request</h5>
 

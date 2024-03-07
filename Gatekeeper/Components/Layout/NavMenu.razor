@@ -1,52 +1,94 @@
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @using Gatekeeper.Models.MenuInfo
 
-<div class="top-row ps-3 navbar navbar-dark" style="height:auto;margin-left:50px">
-    <img src="crest-cps.svg" style="width:70%; height:70%" class="img-fluid" />
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">
-            Gatekeeper
-        </a>
-    </div>
+@inject LoginState loginState
+@implements IDisposable
+
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager navigationManager
+
+
+
+<div class="text-center" style="max-height:200px; max-width:200px;">
+    <img src="crest-cps.svg" class="rounded mx-auto d-block" />
+ 
 </div>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="/mytasks/search" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> My Tasks
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="/accessrequests/search">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Request
-            </NavLink>
-        </div>
-        <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="/analyst/add">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Analysts
-            </NavLink>
-        </div>
-        <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="/holiday/add">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Holidays
-            </NavLink>
-        </div>
-        <div class="nav-item px-2">
-            <NavLink class="nav-link" @onclick="HideMenu" href="/lkpaymenttype/add">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Payment Types
-            </NavLink>
-        </div>
-    </nav>
+    @if (canAccess)
+    {
+        <nav class="flex-column">
+            <div class="nav-item px-2">
+                <NavLink class="nav-link" @onclick="HideMenu" href="/mytasks/search" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> My Tasks
+                </NavLink>
+            </div>
+            @if (adminrole)
+            {
+            <div class="nav-item px-2">
+    }
+        </nav>
+                </div>
+            }
+                    </NavLink>
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Holidays
+                <div class="nav-item px-2">
+                </div>
+                    </NavLink>
+                    <NavLink class="nav-link" @onclick="HideMenu" href="/analyst/add">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Analysts
+                <div class="nav-item px-2">
+            </div>
+                    <NavLink class="nav-link" @onclick="HideMenu" href="/holiday/add">
+                <NavLink class="nav-link" @onclick="HideMenu" href="/accessrequests/search">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Request
+                </NavLink>
 </div>
 
 @code {
+    private bool canAccess = false;
+    private bool adminrole = false;
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    private string? userReg;
     public SelectedmenuInfo? selmenu;
+
+    protected async override Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        loginState.OnChange += StateHasChanged;
+
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var nameUser = user.Identity?.Name;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        analysts = await context.Analysts.Where(x => x.Regno.Contains(userReg) && !x.Status.Contains("del")).ToListAsync();
+
+        if (analysts.Count > 0)
+        {
+            canAccess = true;
+            if (string.IsNullOrEmpty(analysts.FirstOrDefault().Role.ToLower()) )
+            {
+                adminrole = false;
+            }
+            else
+            {
+                adminrole = true;
+            }
+        }
+        else
+        {
+            canAccess = false;
+        }
+    }
+
     public async void ShowMenu()
     {
         selmenu = new SelectedmenuInfo();
@@ -55,6 +97,12 @@
         await sessionStorage.SetItemAsync("SessionSelectedMenu", selmenu);
         await JSRuntime.InvokeVoidAsync("showTopmenu");
     }
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
+    }
+
 
     public async void HideMenu()
     {
@@ -72,6 +120,11 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            // await sessionStorage.SetItemAsync("RQID", fileid);
+           //await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
+            //var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+
+
             firstRender = false;
         }
 

@@ -18,7 +18,7 @@ namespace Gatekeeper.DataServices
 
         public async Task<IEnumerable<Extension>> GetExtensionsList(int fileid)
         {
-            return await _context.Extensions
+            return await _context.Extensions.Where(x=>x.Requestid==fileid)
                     .ToListAsync();
         }
 

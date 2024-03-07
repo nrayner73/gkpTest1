@@ -7,6 +7,6 @@ namespace Gatekeeper.Interfaces.Lookups
     {
         Task<IEnumerable<DisclosedViewitem>> GetDiscloseditemsList(int fileid);
         Task<IEnumerable<Summarydisclosure>> GetDisclosureSummary(int fileid);
-
+        Task<IEnumerable<LocationViewitem>> GetLocationitemsList(int fileid);
     }
 }

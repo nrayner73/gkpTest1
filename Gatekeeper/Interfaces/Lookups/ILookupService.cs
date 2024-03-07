@@ -1,6 +1,12 @@
-﻿namespace Gatekeeper.Interfaces.Lookups
+﻿using Gatekeeper.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace Gatekeeper.Interfaces.Lookups
 {
-    public class ILookupService
+    public interface ILookupService
     {
+        Task<IEnumerable<LkSection>> GetLkSectionsList();
+       
+
     }
 }

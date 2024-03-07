@@ -11,12 +11,15 @@
 
 @using BlazorBootstrap
 
+
+@inject IServiceScopeFactory serviceScopeFactory
+@inject IDbContextFactory<AppDbContext> DbFactory
 @inject IAnalystsService analystService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
 @inject IDiscloseditemsService discloseditemsService
 @inject IDisclosureViewService disclosedViewService
-@inject ILkSectionsService lksectionService
+
 @inject NavigationManager navigationManager
 
 @inject AppState appState
@@ -27,6 +30,7 @@
 @page "/disclosure/add/{fileid:int?}"
 
 @code {
+
     #region "Variables"
     private System.Security.Claims.ClaimsPrincipal user;
     private string? userReg;
@@ -59,12 +63,14 @@
     private IDiscloseditemsService DiscloseditemService { get; set; }
 
     private List<LkSection> sectionlist { get; set; } = new List<LkSection>();
-
+    private List<LkLocationsearch> locationlist { get; set; } = new List<LkLocationsearch>();
 
     private List<DisclosedViewitem> disclosedViewData { get; set; } = new List<DisclosedViewitem>();
+    private List<LocationViewitem> locationViewData { get; set; } = new List<LocationViewitem>();
 
     private List<Discloseditem> discloseditemsData { get; set; } = new List<Discloseditem>();
     private List<Discloseditem> odiscloseditemsData { get; set; } = new List<Discloseditem>();
+    private List<Locationitem> locationitemData { get; set; } = new List<Locationitem>();
 
     // private List<Discloseditem> sectionuseditemsData { get; set; } = new List<Discloseditem>();
     // private List<Discloseditem> osectionuseditemsData { get; set; } = new List<Discloseditem>();
@@ -84,15 +90,9 @@
         {
             fileid = (int)loginState.gFileId;
             FileNumber = loginState.gFileNumber;
-
-
+            //  LoadData();
+            // StateHasChanged();
         }
-        if (sectionlist.Count == 0)
-        {
-            sectionlist = (await lksectionService.GetLkSectionsList()).ToList();
-        }
-
-        // LoadData();
     }
 
 
@@ -106,40 +106,46 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-        odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-        disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
-    }
+    //     discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+    //     locationitemData = (await context.Locationitems.Where(x => x.Requestid == fileid).ToListAsync());
+    //     odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
+    //     disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
+     }
 
     protected async override void OnAfterRender(bool firstRender)
     {
+
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
             JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "disclosure-tab");
 
             savetype = string.Empty;
             var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-            var objRequest = await sessionStorage.GetItemAsync<Requestfile>("objFileRequest");
-
             if (RQID != "0" && RQID != null)
             {
-                fileid = Int32.Parse(RQID);
+                using var context = DbFactory.CreateDbContext();
 
-               // if (loginState.gFileId == 0 && loginState.gFileId != null)
+                fileid = Int32.Parse(RQID);
                 if (loginState.gFileId == 0 || loginState.gFileId == null)
                 {
-                    loginState.SetLogin(objRequest);
+                    loginState.SetLogin(await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid));
+
                 }
+                requestfile = loginState.Requestfile;
 
-                // requestfile = loginState.Requestfile;
-                FileNumber = objRequest.Filenumber;
+                summarydisclosures = await context.Summarydisclosures.ToListAsync();
+                summarydisclosure = await context.Summarydisclosures.FirstOrDefaultAsync(x => x.Requestid == fileid);
+             
+                sectionlist = await context.LkSections.ToListAsync();
+                locationlist = await context.LkLocationsearchs.ToListAsync();
+                discloseditemsData = (await context.Discloseditems.Where(x => x.Requestid == fileid).ToListAsync());
+                locationitemData = (await context.Locationitems.Where(x=>x.Requestid==fileid).ToListAsync());
 
-                //discloseditemsService.GetDiscloseditemsList();
-
-
-                
+                odiscloseditemsData = (await context.Discloseditems.Where(x => x.Requestid == fileid).ToListAsync());
+                disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
 
                 LoadData();
             }
@@ -164,6 +170,7 @@
 
     private void FillData()
     {
+        summarydisclosure = new Summarydisclosure();
         summarydisclosure.Requestid = fileid;
         summarydisclosure.Fileclosedate = DateTime.Now;
         summarydisclosure.Pagesidentified = "100";
@@ -182,37 +189,14 @@
 
     private async Task LoadData()
     {
-        //get summary disclosure data
-        summarydisclosures = (await SummarydisclosureService.GetSummarydisclosureList(fileid)).ToList();
-
-        if (summarydisclosures.Count > 0)
+        if (fileid != null && fileid > 0)
         {
-            summarydisclosure = new Summarydisclosure();
-            summarydisclosure = summarydisclosures.FirstOrDefault();
+            disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
 
-            if (fileid != null && fileid > 0)
-            {
-
-                disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
-                // if (discloseditemsData.Count == 0)
-                // {
-                //     discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-                // }
-                
-                
-
-                // discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-                // odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-
-
-                // disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
-                // //get disclosure authorities data
-                // discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-
-            }
-
-            StateHasChanged();
         }
+
+        // StateHasChanged();
+
     }
 
     protected void HandleInvalidSubmit()
@@ -228,7 +212,6 @@
         //  osummarydisclosure = osummarydisclosures.FirstOrDefault();
 
         Saved = false;
-
 
         //check list data testing
         summarydisclosure.Moddate = DateTime.Now;
@@ -275,7 +258,7 @@
 
             odiscloseditem = await DiscloseditemService.GetDiscloseditemsBySectionId(item.Sectionid, fileid);
 
-            
+
             //skip any section item that already exists in the table
             if (odiscloseditem == null)
             {
@@ -398,7 +381,7 @@
         </div>
     </div>
     <br />
-    <DiscloseditemAdd userReg="@userReg" requestfile="requestfile" sectionlist="sectionlist" File_discloseditems="discloseditemsData" View_discloseditems="disclosedViewData"></DiscloseditemAdd>
+    <DiscloseditemAdd userReg="@userReg" requestfile="requestfile" locationlist="locationlist" sectionlist="sectionlist" File_locationitems="locationitemData" File_discloseditems="discloseditemsData" View_locationitems="locationViewData" View_discloseditems="disclosedViewData"></DiscloseditemAdd>
     <br />
 
     <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>

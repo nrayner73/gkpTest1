@@ -433,6 +433,7 @@ C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\staticwebassets\msbuild.
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\staticwebassets.pack.json
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Layout\MainLayout.razor.rz.scp.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Layout\NavMenu.razor.rz.scp.css
+C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Layout\TopMenu.razor.rz.scp.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pages\AccessRequests\AccessRequestSearch.razor.rz.scp.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pages\AnalystNotes\AnalystNoteAdd.razor.rz.scp.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pages\Analysts\AnalystAdd.razor.rz.scp.css
@@ -442,7 +443,7 @@ C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pag
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\Components\Pages\VideoNotes\VideoNoteAdd.razor.rz.scp.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\bundle\Gatekeeper.styles.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\scopedcss\projectbundle\Gatekeeper.bundle.scp.css
-C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.csproj.CopyComplete
+C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.csproj.Up2Date
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.dll
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\refint\Gatekeeper.dll
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.pdb

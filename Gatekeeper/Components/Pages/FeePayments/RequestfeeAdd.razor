@@ -8,7 +8,8 @@
 @using System.Reflection;
 @using System;
 @using Gatekeeper.Models;
-
+@implements IDisposable;
+@inject LoginState loginState;
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -18,7 +19,7 @@
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
 
-
+@inject IDbContextFactory<AppDbContext> DbFactory
 
 
 
@@ -109,24 +110,30 @@
 
     }
 
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
+    }
+
     protected async override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-
+            using var context = DbFactory.CreateDbContext();
             if (fileid == 0)
             {
                 var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-                if (RQID != "0" && RQID != null)
+                fileid = Int32.Parse(RQID);
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
                 {
-                    fileid = Int32.Parse(RQID);
-                    if (requestfile.Id == 0 && FileNumber == "")
-                    {
-                       requestfile = await requestFileService.GetRequestfileById(fileid);
-                       FileNumber = requestfile.Filenumber.ToString();
-                    }
+                    loginState.SetLogin(await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid));
                 }
+                requestfile = await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid);
+                FileNumber = requestfile.Filenumber.ToString();
+
+              
+
             }
 
             LoadData();

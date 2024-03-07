@@ -113,6 +113,7 @@
         if (firstRender)
         {
             JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "video-tab");
 
 
@@ -121,18 +122,20 @@
             if (RQID != "0" && RQID != null)
             {
                 fileid = Int32.Parse(RQID);
-                loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
+                if (loginState.gFileId == 0)
+                {
+                    loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
+                }
                 requestfile = loginState.Requestfile;
-                FileNumber = loginState.gFileNumber;
+
 
                //  requestfile = await requestFileService.GetRequestfileById(fileid);
                //  FileNumber = requestfile.Filenumber.ToString();
                 //searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
                 LoadData();
-                //videonote.Enterdate = DateTime.Today;
-                //videonotes.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
-                //videonote.Requestid = fileid;
-                videonotes = (await VideonotesService.GetVideonoteList(fileid)).ToList();
+                videonote.Enterdate = DateTime.Today;
+                videonote.Requestid = fileid;
+               // videonotes = (await VideonotesService.GetVideonoteList(fileid)).ToList();
             }
 
             StateHasChanged();

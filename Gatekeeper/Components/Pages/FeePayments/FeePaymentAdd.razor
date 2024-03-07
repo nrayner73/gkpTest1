@@ -9,6 +9,9 @@
 @using System;
 @using Gatekeeper.Models;
 
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -80,6 +83,9 @@
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
+        // using var context = DbFactory.CreateDbContext();
+
+
         loginState.OnChange += StateHasChanged;
 
         if (loginState.gFileId > 0)
@@ -89,11 +95,14 @@
 
             requestfile = loginState.Requestfile;
 
-            requestfees = (await RequestfeeService.GetRequestfeeList(fileid)).ToList();
-            payments = (await PaymentService.GetPaymentList(fileid)).ToList();
+            // requestfees = await context.Requestfees.Where(x => x.Requestid == fileid).ToListAsync();
+            // payments = await context.Payments.Where(x => x.Requestid == fileid).ToListAsync();
 
-            LoadData();
-            StateHasChanged();
+            // requestfees = (await RequestfeeService.GetRequestfeeList(fileid)).ToList();
+            // payments = (await PaymentService.GetPaymentList(fileid)).ToList();
+
+            // LoadData();
+            // StateHasChanged();
         }
     }
 
@@ -120,6 +129,7 @@
         if (firstRender)
         {
             JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "payment-tab");
 
 
@@ -127,30 +137,40 @@
 
             if (fileid == 0 || fileid == null)
             {
+                using var context = DbFactory.CreateDbContext();
+
                 var RQID = await sessionStorage.GetItemAsync<string>("RQID");
                 if (RQID != "0" && RQID != null)
                 {
                     fileid = Int32.Parse(RQID);
-                    if (requestfile.Id == 0 && FileNumber == "")
+                    if (loginState.gFileId == 0 || loginState.gFileId == null)
                     {
-                        //  searchrequestfile = searchrequestFileService.GetRequestfileById(fileid);
-                        // requestfile = await requestFileService.GetRequestfileById(fileid);
-
-                        // FileNumber = requestfile.Filenumber.ToString();
-
-                        // requestfees = requestfees.Where(x => x.Requestid == fileid).ToList();
-                        // //(await RequestfeeService.GetRequestfeeList(fileid)).ToList();
-                        // payments = payments.Where(x => x.Requestid == fileid).ToList();
-                        //(await PaymentService.GetPaymentList(fileid)).ToList();
+                        loginState.SetLogin(await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid));
                     }
+                    requestfile = loginState.Requestfile;
+                    requestfees = await context.Requestfees.Where(x => x.Requestid == fileid).ToListAsync();
+                    payments = await context.Payments.Where(x => x.Requestid == fileid).ToListAsync();
+
+                    // if (requestfile.Id == 0 && FileNumber == "")
+                    // {
+                    //     //  searchrequestfile = searchrequestFileService.GetRequestfileById(fileid);
+                    //     // requestfile = await requestFileService.GetRequestfileById(fileid);
+
+                    //     // FileNumber = requestfile.Filenumber.ToString();
+
+
+                    //     requestfees = await context.Requestfees.Where(x => x.Requestid == fileid).ToListAsync();
+                    //     payments = await context.Payments.Where(x => x.Requestid == fileid).ToListAsync();
+
+                    //     // requestfees = requestfees.Where(x => x.Requestid == fileid).ToList();
+                    //     // //(await RequestfeeService.GetRequestfeeList(fileid)).ToList();
+                    //     // payments = payments.Where(x => x.Requestid == fileid).ToList();
+                    //     //(await PaymentService.GetPaymentList(fileid)).ToList();
+                    // }
                 }
                 LoadData();
             }
-            else
-            {
-                //  requestfile = await requestFileService.GetRequestfileById(fileid);
-                // FileNumber = requestfile.Filenumber.ToString();
-            }
+
             requestfee.Requestid = fileid;
 
             payment.Requestid = fileid;

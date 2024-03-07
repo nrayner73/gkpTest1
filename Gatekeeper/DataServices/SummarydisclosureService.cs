@@ -5,6 +5,7 @@ using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
+using System.Linq;
 
 namespace Gatekeeper.Services
 {
@@ -24,10 +25,11 @@ namespace Gatekeeper.Services
         }
     
     
-        public async Task<Summarydisclosure> GetSummarydisclosureById(int id)
+        public async Task<Summarydisclosure> GetSummarydisclosureById(int fileid)
         {
-            return await _context.Summarydisclosures
-                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return await _context.Summarydisclosures.FirstOrDefaultAsync(x => x.Requestid == fileid);
+                
         }
 
         public async Task<Summarydisclosure> CreateSummarydisclosure(Summarydisclosure summarydisclosure)

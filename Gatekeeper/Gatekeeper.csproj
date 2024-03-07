@@ -7,13 +7,44 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-grid.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-grid.min.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-grid.rtl.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-grid.rtl.min.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-reboot.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-reboot.min.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-reboot.rtl.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-reboot.rtl.min.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-utilities.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-utilities.min.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-utilities.rtl.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-utilities.rtl.min.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap.min.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap.rtl.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap.rtl.min.css.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.bundle.js" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.bundle.js.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.bundle.min.js" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.bundle.min.js.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.esm.js" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.esm.js.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.esm.min.js" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.esm.min.js.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.js" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.js.map" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.min.js" />
+    <Content Remove="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.min.js.map" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="XMLFile.xml" />
   </ItemGroup>
 
 
 
   <ItemGroup>
-    <PackageReference Include="Blazor.Bootstrap" Version="1.10.5" />
+    <PackageReference Include="Blazor.Bootstrap" Version="2.0.0" />
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
     <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />
@@ -26,6 +57,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="popper.js" Version="1.16.1" />
     <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
   </ItemGroup>
 
@@ -34,6 +66,67 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="Models\Audit\" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-grid.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-grid.min.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-grid.rtl.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-grid.rtl.min.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-reboot.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-reboot.min.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-reboot.rtl.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-reboot.rtl.min.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-utilities.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-utilities.min.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-utilities.rtl.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap-utilities.rtl.min.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap.min.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap.rtl.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\css\bootstrap.rtl.min.css.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.bundle.js" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.bundle.js.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.bundle.min.js.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.esm.js" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.esm.js.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.esm.min.js" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.esm.min.js.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.js" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.js.map" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.min.js" />
+    <None Include="wwwroot\bootstrap-5.3.3-dist\js\bootstrap.min.js.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-grid.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-grid.min.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-grid.rtl.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-grid.rtl.min.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-reboot.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-reboot.min.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-reboot.rtl.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-reboot.rtl.min.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-utilities.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-utilities.min.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-utilities.rtl.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap-utilities.rtl.min.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap.min.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap.rtl.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\css\bootstrap.rtl.min.css.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.bundle.js" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.bundle.js.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.bundle.min.js.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.esm.js" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.esm.js.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.esm.min.js" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.esm.min.js.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.js" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.js.map" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.min.js" />
+    <None Include="wwwroot\bootstrap\bootstrap-5.3.3-dist\js\bootstrap.min.js.map" />
   </ItemGroup>
 
 </Project>

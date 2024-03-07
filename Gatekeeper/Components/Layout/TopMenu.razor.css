@@ -1,0 +1,17 @@
+﻿a:hover {
+    font-weight: bold;
+    color: darkblue;
+}
+
+a:active {
+    background-color: #000;
+    color: white;
+}
+
+.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+    color: white;
+    background-color: steelblue;
+    font-weight: bold;
+    border-radius:4px;
+    float:right;
+}

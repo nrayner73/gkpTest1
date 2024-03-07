@@ -9,6 +9,8 @@
 @using System.Text.RegularExpressions
 @using Microsoft.AspNetCore.Components.QuickGrid
 
+@inject IDbContextFactory<AppDbContext> DbFactory
+
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -101,6 +103,7 @@
         if (firstRender)
         {
             JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "note-tab");
 
 
@@ -127,6 +130,8 @@
                 analystnote.Enterdate = DateTime.Today;
                 analystnote.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
                 analystnote.Requestid = fileid;
+
+               
                 
             }
 
@@ -295,10 +300,10 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Notes: @loginState.gFileNumber</h5>
+<h5>Notes: </h5>
 
 
-My Messagte: @appState.myMessage
+
 <EditForm Model="@analystnote" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />

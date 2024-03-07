@@ -1,0 +1,17 @@
+a:hover[b-bbh6r6pxsf] {
+    font-weight: bold;
+    color: darkblue;
+}
+
+a:active[b-bbh6r6pxsf] {
+    background-color: #000;
+    color: white;
+}
+
+.navbar-nav .nav-link.active[b-bbh6r6pxsf], .navbar-nav .nav-link.show[b-bbh6r6pxsf] {
+    color: white;
+    background-color: steelblue;
+    font-weight: bold;
+    border-radius:4px;
+    float:right;
+}

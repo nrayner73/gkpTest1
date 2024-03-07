@@ -34,6 +34,7 @@
         //Generate lookup data using DbContext
         using var context = DbFactory.CreateDbContext();
 
+
         requesttypes = await context.LkRequesttypes.ToListAsync();
         processingdeficiencies = await context.LkProcessingdeficiencies.ToListAsync();
         recorddeliverymethods = await context.LkRecorddeliverymethods.ToListAsync();
@@ -94,6 +95,8 @@
     }
 
 }
+
+
 
 <EditForm  Model="@requestfile">
     <DataAnnotationsValidator />

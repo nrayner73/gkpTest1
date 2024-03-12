@@ -23,7 +23,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Discloseditem> Discloseditems { get; set; }
     public virtual DbSet<Extension> Extensions { get; set; }
     public virtual DbSet<Holiday> Holidays { get; set; }
-    public virtual DbSet<ProcessingDeficiency>  ProcessingDeficiencies { get; set; }
     public virtual DbSet<LkCity> LkCities { get; set; }
     public virtual DbSet<LkExtension> LkExtensions { get; set; }
     public virtual DbSet<LkLocationsearch> LkLocationsearchs { get; set; }

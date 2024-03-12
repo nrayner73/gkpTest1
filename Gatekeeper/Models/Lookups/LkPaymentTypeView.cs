@@ -9,10 +9,11 @@ namespace Gatekeeper.Models.Lookups
         public string? Detail { get; set; }
         public DateTime? Createdate { get; set; }
         public string? Createuser { get; set; }
+        public string? Status { get; set; }
+        public int? Sortby { get; set; }
+
         public DateTime? Moddate { get; set; }
         public string? Moduser { get; set; }
-        public string? Status { get; set; }
 
-        public int? Sortby { get; set; }
     }
 }

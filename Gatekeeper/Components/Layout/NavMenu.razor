@@ -37,7 +37,11 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Holidays
             </NavLink>
         </div>
-
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" @onclick="HideMenu" href="/lkpaymenttype/add">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Payment Types
+            </NavLink>
+        </div>
     </nav>
 </div>
 
@@ -72,11 +76,6 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            // await sessionStorage.SetItemAsync("RQID", fileid);
-           //await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
-            //var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-
-
             firstRender = false;
         }
 

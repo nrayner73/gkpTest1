@@ -67,6 +67,7 @@ builder.Services.AddScoped<IPersonnameService,PersonnameService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IViewHolidayService,ViewHolidayService>();
+builder.Services.AddScoped<IViewLkPaymentTypeService, ViewLkPaymentTypeService>();
 
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();

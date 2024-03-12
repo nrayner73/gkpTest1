@@ -39,6 +39,8 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<HolidayView> HolidayInfos { get; set; }
 
+        public virtual DbSet<LkPaymentTypeView> LkPaymentTypeInfos { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

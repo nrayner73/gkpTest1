@@ -56,7 +56,6 @@
 
 
     //Data Grid -- Blazor QuickGrid
-    // private IQueryable<HolidayView> searchholidays;
     private IQueryable<ProcessingDeficiencyView> searchProcessingDeficiencies;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
@@ -108,10 +107,10 @@
         get
         {
             var result = searchProcessingDeficiencies;
-                    // if (!string.IsNullOrEmpty(nameFilter))
-                    // {
-                    //     result = result.Where(c => c.HolidayYear.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
-                    // }
+            // if (!string.IsNullOrEmpty(nameFilter))
+            // {
+            //     result = result.Where(c => c.HolidayYear.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
+            // }
 
 
             return result;
@@ -146,6 +145,12 @@
         {
             processingDeficiency.Createdate = DateTime.Now;
             processingDeficiency.Createuser = userReg;
+
+            //
+            //processingDeficiency.Id = 99;
+
+
+
             await ProcessingDeficiencyService.CreateProcessingDeficiency(processingDeficiency);
             await AuditData("Create Processing Deficiency", "create");
 
@@ -251,7 +256,8 @@
         processingDeficiency.Moduser = userReg;
         processingDeficiency.Createdate = DateTime.Now;
         processingDeficiency.Createuser = userReg;
-        processingDeficiency.Status = "stat";
+        processingDeficiency.Status = "ok";
+        processingDeficiency.SortBy = "description";
     }
     #endregion
 }
@@ -262,7 +268,7 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Holiday:</h5>
+<h5>Processing Deficiency:</h5>
 
 <EditForm Model="@processingDeficiency" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />

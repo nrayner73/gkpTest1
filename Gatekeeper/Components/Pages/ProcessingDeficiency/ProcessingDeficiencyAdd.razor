@@ -42,14 +42,14 @@
     private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
 
     [Inject]
-    private IProcessingDeficiencyService ProcessingDeficiencyService { get; set; }
+    private ILkProcessingdeficiencyService ProcessingDeficiencyService { get; set; }
 
 
-    private ProcessingDeficiency processingDeficiency { get; set; } = new ProcessingDeficiency();
+    private LkProcessingdeficiency processingDeficiency { get; set; } = new LkProcessingdeficiency();
 
-    private ProcessingDeficiency oprocessingDeficiency { get; set; } = new ProcessingDeficiency();
+    private LkProcessingdeficiency oprocessingDeficiency { get; set; } = new LkProcessingdeficiency();
 
-    private List<ProcessingDeficiency> processingDeficiencies { get; set; } = new List<ProcessingDeficiency>();
+    private List<LkProcessingdeficiency> processingDeficiencies { get; set; } = new List<LkProcessingdeficiency>();
 
     // private Requestfile requestfile { get; set; } = new Requestfile();
     // public List<Analyst>? analysts { get; set; } = new List<Analyst>();
@@ -75,7 +75,7 @@
         var user = authstate.User;
         var name = user.Identity.Name;
 
-        processingDeficiencies = (await ProcessingDeficiencyService.GetProcessingDeficiencyList()).ToList();
+        processingDeficiencies = (await ProcessingDeficiencyService.GetLkProcessingdeficiencyList()).ToList();
         LoadData();
     }
 
@@ -138,7 +138,7 @@
 
         if (savetype == "update")
         {
-            await ProcessingDeficiencyService.UpdateProcessingDeficiency(processingDeficiency);
+            await ProcessingDeficiencyService.UpdateLkProcessingdeficiency(processingDeficiency);
             await AuditData("Update Processing Deficiency", "update");
         }
         else
@@ -151,7 +151,7 @@
 
 
 
-            await ProcessingDeficiencyService.CreateProcessingDeficiency(processingDeficiency);
+            await ProcessingDeficiencyService.CreateLkProcessingdeficiency(processingDeficiency);
             await AuditData("Create Processing Deficiency", "create");
 
         }
@@ -199,8 +199,8 @@
     {
         if (id != null && id > 0)
         {
-            oprocessingDeficiency = await ProcessingDeficiencyService.GetProcessingDeficiencyById(id);
-            processingDeficiency = await ProcessingDeficiencyService.GetProcessingDeficiencyById(id);
+            oprocessingDeficiency = await ProcessingDeficiencyService.GetLkProcessingdeficiencyById(id);
+            processingDeficiency = await ProcessingDeficiencyService.GetLkProcessingdeficiencyById(id);
             StateHasChanged();
         }
     }
@@ -217,8 +217,8 @@
         {
             if (id != null && id > 0)
             {
-                processingDeficiency = await ProcessingDeficiencyService.GetProcessingDeficiencyById(id);
-                await ProcessingDeficiencyService.DeleteProcessingDeficiency(processingDeficiency);
+                processingDeficiency = await ProcessingDeficiencyService.GetLkProcessingdeficiencyById(id);
+                await ProcessingDeficiencyService.DeleteLkProcessingdeficiency(processingDeficiency);
                 AuditData("Delete Processing Deficiency", "delete");
             }
 
@@ -244,14 +244,14 @@
 
     private void ClearData()
     {
-        processingDeficiency = new ProcessingDeficiency();
+        processingDeficiency = new LkProcessingdeficiency();
 
     }
 
     private void FillData()
     {
 
-        processingDeficiency.Description = "processingDeficiencyDescription";
+        processingDeficiency.Detail = "processingDeficiencyDescription";
         processingDeficiency.Moddate = DateTime.Now;
         processingDeficiency.Moduser = userReg;
         processingDeficiency.Createdate = DateTime.Now;
@@ -279,7 +279,7 @@
                 <label for="lbDescription">
                     Description:
                 </label>
-                <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="processingDeficiency.Description" />
+                <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="processingDeficiency.Detail" />
             </div>
         </div>
     </div>
@@ -332,9 +332,11 @@
             </ColumnOptions>
         </PropertyColumn> *@
         
-        <PropertyColumn Property="@(r => r.Description)" Title="Description" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Detail)" Title="Description" Sortable="true" />
         <PropertyColumn Property="@(r => r.Moddate)" Title="Modified Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Moduser)" Title="Modified By" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Status)" Title="Status" Sortable="true" />
+
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
             <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>

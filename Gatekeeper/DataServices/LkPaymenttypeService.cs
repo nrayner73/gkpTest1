@@ -17,14 +17,12 @@ namespace Gatekeeper.Services
 
         public async Task<IEnumerable<LkPaymenttype>> GetLkPaymenttypeList()
         {
-            return await _context.LkPaymenttypes
-                    .ToListAsync();
+            return await _context.LkPaymenttypes.ToListAsync();
         }
     
         public async Task<LkPaymenttype> GetLkPaymenttypeById(int id)
         {
-            return await _context.LkPaymenttypes
-                .FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.LkPaymenttypes.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<LkPaymenttype> CreateLkPaymenttype(LkPaymenttype lkpaymenttype)

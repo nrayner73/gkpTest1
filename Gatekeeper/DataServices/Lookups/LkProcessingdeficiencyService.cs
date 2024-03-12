@@ -41,7 +41,9 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task DeleteLkProcessingdeficiency(LkProcessingdeficiency lkprocessingdeficiency)
         {
-            _context.LkProcessingdeficiencies.Remove(lkprocessingdeficiency);
+            //_context.LkProcessingdeficiencies.Remove(lkprocessingdeficiency);
+            lkprocessingdeficiency.Status = "del";
+            _context.LkProcessingdeficiencies.Update(lkprocessingdeficiency);
             await _context.SaveChangesAsync();
         }
 

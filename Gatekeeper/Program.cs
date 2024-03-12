@@ -99,8 +99,6 @@ builder.Services.AddScoped<IRequestfeeService, RequestfeeService>();
 builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
 builder.Services.AddScoped<IProcessingDeficiencyService, ProcessingDeficiencyService>();
-builder.Services.AddScoped<ILocationitemsService, LocationitemsService>();
-
 //Lookup
 builder.Services.AddScoped<ILookupService, LookupDataService>();
 

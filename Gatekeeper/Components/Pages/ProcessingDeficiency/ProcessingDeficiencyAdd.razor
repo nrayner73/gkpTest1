@@ -75,7 +75,8 @@
         var user = authstate.User;
         var name = user.Identity.Name;
 
-        processingDeficiencies = (await ProcessingDeficiencyService.GetLkProcessingdeficiencyList()).ToList();
+        //processingDeficiencies = (await ProcessingDeficiencyService.GetLkProcessingdeficiencyList()).ToList();
+        processingDeficiencies = new List<LkProcessingdeficiency>();
         LoadData();
     }
 

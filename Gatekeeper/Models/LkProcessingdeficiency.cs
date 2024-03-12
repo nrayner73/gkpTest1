@@ -19,6 +19,14 @@ public DateTime? Createdate{ get; set; }
 public string? Createuser{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Status{ get; set; }
+[Column(TypeName = "varchar(255")]
+public DateTime? Moddate { get; set; }
+[Column(TypeName = "varchar(45)")]
+public string? Moduser { get; set; }
+[Column(TypeName = "varchar(45)")]
+public string? SortBy { get; set; }
+
+
 
 
 }

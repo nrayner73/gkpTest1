@@ -1,14 +1,21 @@
-﻿@using Gatekeeper.Models.MenuInfo
+﻿
+@using Gatekeeper.Models.MenuInfo
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider authenticationProvider
 
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject Blazored.SessionStorage.ISessionStorageService session
 @inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
-@inject NavigationManager navigationManager
+
+
+
 
 
 <style>
+
+    
+
+
     .required {
         color: red;
         background-color: inherit;
@@ -56,14 +63,21 @@
 </style>
 
 <div class="page">
-  
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-      
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
     <main>
         <div class="top-row">
-        <TopMenu></TopMenu>
+            <div class="col-7 align-self-start">
+                <TopMenu></TopMenu>
+            </div>
+            <div class="col-3">
+                &nbsp;
+            </div>
+            <div class="col-2  align-self-center" style="font-weight:bold">
+                <label id="lblfilenumber" style="display:content">Reg#: @userReg</label>
+            </div>
         </div>
 
         <article class="content px-4">
@@ -79,31 +93,26 @@
 </div>
 
 @code {
-
     private string? userReg;
     protected async override Task OnInitializedAsync()
     {
-
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         var nameUser = user.Identity?.Name;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
       
+
     }
 
-   
-    protected async override Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            await sessionStorage.ClearAsync();
-            await JSRuntime.InvokeVoidAsync("hideTopmenu");
-          //  await sessionStorage.SetItemAsStringAsync("SessionUser", userReg);
-           // var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+            session.SetItemAsync("SessionUser", userReg);
             firstRender = false;
         }
-
+         
 
     }
 

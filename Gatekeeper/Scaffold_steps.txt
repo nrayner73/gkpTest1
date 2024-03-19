@@ -9,10 +9,3 @@
 
 dotnet ef migrations add InitialCreate
 dotnet ef database update
-
-
-
--- Migration EF core command for multiple provider
-
-Add-Migration InitialMigration -context AppDbContext
-Update-Database -context AppDbContext

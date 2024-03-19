@@ -1,53 +1,33 @@
 ﻿@inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@inherits LayoutComponentBase
 
-@inject LoginState loginState;
-@implements IDisposable
-
-
-
-<nav id="fileTabs" class="navbar navbar-expand-lg bg-body-tertiary" style="display:none" >
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Search</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <a id="file-tab" class="nav-link active"  href="accessrequests/add">Access Request</a>
-                <a id="payment-tab" class="nav-link disabled" href="/feepayment/add">Payment</a>
-                <a id="note-tab" class="nav-link disabled" href="analystnotes/add">Notes</a>
-                <a id="video-tab" class="nav-link disabled" href="/videonotes/add">Video Notes</a>
-                <a id="disclosure-tab" class="nav-link disabled" href="disclosure/add">Disclosure</a>
-                <a id="extension-tab" class="nav-link disabled" href="extension/add">Extension</a>
-                <a id="other-tab" class="nav-link disabled" aria-disabled="true">Audit</a>
-            </div>
-        </div>
+<nav class="navbar .navbar-collapse  bg-body-tertiary" >
+        <div class="container-fluid">
+        <ul id="fileTabs" class="nav nav-pills" style="display:none">
+            <li class="nav-item">
+                <a id="file-tab" class="nav-link " href="accessrequests/search">Access Request</a>
+            </li>
+            <li class="nav-item">
+                <a id="payment-tab" class="nav-link active" href="/weather">Payment</a>
+            </li>
+            <li class="nav-item">
+                <a id="note-tab" class="nav-link" href="#">Notes</a>
+            </li>
+            <li class="nav-item">
+                <a id="video-tab" class="nav-link" href="#">Video Notes</a>
+            </li>
+            <li class="nav-item">
+                <a id="disclosure-tab" class="nav-link" href="#">Disclousure</a>
+            </li>
+            <li class="nav-item">
+                <a id="other-tab" class="nav-link disabled" aria-disabled="true">Disabled</a>
+            </li>
+        </ul>
     </div>
-</nav>
-
+    </nav>
 
 @code {
-    private string? userReg;
-    protected async override Task OnInitializedAsync()
-    {
-        loginState.OnChange += StateHasChanged;
 
-        if (loginState.gFileId > 0)
-        {
-            var x = loginState.gFileId;
-        }
-
-
-    }
-
-
-    public void Dispose()
-    {
-        loginState.OnChange -= StateHasChanged;
-    }
 
 }

@@ -1,28 +1,18 @@
 ﻿@rendermode InteractiveServer
-@using System
 @using System.Text
 @using Microsoft.AspNetCore.Components.QuickGrid
-
-
 @inject ISearchrequestfileService searchfileService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager navigationManager
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
-
-@inject IRequestfileService requestFileService
-@inject IJSRuntime JSRuntime
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@inject LoginState loginState;
-@inject AppState appState;
-
 @page "/accessrequests/search"
 
 
 @code {
 
-    #region "Variables"
-    // private List<string> header = new List<string>();
+
+    private List<string> header = new List<string>();
     private IRequestfileService RequestfileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
 
@@ -33,14 +23,11 @@
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
     QuickGrid<Searchrequestfile>? grid;
-    bool showpanel = false;
-    bool showyear = false;
-    bool showid = false;
+    bool showpanel = true;
+    bool showyear = true;
 
 
     #region Lookup Parameters
-
-    public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
     public List<LkRequeststate>? requeststates { get; set; } = new List<LkRequeststate>();
@@ -52,61 +39,31 @@
     private PersonName personname { get; set; } = new PersonName();
     #endregion
 
-    #endregion
-
-
-    #region  "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-       
 
     }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("hideTopmenu");
-        }
-    }
-
 
     protected override async Task OnParametersSetAsync()
     {
-
-        if (requesttypes.Count == 0)
-        {
-            using var context = DbFactory.CreateDbContext();
-            requesttypes = await context.LkRequesttypes.ToListAsync();
-            requeststates = await context.LkRequeststates.ToListAsync();
-            // Requestfiles = await context.Requestfiles.ToListAsync();
-            analysts = await context.Analysts.ToListAsync();
-            LoadData();
-        }
-
+        using var context = DbFactory.CreateDbContext();
+        LoadData();
+        requesttypes = await context.LkRequesttypes.ToListAsync();
+        requeststates = await context.LkRequeststates.ToListAsync();
+        analysts = await context.Analysts.ToListAsync();
+        POIpersonnames = personNameService.GetPOINames();
+        personnames = personNameService.GetNames();
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender)
-        {
-            //using var context = DbFactory.CreateDbContext();
-            // LoadData();
 
-            POIpersonnames = personNameService.GetPOINames();
-            personnames = personNameService.GetNames();
-            firstRender = false;
-        }
     }
 
-    #endregion
 
-    #region "Methods"
     private void ClearSearch()
     {
-        POIselectedpersonname = null;
-        selectedpersonname = null;
-        searchrequestfiles = Enumerable.Empty<Searchrequestfile>().AsQueryable();
+
         fileInfo = new Searchrequestfile();
         LoadData();
 
@@ -131,43 +88,46 @@
             fileInfo.Requeststateid = null;
         }
 
-        searchrequestfiles = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
+        searchrequestfiles = searchfileService.GetRequestfileList()
+        .Where(r => r.Filenumber.ToLower().Contains(fileInfo.Filenumber.ToLower()) || fileInfo.Filenumber == null)
+        // .Where(r => r.Lastname.ToLower().Contains(fileInfo.Lastname.ToLower()) || fileInfo.Lastname == null)
+        // .Where(r => r.Firstname.ToLower().Contains(fileInfo.Firstname.ToLower()) || fileInfo.Firstname == null)
+        // .Where(r => r.Middlename.ToLower().Contains(fileInfo.Middlename.ToLower()) || fileInfo.Middlename == null)
+        // .Where(r => r.POIlastname.ToLower().Contains(fileInfo.POIlastname.ToLower()) || fileInfo.POIlastname == null)
+        // .Where(r => r.POIfirstname.ToLower().Contains(fileInfo.POIfirstname.ToLower()) || fileInfo.POIfirstname == null)
+        // .Where(r => r.POImiddlename.ToLower().Contains(fileInfo.POImiddlename.ToLower()) || fileInfo.POImiddlename == null)
+        // .Where(r => r.Requestdate >= fileInfo.Requestdate || fileInfo.Requestdate == null)
+        // .Where(r => r.Requestdate <= fileInfo.Requestduedate || fileInfo.Requestduedate == null)
+        // .Where(r => r.Requesttypeid == fileInfo.Requesttypeid || fileInfo.Requesttypeid == null)
+        // // .Where(r => r.Requeststateid == fileInfo.Requeststateid || fileInfo.Requeststateid == null)
+        // .Where(r => r.Referencenumber == fileInfo.Referencenumber || fileInfo.Referencenumber == null)
+        .AsQueryable<Searchrequestfile>();
+
+        // if (fileInfo.Intakenotes != null)
+        // {
+        //     searchrequestfiles = searchrequestfiles
+        //     .Where(r => r.Intakenotes.ToLower().Contains(fileInfo.Intakenotes.ToLower()) || fileInfo.Intakenotes == null)
+        //      .AsQueryable<Searchrequestfile>();
+        // }
+
+        // if (fileInfo.Requestdetails != null)
+        // {
+        //     searchrequestfiles = searchrequestfiles
+        //     .Where(r => r.Requestdetails.ToLower().Contains(fileInfo.Requestdetails.ToLower()) || fileInfo.Requestdetails == null)
+        //      .AsQueryable<Searchrequestfile>();
+        // }
 
     }
 
     private void LoadData()
     {
-
-        if (searchrequestfiles == null  || searchrequestfiles.Count() == 0)
-        {
-            searchrequestfiles = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
-        }
-
+        searchrequestfiles = searchfileService.GetRequestfileList().AsQueryable<Searchrequestfile>();
     }
 
-    private void goToAddPage(int fileid)
+    private void goToAddPage()
     {
-        setSession(fileid);
-        navigationManager.NavigateTo($"/accessrequests/add/{fileid}");
-
+        navigationManager.NavigateTo("/accessrequests/add");
     }
-
-    private async Task setSession(int fileid)
-    {
-        //  Requestfile requestfile = new Requestfile();
-        if (fileid > 0)
-        {
-            requestfile = await requestFileService.GetRequestfileById(fileid);
-
-            await sessionStorage.SetItemAsync("RQID", requestfile.Id);
-            await sessionStorage.SetItemAsync("objFileRequest", requestfile);
-
-            loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
-            requestfile = loginState.Requestfile;
-
-        }
-    }
-
 
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
     {
@@ -179,7 +139,6 @@
     {
         return await Task.FromResult(personnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
     }
-    #endregion
 }
 
 <EditForm Model="@fileInfo">
@@ -331,15 +290,11 @@
         </div>
     }
 </EditForm>
-
-
 <br />
 
-<div class="row" style="width:100%;padding-bottom: 1em;">
+<div class="row" style="width:100%">
     <div class="col-lg-5" style="float:left">
         Show:
-        <label><input type="checkbox" @bind="showid" /> Record Id</label>
-        &nbsp;&nbsp;&nbsp;
         <label><input type="checkbox" @bind="showyear" /> Year</label>
         &nbsp;&nbsp;&nbsp;
         <label><input type="checkbox" @bind="showpanel" /> Search Panel</label>
@@ -359,21 +314,20 @@
     </div>
     <div class="col-lg-2" style="float:revert">
         <div class="page-size-chooser">
-            <button type="button" class="btn btn-warning" @onclick="()=>goToAddPage(0)">Add New</button>
+            <button type="button" class="btn btn-warning" @onclick="goToAddPage">Add New</button>
         </div>
     </div>
 
 </div>
 
+<p>
+
+
+</p>
 
 
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchrequestfiles" Virtualize="true" Pagination="@pagination">
-        @if (showid)
-        {
-            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
-        }
-
         @if (showyear)
         {
             <PropertyColumn Property="@(r => r.Fileyear)" Title="Year" Sortable="true" />
@@ -382,14 +336,13 @@
         <PropertyColumn Property="@(r => r.Filenumber)" Title="File Number" Sortable="true" />
         <PropertyColumn Property="@(r => r.Referencenumber)" Title="Reference Number" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requesttype)" Title="Request Type" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requestduedate)" Title="Requst Due Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
         <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
         <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" />
-        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Person Of Request" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
+        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Person Of Interest" Sortable="true" />
         <TemplateColumn Title="Actions">
-            <a @onclick="()=>goToAddPage(context.Id)"  class="btn btn-outline-primary">
+            <a href="@($"/accessrequests/add/{context.Id}")" class="btn btn-outline-primary">
                 <i class="fas fa-edit">Edit</i>
             </a>
         </TemplateColumn>

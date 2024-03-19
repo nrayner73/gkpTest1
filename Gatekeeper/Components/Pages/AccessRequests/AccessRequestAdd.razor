@@ -2,39 +2,21 @@
 @using Gatekeeper.Models.MenuInfo
 @using Gatekeeper.CustomValidators
 @using System.Text
-@using System.Web
 @using Microsoft.AspNetCore.Components.Authorization
-@using System.Text.Encodings.Web
-@using Gatekeeper.Classes;
-@using System.Text.RegularExpressions
 
-
-@inject IConfiguration Configuration
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService session
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
-
-@inject IAuditlogService auditlogService
+@inject IPersonService personService
+@inject IRequestfileService requestFileService
 @inject IJSRuntime JSRuntime
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@inject LoginState loginState;
-@inject AppState appState;
-@inject NavigationManager navigationManager
+
 
 @page "/accessrequests/add/{fileid:int?}"
 
 
 @code {
-
-    #region "Parameters"
-    //Audit
-    private AuditLog auditlog = new AuditLog();
-    bool otherreason = false;
-    bool setTestdata = false;
-
-    private bool tester = false;
-
     [Parameter]
     public int fileid { get; set; }
     public SelectedmenuInfo currentmenu;
@@ -46,50 +28,44 @@
 
 
     [Inject]
-    private IRequestfileService requestFileService { get; set; }
+    private IRequestfileService RequestfileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
-
-    private Requestfile orequestfile = new Requestfile();
-
     private Requestfile Sessionrequestfile { get; set; } = new Requestfile();
-
     private List<Requestfile>? requestfiles { get; set; } = new List<Requestfile>();
     public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
 
-    [Inject]
-    private IPersonService personService { get; set; }
-    private List<Person> persons { get; set; } = new List<Person>();
+    
+    private List<Person> persons { get; set; } =new List<Person>();
     private Person person { get; set; } = new Person();
-    private Person operson { get; set; } = new Person();
-
 
     private bool alertMessageShow = false;
     private string? SuccessMessage { get; set; }
     public List<Holiday>? holidays { get; set; } = new List<Holiday>();
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
 
-    private string thisMachine = string.Empty;
-    #endregion
 
-    #region "Component Lifecycle"
+
     protected async override Task OnInitializedAsync()
     {
+
         DisplayTab(1);
 
-
-    }
-
-    public void Dispose()
-    {
-        loginState.OnChange -= StateHasChanged;
+        // var  xuser =  await session.SetItemAsync("SessionUser", user);
     }
 
     protected async override Task OnParametersSetAsync()
     {
-        loginState.OnChange += StateHasChanged;
+
+        using var context = DbFactory.CreateDbContext();
+        requesttypes = await context.LkRequesttypes.ToListAsync();
+        persons = await context.People.ToListAsync();
+        requestfiles = await context.Requestfiles.ToListAsync();
+        holidays = await context.Holidays.ToListAsync();
         if (fileid > 0)
         {
-            getDataContext();
+            requestfile = requestfiles.Where(r => r.Id == fileid).FirstOrDefault();
+            person = persons.Where(p => p.Id == requestfile.Personid).FirstOrDefault();
+
+
         }
 
         if (requestfile.Yearid == 0 || requestfile.Yearid is null)
@@ -97,172 +73,60 @@
             requestfile.Filenumber = "TBD";
         }
 
-        #region "oldcode"
-        // using var context = DbFactory.CreateDbContext();
-        // requesttypes = await context.LkRequesttypes.ToListAsync();
-        // persons = await context.People.ToListAsync();
-        // requestfiles = await context.Requestfiles.ToListAsync();
-
-        // holidays = await context.Holidays.ToListAsync();
-        // if (fileid > 0)
-        // {
-        //     string pattern = "&%23160;";
-        //     Regex defaultRegex = new Regex(pattern);
-        //     MatchCollection matches;
-
-        //     loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
-        //     requestfile = loginState.Requestfile;
-
-        //     var _intakeNotes = requestfile.Intakenotes;
-        //     if (!string.IsNullOrEmpty( requestfile.Intakenotes))
-        //     {
-        //         _intakeNotes = HtmlUtilities.ConvertToPlainText(requestfile.Intakenotes);
-        //         requestfile.Intakenotes = _intakeNotes.ToString().Replace("&%23160;", "");
-        //     }
-
-        //     var _requestDetails = requestfile.Requestdetails;
-        //     if (!string.IsNullOrEmpty(requestfile.Requestdetails))
-        //     {
-        //         _requestDetails = HtmlUtilities.ConvertToPlainText(requestfile.Requestdetails);
-        //         requestfile.Requestdetails = _requestDetails.ToString().Replace("&%23160;", "");
-        //     }
-
-        //     person = await personService.GetPersonById((int)requestfile.Personid);
-
-
-        // }
-
-        // if (requestfile.Yearid == 0 || requestfile.Yearid is null)
-        // {
-        //     requestfile.Filenumber = "TBD";
-        // }
-
         // userReg = await session.GetItemAsStringAsync("SessionUser");
-
-        #endregion
-
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
 
-        var AccessPerson = Configuration["Testers"];
-
-        tester = false;
-        thisMachine = "";
-        if (AccessPerson.Contains(userReg))
-        {
-            tester = true;
-            thisMachine = Environment.MachineName;
-        }
-
         SuccessMessage = "";
-        StateHasChanged();
+        // Sessionrequestfile = await session.GetItemAsync<Requestfile>("SessionRequestFile");
+
     }
 
-    private string? userReg;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
+        base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            if (fileid > 0)
-            {
-                await sessionStorage.SetItemAsync("RQID", fileid);
-                await sessionStorage.SetItemAsync("objFileRequest", requestfile);
-                getDataContext();
-                // loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
-            }
-            else
-            {
-                var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-
-                if (RQID != "0" && RQID != null)
-                {
-                    fileid = Int32.Parse(RQID);
-                    //  navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
-                    // if (loginState.gFileId == 0 || loginState.gFileId == null)
-                    // {
-                    //     // loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
-                    //     getDataContext();
-                    // }
-                    // requestfile = loginState.Requestfile;
-                    getDataContext();
-                }
-            }
-
-            #region "set tab and top menu "
-            if (fileid > 0)
-            {
-                JSRuntime.InvokeVoidAsync("activetab");
-            }
-            else
-            {
-                JSRuntime.InvokeVoidAsync("disabledtab");
-            }
-
-            setTestdata = false;
             JSRuntime.InvokeVoidAsync("showTopmenu");
             JSRuntime.InvokeVoidAsync("changetab", "file-tab");
 
-            #endregion
-
-            StateHasChanged();
-            firstRender = false;
+         
         }
-        ;
+
     }
-    #endregion
-
-    #region "Methods"
-    public void getDataContext()
+    private string? userReg;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        using (var context = DbFactory.CreateDbContext())
+        // await  JSRuntime.InvokeVoidAsync("showTopmenu");
+        // await  JSRuntime.InvokeVoidAsync("changetab", "file-tab");
+
+        if (firstRender)
         {
-            holidays = context.Holidays.ToList();
-            requesttypes = context.LkRequesttypes.ToList();
-            if (fileid > 0)
-            {
-                //assigned Access Request File object
-                if (loginState.gFileId == 0 || loginState.gFileId == null)
-                {
-                    loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
-                }
+            // using var context = DbFactory.CreateDbContext();
+            // requesttypes = await context.LkRequesttypes.ToListAsync();
+            // requestfiles = await context.Requestfiles.ToListAsync();
+            // holidays = await context.Holidays.ToListAsync();
+            // if (requestfile.Yearid == 0 || requestfile.Yearid is null)
+            // {
+            //     requestfile.Filenumber = "TBD";
+            // }
 
-                requestfile = loginState.Requestfile;
-                orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
+            // // userReg = await session.GetItemAsStringAsync("SessionUser");
+            // var authState = await authenticationProvider.GetAuthenticationStateAsync();
+            // var user = authState.User;
+            // userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\","");
 
-                if (requestfile.Yearid == 0 || requestfile.Yearid is null)
-                {
-                    requestfile.Filenumber = "TBD";
-                }
-                analysts = context.Analysts.ToList();
+            // SuccessMessage = "";
+            // Sessionrequestfile = await session.GetItemAsync<Requestfile>("SessionRequestFile");
 
-                string pattern = "&%23160;";
-                Regex defaultRegex = new Regex(pattern);
-                MatchCollection matches;
-
-                var _intakeNotes = requestfile.Intakenotes;
-                if (!string.IsNullOrEmpty(requestfile.Intakenotes))
-                {
-                    _intakeNotes = HtmlUtilities.ConvertToPlainText(requestfile.Intakenotes);
-                    requestfile.Intakenotes = _intakeNotes.ToString().Replace("&%23160;", "");
-                }
-
-                var _requestDetails = requestfile.Requestdetails;
-                if (!string.IsNullOrEmpty(requestfile.Requestdetails))
-                {
-                    _requestDetails = HtmlUtilities.ConvertToPlainText(requestfile.Requestdetails);
-                    requestfile.Requestdetails = _requestDetails.ToString().Replace("&%23160;", "");
-                }
-                person = context.People.Where(x => x.Id == requestfile.Personid).FirstOrDefault();
-                operson =(Person)context.Entry(person).GetDatabaseValues().ToObject();
-
-            }
+          
         }
     }
 
     private void FillData()
     {
-        setTestdata = true;
+
         person.Firstname = "Donald";
         person.Lastname = "Duck";
         person.Middlename = "D";
@@ -306,6 +170,7 @@
 
     private async Task ValidSubmit()
     {
+
         ValidateData();
 
         if (AlertText1.Count > 0 || AlertText2.Count > 0)
@@ -316,8 +181,9 @@
         {
             DisplayAlert = false;
 
-            if (person.Id != 0 && requestfile.Id != 0)
+            if (person.Id != 0  && requestfile.Id != 0)
             {
+
                 person.Moduser = userReg;
                 person.Moddate = DateTime.Today;
 
@@ -326,7 +192,6 @@
 
 
                 await personService.UpdatePerson(person);
-                await AuditData("update Person","update person");
                 UpdateFileNumber(requestfile.Id);
                 // await RequestfileService.UpdateRequestfile(requestfile);
 
@@ -334,13 +199,14 @@
             }
             else
             {
+
                 person.Moduser = userReg;
                 person.Createdby = userReg;
 
                 person.Moddate = DateTime.Today;
                 person.Createdate = DateTime.Today;
                 await personService.CreatePerson(person);
-                await AuditData("create Person", "create person");
+
                 if (person.Id != null)
                 {
                     requestfile.Personid = person.Id;
@@ -355,28 +221,13 @@
                     /*********************************************************/
 
                     await requestFileService.CreateRequestfile(requestfile);
-                    await AuditData("Create RequestFile","create file");
                     UpdateFileNumber(requestfile.Id);
-
-                    //await session.SetItemAsync("SessioRequestFile", requestfile);
-
-                    await sessionStorage.SetItemAsync("RQID", requestfile.Id);
-                    await sessionStorage.SetItemAsync("objFileRequest", requestfile);
-                    loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
-
-                    if (requestfile.Id > 0)
-                    {
-                        JSRuntime.InvokeVoidAsync("activetab");
-                    }
-                    else
-                    {
-                        JSRuntime.InvokeVoidAsync("disabledtab");
-                    }
+                    await session.SetItemAsync("SessioRequestFile", requestfile);
 
                     // await JSRuntime.InvokeVoidAsync("alert", "Data saved successfully");
                     SuccessMessage = "Data saved successfully";
                 }
-
+               
             }
             alertMessageShow = true;
             await InvokeAsync(() => StateHasChanged());
@@ -385,65 +236,44 @@
         }
     }
 
+
     private async void UpdateFileNumber(int fileid)
     {
-        Requestfile updatefile = requestfile;
+
+        Requestfile updatefile = await RequestfileService.GetRequestfileById(fileid);
+        //Requestfile updatefile = requestfiles.FirstOrDefault(x => x.Id == fileid);
 
         var rtype = requesttypes.Where(x => x.Id == requestfile.Requesttypeid).FirstOrDefault();
 
         // If receive date is not null then update file number with new format
-        if (updatefile.Filenumber == "TBD" && requestfile.Receivedate != null)
+        if (updatefile.Filenumber == "TBD" && requestfile.Receivedate != null )
         {
             updatefile = requestfile;
 
             int year = ((DateTime)updatefile.Receivedate).Year;
             updatefile.Yearid = requestfiles.Where(x => x.Receivedate.ToString().Contains(year.ToString())).Count() + 1;
-        }
 
-        if (updatefile.Yearid != null)
-        {
-            updatefile.Filenumber = ((DateTime)requestfile.Receivedate).Year + "-" + rtype.Refertype + "-" + ((int)requestfile.Yearid).ToString("D4");
-            // // Start Test Data
-            if (setTestdata)
+            if (updatefile.Yearid != null)
             {
+                updatefile.Filenumber = ((DateTime)requestfile.Receivedate).Year + "-" + rtype.Refertype + "-" + ((int)requestfile.Yearid).ToString("D4");
+
+                // Start Test Data
                 updatefile.Referencenumber = "RF " + requestfile.Filenumber;
                 updatefile.Requestdetails = "Request Details For " + requestfile.Filenumber;
                 updatefile.Previousrequests = "Test For " + requestfile.Filenumber;
                 updatefile.Intakenotes = "Intake Notes For " + requestfile.Filenumber;
 
+                // End Test Data
+
             }
+            await requestFileService.UpdateRequestfile(updatefile);
         }
-        await requestFileService.UpdateRequestfile(updatefile);
-        await AuditData("update RequestFile","update file");
 
         requestfile = updatefile;
-        StateHasChanged();
-    }
+      //  StateHasChanged();
 
-    private async Task AuditData(string act,string type)
-    {
-        auditlog = new AuditLog();
-
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-
-        if (type == "update person" || type == "delete person")
-        {
-
-            auditlog.ActivityXml = auditlogService.GetAuditxml(operson, person, act).ToString();
-        }
-
-        if (type == "update file" || type == "delete file")
-        {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfile, requestfile, act).ToString();
-
-        }
-
-        await auditlogService.CreateAuditlog(auditlog);
+        
+    
     }
 
     private void ClearData()
@@ -483,25 +313,6 @@
             if (requestfile.Requestdetails == null)
             {
                 AlertText1.Add("- Request Details");
-            }
-
-
-            if (requestfile.Requeststate != null)
-            {
-                string reqStateStr = string.Empty;
-                using (var context = DbFactory.CreateDbContext())
-                {
-                    reqStateStr = context.LkRequeststates.Where(x => x.Id == requestfile.Requeststate).FirstOrDefault().Detail.ToString();
-                }
-
-                if (reqStateStr.ToLower() == "closed" || reqStateStr.ToLower() == "withdrawn" || reqStateStr.ToLower() == "abandoned")
-                {
-                    if (requestfile.Closedate == null)
-                    {
-                        AlertText1.Add("- Specify Closed Date for Closed, Abandoned, and Withdrawn state types.");
-                    }
-                }
-
             }
 
             if (AlertText1.Count > 0)
@@ -548,12 +359,17 @@
         }
         else
         {
+
             AlertText2.Add("Person Request is required.");
         }
     }
 
     public void setDuedate()
     {
+        // var dt = e.Value;
+        /*  await Task.Delay(500) */
+        ;
+
         if (requestfile.Receivedate != null)
         {
             List<DateTime> dateRange1 = new List<DateTime>();
@@ -575,7 +391,7 @@
             }
 
             //Remove holidays
-            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == DateTime.Today.Year && x.Holidayname != null);
+            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == DateTime.Today.Year);
 
             foreach (var item in thisYearHolidays)
             {
@@ -590,6 +406,8 @@
             }
 
             requestfile.Requestduedate = dateRange2.FirstOrDefault();
+            // var rtype = requesttypes.Where(x => x.Id == requestfile.Requesttypeid);
+            // filenumberDisplay = ((DateTime)requestfile.Receivedate).Year + "-" + rtype + "=" + requestfile.Id;
         }
     }
 
@@ -628,11 +446,9 @@
     }
     #endregion
 
-    #endregion
 }
 
-
-<h5>Access Request : @thisMachine</h5>
+<h3>Access Request</h3>
 
 <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -646,7 +462,7 @@
 
     @if (alertMessageShow)
     {
-        <br />
+        <br/>
         <div class="alert alert-success" style="margin-left: 50px">@SuccessMessage</div>
     }
     @if (DisplayAlert)
@@ -676,7 +492,6 @@
     {
         <br />
         <div class="tabcontent">
-            
             <RequestFileForm requestfile="@requestfile" person="@person" />
         </div>
     }
@@ -697,11 +512,9 @@
         </div>
     }
     <br />
-    @if (tester)
-    {
-        <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
-    }
-    &nbsp;
+
+
+    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm>

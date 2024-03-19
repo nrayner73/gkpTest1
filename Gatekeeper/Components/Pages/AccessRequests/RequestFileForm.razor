@@ -31,34 +31,18 @@
 
     protected async override Task OnInitializedAsync()
     {
-
-        getDataContext();
         //Generate lookup data using DbContext
-       // using var context = DbFactory.CreateDbContext();
-        // requesttypes = await context.LkRequesttypes.ToListAsync();
-        // processingdeficiencies = await context.LkProcessingdeficiencies.ToListAsync();
-        // recorddeliverymethods = await context.LkRecorddeliverymethods.ToListAsync();
-        // requeststates = await context.LkRequeststates.ToListAsync();
-        // analysts = await context.Analysts.ToListAsync();
-        // holidays = await context.Holidays.ToListAsync();
-        // POIpersonnames = personNameService.GetPOINames();
+        using var context = DbFactory.CreateDbContext();
 
-
+        requesttypes = await context.LkRequesttypes.ToListAsync();
+        processingdeficiencies = await context.LkProcessingdeficiencies.ToListAsync();
+        recorddeliverymethods = await context.LkRecorddeliverymethods.ToListAsync();
+        requeststates = await context.LkRequeststates.ToListAsync();
+        analysts = await context.Analysts.ToListAsync();
+        holidays = await context.Holidays.ToListAsync();
+        POIpersonnames = personNameService.GetPOINames();
     }
 
-    public void getDataContext()
-    {
-        using (var context = DbFactory.CreateDbContext())
-        {
-            requesttypes =  context.LkRequesttypes.ToList();
-            processingdeficiencies = context.LkProcessingdeficiencies.ToList();
-            recorddeliverymethods =  context.LkRecorddeliverymethods.ToList();
-            requeststates =  context.LkRequeststates.ToList();
-            analysts =  context.Analysts.ToList();
-            holidays =  context.Holidays.ToList();
-            POIpersonnames = personNameService.GetPOINames();
-        }
-    }
 
 
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
@@ -98,22 +82,21 @@
             foreach (var item in thisYearHolidays)
             {
                 foreach (var dt in dateRange1)
-                {
-                    int y = dateRange1.IndexOf(dt);
-                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
                     {
-                        dateRange2.RemoveAt(y);
+                        int y = dateRange1.IndexOf(dt);
+                        if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
+                        {
+                            dateRange2.RemoveAt(y);
+                        }
                     }
-                }
             }
 
             requestfile.Requestduedate = dateRange2.FirstOrDefault();
         }
     }
 
+
 }
-
-
 
 <EditForm  Model="@requestfile">
     <DataAnnotationsValidator />
@@ -124,7 +107,7 @@
                 <label for="lbfilenumber">
                     File Number:
                 </label>
-                <InputText id="filenumber" class="form-control" readonly="true" placeholder="FILE NUMBER" @bind-Value="requestfile.Filenumber" style="background-color:lightgray" />
+                <InputText id="filenumber" class="form-control" readonly="true" placeholder="FILE NUMBER" @bind-Value="requestfile.Filenumber" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                <span class="required">*</span> <label for="lbrequestdate">
@@ -144,7 +127,7 @@
                 <label for="lbrequestduedate">
                     Request Due Date:
                 </label>
-                <InputDate id="requestduedate" class="form-control" readonly="true" placeholder="REQUEST DUEDATE" @bind-Value="requestfile.Requestduedate" style="background-color:lightgray" />
+                <InputDate id="requestduedate" class="form-control" readonly="true" placeholder="REQUEST DUEDATE" @bind-Value="requestfile.Requestduedate" />
             </div>
         </div>
 
@@ -198,6 +181,7 @@
 
         <br />
 
+
         <hr />
         <div class="row h-auto">
             <div class="col-lg-6 col-md-3 col-sm-12">
@@ -216,6 +200,8 @@
        
         @if (POIselectedpersonname != null)
         {
+            
+         
             person.Personofinterestfirstname = POIselectedpersonname.firstname;
             person.Personofinterestlastname = POIselectedpersonname.lastname;
             person.Personofinterestmiddlename = POIselectedpersonname.middlename;
@@ -301,10 +287,7 @@
                 <label for="lbrequestdetails">
                     Request Details:
                 </label>
-                
-                <InputTextArea id="requestdetails" class="form-control"  placeholder="REQUEST DETAILS" @bind-Value="requestfile.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;">
-                    @((MarkupString)requestfile.Requestdetails)
-                    </InputTextArea>
+                <InputTextArea id="requestdetails" class="form-control" placeholder="REQUEST DETAILS" @bind-Value="requestfile.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;" />
                 <ValidationMessage For="@(() => requestfile.Requestdetails)" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">

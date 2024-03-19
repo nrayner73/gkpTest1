@@ -1,10 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
-
-@inject IDbContextFactory<AppDbContext> DbFactory
-@inject NavigationManager navigationManager
-@inject AuthenticationStateProvider authenticationProvider
-
-@page "/"
+﻿@page "/"
 
 <PageTitle>Home</PageTitle>
 
@@ -24,29 +18,3 @@
         <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit, consequuntur. Laborum, placeat.</div>
     </div>
 </div>
-
-@code {
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
-
-    protected async override Task OnInitializedAsync()
-    {
-        using var context = DbFactory.CreateDbContext();
-
-        var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        string userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-
-        analysts = await context.Analysts.Where(x=>x.Regno.Contains(userReg) && !x.Status.Contains("del")).ToListAsync();
-
-        if (analysts.Count > 0)
-        {
-            navigationManager.NavigateTo("mytasks/search");
-        }
-        else
-        {
-            navigationManager.NavigateTo("accessdenied");
-        }
-        
-
-    }
-}

@@ -1,5 +1,7 @@
 ﻿@using BlazorBootstrap
+
 @code {
+
     #region "Variables"
     [Inject]
     private IDiscloseditemsService DiscloseditemsService { get; set; }
@@ -13,23 +15,43 @@
 
     [Parameter]
     public List<LkSection> sectionlist { get; set; } = new List<LkSection>();
+
+    [Parameter]
+    public List<LkLocationsearch> locationlist { get; set; } = new List<LkLocationsearch>();
+
+    [Parameter]
+    public List<Locationitem> File_locationitems { get; set; } = new List<Locationitem>();
+
     [Parameter]
     public List<Discloseditem> File_discloseditems { get; set; } = new List<Discloseditem>();
+
     [Parameter]
     public List<DisclosedViewitem> View_discloseditems { get; set; } = new List<DisclosedViewitem>();
 
+    [Parameter]
+    public List<LocationViewitem> View_locationitems { get; set; } = new List<LocationViewitem>();
+
+
+    private LkLocationsearch lklocationsearch { get; set; } = new LkLocationsearch();
     private LkSection lksection { get; set; } = new LkSection();
     private Discloseditem discloseditem { get; set; } = new Discloseditem();
     private Discloseditem sectionuseditem { get; set; } = new Discloseditem();
+
+
+    // private LkLocationsearch lklocationserach { get; set; } = new LkLocationsearch();
+    private Locationitem locationitem { get; set; } = new Locationitem();
 
     // public List<LkSection> disclosuredlist { get; set; } = new List<LkSection>();
     // public List<LkSection> sectionusedlist { get; set; } = new List<LkSection>();
 
     public List<DisclosedViewitem> disclosuredlist { get; set; } = new List<DisclosedViewitem>();
     public List<DisclosedViewitem> sectionusedlist { get; set; } = new List<DisclosedViewitem>();
+    public List<LocationViewitem> locationsearchlist { get; set; } = new List<LocationViewitem>();
 
     public List<LkSection> Lkdisclosured { get; set; } = new List<LkSection>();
     public List<LkSection> Lksectionused { get; set; } = new List<LkSection>();
+    public List<LkLocationsearch> Lklocationsearch { get; set; } = new List<LkLocationsearch>();
+
 
     bool showOthertext = false;
     #endregion
@@ -37,12 +59,11 @@
     #region "Component Lifecycle"
     protected override async Task OnParametersSetAsync()
     {
-        // if (View_discloseditems.Count > 0)
-        // {
+
         disclosuredlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "disclose").ToList();
         sectionusedlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "redac").ToList();
+        locationsearchlist = View_locationitems.ToList();
         StateHasChanged();
-        // }
         ClearData();
 
     }
@@ -53,6 +74,7 @@
 
         if (firstRender)
         {
+
             firstRender = false;
         }
     }
@@ -60,17 +82,17 @@
     #endregion
 
     #region "Methods"
+
+
     private void ClearData()
     {
 
         discloseditem.Sectionid = -1;
         sectionuseditem.Sectionid = -1;
 
-        // Lkdisclosured = new List<LkSection>();
-        // Lksectionused = new List<LkSection>();
         if (sectionlist.Count > 0)
         {
-            Lkdisclosured = sectionlist.Where(x => x.Sectiontype.ToLower() == "disclose").OrderBy(x=>x.Sortby).ToList() ;
+            Lkdisclosured = sectionlist.Where(x => x.Sectiontype.ToLower() == "disclose").OrderBy(x => x.Sortby).ToList();
             Lksectionused = sectionlist.Where(x => x.Sectiontype.ToLower() == "redac").OrderBy(x => x.Sortby).ToList();
 
         }
@@ -98,6 +120,61 @@
             }
             StateHasChanged();
         }
+
+        // Location Search Items
+        locationitem.Locationid = -1;
+
+        if (locationlist.Count > 0)
+        {
+            Lklocationsearch = locationlist.ToList();
+        }
+
+        if (locationlist.Count > 0)
+        {
+            foreach (var item in locationsearchlist)
+            {
+                lklocationsearch = new LkLocationsearch();
+                lklocationsearch = locationlist.Where(x => x.Id == item.Locationid).FirstOrDefault();
+                Lklocationsearch.Remove(lklocationsearch);
+            }
+        }
+    }
+
+    private async Task locationSearchAdd()
+    {
+        var item = new LkLocationsearch();
+        if (locationitem != null)
+        {
+            item = locationlist.Where(x => x.Id == locationitem.Locationid).FirstOrDefault();
+
+            if (item != null)
+            {
+                LocationViewitem _vitem = new LocationViewitem();
+                _vitem.Locationid = item.Id;
+                _vitem.Requestid = requestfile.Id;
+                _vitem.Locationname = item.Detail;
+                _vitem.Createdate = DateTime.Now;
+                _vitem.Createuser = userReg;
+
+                Locationitem _litem = new Locationitem();
+                _litem.Locationid = item.Id;
+                _litem.Requestid = requestfile.Id;
+                _litem.Createdate = DateTime.Now;
+                _litem.Createuser = userReg;
+
+                File_locationitems.Add(_litem);
+                locationsearchlist.Add(_vitem);
+
+                locationitem = new Locationitem();
+                locationitem.Locationid = -1;
+
+                ClearData();
+                StateHasChanged();
+            }
+
+        }
+
+
     }
 
     private async Task disclosuredAuthAdd()
@@ -126,7 +203,6 @@
                 _ditem.Createuser = userReg;
 
                 File_discloseditems.Add(_ditem);
-
                 disclosuredlist.Add(_vitem);
                 //  Lkdisclosured.Remove(item);
 
@@ -169,8 +245,7 @@
 
                 File_discloseditems.Add(_ditem);
                 sectionusedlist.Add(_vitem);
-                //Lksectionused.Remove(item);
-
+             
                 sectionuseditem = new Discloseditem();
                 sectionuseditem.Sectionid = -1;
 
@@ -178,6 +253,29 @@
                 StateHasChanged();
             }
         }
+    }
+
+    private void locationSearchDelete(int id)
+    {
+
+        if (id > 0)
+        {
+
+            Locationitem _litem = new Locationitem();
+            _litem = File_locationitems.Where(x => x.Id == id).FirstOrDefault();
+
+            LocationViewitem _vitem = new LocationViewitem();
+            _vitem = View_locationitems.Where(x => x.Id == id).FirstOrDefault();
+
+            if (_litem != null)
+            {
+                locationsearchlist.Remove(_vitem);
+                File_locationitems.Remove(_litem);
+            }
+            ClearData();
+            StateHasChanged();
+        }
+
     }
 
     private void disclosuredAuthDelete(int id)
@@ -191,7 +289,7 @@
             _vitem = View_discloseditems.Where(x => x.Id == id).FirstOrDefault();
 
 
-            if (_ditem != null)
+            if (_vitem != null)
             {
                 // Lkdisclosured.Add(sectionlist.Where(x => x.Id == id).FirstOrDefault());
                 disclosuredlist.Remove(_vitem);
@@ -201,7 +299,6 @@
             StateHasChanged();
         }
     }
-
 
     private void sectionusedDelete(int id)
     {
@@ -237,16 +334,32 @@
         return showOthertext;
 
     }
-#endregion
+    #endregion
 }
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12"> <span style="font-weight:bold">Authority to disclosure:</span> </div>
-        <div class="col-lg-6 col-md-6 col-sm-12"><span style="font-weight:bold">Section used:</span></div>
+        <div class="col-lg-4 col-md-6 col-sm-12"> <span style="font-weight:bold">Location Search:</span> </div>
+        <div class="col-lg-4 col-md-6 col-sm-12"> <span style="font-weight:bold">Authority to disclosure:</span> </div>
+        <div class="col-lg-4 col-md-6 col-sm-12"><span style="font-weight:bold">Section used:</span></div>
     </div>
+
     <div class="row">
-        <div class="col-lg-5 col-md-5 col-sm-12">
+        <div class="col-lg-4 col-md-5 col-sm-12">
+            <EditForm Model="@locationitem">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <InputSelect id="locationitem" class="form-select d-inline" style="width:250px;" @bind-Value="locationitem.Locationid">
+                    <option value="-1">Select...</option>
+                    @foreach (var lktype in Lklocationsearch)
+                    {
+                        <option value="@lktype.Id">@lktype.Detail</option>
+                    }
+                </InputSelect>
+                <Button id="addLocationitem" Color="ButtonColor.Primary" @onclick="locationSearchAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
+            </EditForm>
+        </div>
+        <div class="col-lg-4 col-md-5 col-sm-12">
             <EditForm Model="@discloseditem">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -259,11 +372,9 @@
                 </InputSelect>
                 <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="disclosuredAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
 
-
             </EditForm>
         </div>
-        <div class="col-lg-1 col-md-2 col-sm-12"> <h5> &nbsp;</h5> </div>
-        <div class="col-lg-5 col-md-5 col-sm-12">
+        <div class="col-lg-4 col-md-5 col-sm-12">
             <EditForm Model="@sectionuseditem">
                 <InputSelect id="sectionuseditem" class="form-select d-inline" style="width:250px;" onchange="@OtherText()" @bind-Value="sectionuseditem.Sectionid">
                     <option value="-1">Select...</option>
@@ -283,8 +394,46 @@
             </EditForm>
         </div>
     </div>
+
+
+  
     <div class="row">
-        <div class="col-lg-5 col-md-5 col-sm-12">
+        <div class="col-lg-4 col-md-5 col-sm-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+
+                        <th scope="col">Location</th>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (locationsearchlist != null && locationsearchlist.Count > 0)
+                    {
+                        @foreach (var item in locationsearchlist)
+                        {
+                            @if (item != null)
+                            {
+                                <tr>
+                                    <td>@item.Locationname</td>
+                                    <td> <Button @onclick="()=>locationSearchDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
+                                </tr>
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        <tr>
+                            <td>  </td>
+                            <td>  </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-lg-4 col-md-5 col-sm-12">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -309,7 +458,6 @@
                     }
                     else
                     {
-
                         <tr>
                             <td>  </td>
                             <td>  </td>
@@ -318,8 +466,9 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-lg-1 col-md-2 col-sm-12"> <h5> &nbsp;</h5> </div>
-        <div class="col-lg-5 col-md-5 col-sm-12">
+
+
+        <div class="col-lg-4 col-md-5 col-sm-12">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -342,11 +491,9 @@
                                 </tr>
                             }
                         }
-
                     }
                     else
                     {
-
                         <tr>
                             <td>  </td>
                             <td>  </td>

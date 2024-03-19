@@ -16,12 +16,12 @@ public int? Requestid{ get; set; }
 public int? Paytypeid{ get; set; }
 [Column(TypeName = "varchar(250)")]
 public string? Description{ get; set; }
-public int? Estimatedcost{ get; set; }
+public decimal? Estimatedcost{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Requested{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Feewaived{ get; set; }
-public int? Finalcost{ get; set; }
+public decimal? Finalcost{ get; set; }
 public DateTime? Moddate{ get; set; }
 [Column(TypeName = "varchar(45)")]
 public string? Moduser{ get; set; }

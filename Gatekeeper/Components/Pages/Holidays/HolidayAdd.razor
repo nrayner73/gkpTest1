@@ -42,7 +42,7 @@
     private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
 
     [Inject]
-    private IHolidayService HolidaysService { get; set; }
+     private IHolidayService HolidaysService { get; set; }
     private Holiday holiday { get; set; } = new Holiday();
     private Holiday oholiday { get; set; } = new Holiday();
     private List<Holiday> holidays { get; set; } = new List<Holiday>();
@@ -89,26 +89,9 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            //JSRuntime.InvokeVoidAsync("showTopmenu");
-            //JSRuntime.InvokeVoidAsync("changetab", "note-tab");
 
 
             savetype = string.Empty;
-          //  LoadData();
-            // var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-            // if (RQID != "0" && RQID != null)
-            // {
-            //     fileid = Int32.Parse(RQID);
-            //     requestfile = await requestFileService.GetRequestfileById(fileid);
-            //     FileNumber = requestfile.Filenumber.ToString();
-            //     //searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
-            //     LoadData();
-            //     //holidays.Enterdate = DateTime.Today;
-            //     //holidays.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
-            //     //holidays.Requestid = fileid;
-
-            // }
-
             StateHasChanged();
             firstRender = false;
         }
@@ -121,7 +104,6 @@
     {
         get
         {
-            //var result = searchholidays?.Where(c => c.Medals.Total <= maxMedals);
 
             var result = searchholidays;
 

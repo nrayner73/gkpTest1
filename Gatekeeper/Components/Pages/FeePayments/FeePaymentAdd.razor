@@ -9,18 +9,23 @@
 @using System;
 @using Gatekeeper.Models;
 
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject IConfiguration Configuration
+
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject ISearchRequestfeeService searchrequestfeeService
-@inject IAnalystsService analystService
-@inject IRequestfileService requestFileService 
+@inject ISearchrequestfileService searchrequestFileService
+
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
+@implements IDisposable
+@inject LoginState loginState;
+
 
 @inject ILkPaymenttypeService paymentTypeService
 @inject ISearchPaymentService searchpaymentService
-
 
 @page "/feepayment/add/{fileid:int?}"
 
@@ -52,6 +57,7 @@
     private List<Payment> payments { get; set; } = new List<Payment>();
 
     private Requestfile requestfile { get; set; } = new Requestfile();
+
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkPaymenttype>? paymenttype { get; set; } = new List<LkPaymenttype>();
 
@@ -63,26 +69,28 @@
     private Requestfee orequestfee { get; set; } = new Requestfee();
     private List<Requestfee> requestfees { get; set; } = new List<Requestfee>();
 
-
-    // private IQueryable<SearchRequestfee> searchrequestfees;
-    // private IQueryable<SearchPayment> searchpayments;
+    [Inject]
+    private IRequestfileService requestFileService { get; set; }
     private List<SearchRequestfee> searchrequestfees = new List<SearchRequestfee>();
     private List<SearchPayment> searchpayments = new List<SearchPayment>();
+    private Searchrequestfile searchrequestfile { get; set; } = new Searchrequestfile();
+
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
-
-
 
     #endregion
 
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        // var user = authstate.User;
-        // var name = user.Identity.Name;
+        loginState.OnChange += StateHasChanged;
+        getDataContext();
 
-        // requestfees = (await RequestfeeService.GetRequestfeeList()).ToList();
-        // payments = (await PaymentService.GetPaymentList()).ToList();
+    }
+
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -90,17 +98,6 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        analysts = (await analystService.GetAnalystsList()).ToList();
-        paymenttype = (await paymentTypeService.GetLkPaymenttypeList()).ToList();
-
-
-        if (fileid > 0 || requestfile.Id > 0)
-        {
-            // requestfile = await requestFileService.GetRequestfileById(fileid);
-            // FileNumber = requestfile.Filenumber.ToString();
-            // LoadData();
-            // StateHasChanged();
-        }
     }
 
 
@@ -109,10 +106,13 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            //show top menu and highlight selected menu
             JSRuntime.InvokeVoidAsync("showTopmenu");
+            JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "payment-tab");
 
 
+            //clear save type
             savetype = string.Empty;
 
             if (fileid == 0 || fileid == null)
@@ -121,28 +121,20 @@
                 if (RQID != "0" && RQID != null)
                 {
                     fileid = Int32.Parse(RQID);
-                    if (requestfile.Id == 0 && FileNumber == "")
-                    {
-                        requestfile = await requestFileService.GetRequestfileById(fileid);
-                        FileNumber = requestfile.Filenumber.ToString();
-
-                    }
+                    getDataContext();
                 }
+                loginState.OnChange += StateHasChanged;
+                // Load data to grid
                 LoadData();
-            }
-            else
-            {
-                //  requestfile = await requestFileService.GetRequestfileById(fileid);
-                // FileNumber = requestfile.Filenumber.ToString();
+
             }
 
-
-
+            //assign request file id and payment date
             requestfee.Requestid = fileid;
-
             payment.Requestid = fileid;
             payment.Paymentdate = DateTime.Now;
-
+            payment.Createdate = DateTime.Now;
+            payment.Moddate = DateTime.Now;
 
 
             StateHasChanged();
@@ -151,12 +143,38 @@
     }
     #endregion
 
+    #region "Methods"
+    //Load Data from DbContext
+    public void getDataContext()
+    {
+        using (var context = DbFactory.CreateDbContext())
+        {
+            //get analyst lookup data
+            analysts = context.Analysts.ToList();
+            paymenttype = context.LkPaymenttypes.ToList();
+
+            if (fileid > 0)
+            {
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
+                {
+                    //set state login
+                    loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
+                    loginState.OnChange += StateHasChanged;
+                }
+                requestfile = loginState.Requestfile;
+                FileNumber = loginState.Requestfile.Filenumber;
+                requestfees =  context.Requestfees.Where(x => x.Requestid == fileid).ToList();
+                payments =  context.Payments.Where(x => x.Requestid == fileid).ToList();
+
+
+            }
+        }
+        StateHasChanged();
+    }
+
 
     private void LoadData()
     {
-        // searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).AsQueryable<SearchRequestfee>();
-        // searchpayments = searchpaymentService.GetPaymentList(fileid).AsQueryable<SearchPayment>();
-
         searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
         searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
         StateHasChanged();
@@ -170,16 +188,14 @@
 
     protected async Task HandleValidSubmit()
     {
-
         Saved = false;
 
         if (fileid > 0)
         {
-            //string notes = requestfile.Feepayment;
+
             try
             {
                 requestfile = await requestFileService.GetRequestfileById(fileid);
-                // requestfile.Feepayment = notes;
 
                 await requestFileService.UpdateRequestfile(requestfile);
             }
@@ -193,36 +209,8 @@
             requestfee.Moddate = DateTime.Now;
             requestfee.Moduser = userReg;
 
-            // requestfees =  (await RequestfeeService.GetRequestfeeList(fileid)).ToList();
 
-            // if (true)
-            // {
-
-            // }
-
-            // foreach (var item in requestfees)
-            // {
-            //     if (item.Id > 0 && (item.Description != "" && item.Description != null))
-            //     {
-            //         await RequestfeeService.UpdateRequestfee(item);
-            //         // await AuditData("Update Requestfee", "update");
-            //     }
-            //     else if (item.Id > 0 && (item.Description == "" || item.Description == null))
-            //     {
-            //         await RequestfeeService.DeleteRequestfee(item);
-            //     }
-            //     else if (item.Requestid > 0 && item.Id == 0)
-            //     {
-            //         if (item.Description != "" && item.Description != null)
-            //         {
-            //             requestfee.Createdate = DateTime.Now;
-            //             requestfee.Createuser = userReg;
-            //             await RequestfeeService.CreateRequestfee(item);
-            //         }
-            //     }
-            // }
-
-            if (requestfee != null )
+            if (requestfee != null)
             {
                 if (requestfee.Id == 0)
                 {
@@ -236,49 +224,17 @@
                 }
                 else
                 {
+
                     if (requestfee.Description != "" && requestfee.Description != null)
                     {
                         requestfee.Moddate = DateTime.Now;
                         requestfee.Moduser = userReg;
                         await RequestfeeService.UpdateRequestfee(requestfee);
-                        await AuditData("Create Payment", "create");
-
+                        await AuditData("Update Payment", "create");
                     }
-
-
-
                 }
-
-
-
-
             }
 
-            // payments = (await PaymentService.GetPaymentList(fileid)).ToList();
-            // foreach (var item in payments)
-            // {
-            //     if (item.Id > 0 && (item.Description != "" && item.Description != null ))
-            //     {
-
-            //         await PaymentService.UpdatePayment(item);
-            //     }
-            //     else if (item.Id > 0 && (item.Description == "" || item.Description == null))
-            //     {
-            //         await PaymentService.DeletePayment(item);
-            //     }
-            //     else if (item.Requestid > 0 && item.Id == 0)
-            //     {
-            //         if (item.Description != "" && item.Description != null)
-            //         {
-            //             payment.Createdate = DateTime.Now;
-            //             payment.Createuser = userReg;
-            //             await PaymentService.CreatePayment(item);
-            //         }
-
-            //     }
-
-            //     await AuditData("Update Payment", "update");
-            // }
 
             if (payment != null)
             {
@@ -299,10 +255,7 @@
                         payment.Moduser = userReg;
                         await PaymentService.UpdatePayment(payment);
                     }
-                    
-                
                 }
-
             }
 
             StatusClass = "alert-success";
@@ -313,7 +266,7 @@
 
             alertMessageShow = false;
             Saved = true;
-           // navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
+            // navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
         }
 
         LoadData();
@@ -321,8 +274,6 @@
         payment = new Payment();
         StateHasChanged();
     }
-
-
 
     private async Task AuditData(string act, string type)
     {
@@ -377,6 +328,7 @@
         payment.Moduser = userReg;
         savetype = "create";
     }
+    #endregion
 }
 
 @if (alertMessageShow)
@@ -384,33 +336,27 @@
     <br />
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
+
 <EditForm Model="@requestfile" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
 
-    <RequestfeeAdd savetype="" 
-                   searchrequestfees="@searchrequestfees" 
-                   analysts="@analysts" 
-                   fileid="@fileid" 
-                   requestfile="@requestfile" 
-                   requestfees="@requestfees" 
+    <RequestfeeAdd savetype=""
+                   searchrequestfees="@searchrequestfees"
+                   analysts="@analysts"
+                   fileid="@fileid"
+                   requestfile="@requestfile"
+                   requestfees="@requestfees"
                    requestfee="@requestfee" />
-   
+
 
     <PaymentAdd savetype="@savetype" searchpayments="@searchpayments" analysts="@analysts" fileid="@fileid" paymenttype="@paymenttype" payment="@payment" payments="@payments"></PaymentAdd>
-      <div class="col-lg-3 col-md-3 col-sm-12">
+    <div class="col-lg-3 col-md-3 col-sm-12">
         <label for="lbnotes">
             Notes:
         </label>
         <InputTextArea id="notes" class="form-control" placeholder="NOTES" @bind-Value="requestfile.Feepayment" row="15" col="250" style="min-height: 130px; overflow:auto;" />
     </div>
-    <br/>
+    <br />
     <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
-    </EditForm>
-
-
-
-
-
-    
-
+</EditForm>

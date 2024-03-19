@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Gatekeeper.DataServices;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Gatekeeper.Models.Lookups
 {
@@ -31,7 +34,37 @@ namespace Gatekeeper.Models.Lookups
         public string? POImiddlename { get; set; } = string.Empty;
         public string? Requestdetails { get; set; } = string.Empty;
         public string? Intakenotes { get; set; } = string.Empty;
-       
+
+        public void getFileById()
+        {
+            AppState appState = new AppState();
+
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            builder.ConnectionString = appState.gbConnectionString;
+
+            using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+            {
+                Console.WriteLine("\nQuery data example:");
+                Console.WriteLine("=========================================\n");
+
+                connection.Open();
+
+                String sql = "SELECT * from gkp.requestfiles";
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            
+                        }
+                    }
+                }
+
+            }
+
+        }
         
     }
 }

@@ -31,17 +31,35 @@
 
     protected async override Task OnInitializedAsync()
     {
-        //Generate lookup data using DbContext
-        using var context = DbFactory.CreateDbContext();
 
-        requesttypes = await context.LkRequesttypes.ToListAsync();
-        processingdeficiencies = await context.LkProcessingdeficiencies.ToListAsync();
-        recorddeliverymethods = await context.LkRecorddeliverymethods.ToListAsync();
-        requeststates = await context.LkRequeststates.ToListAsync();
-        analysts = await context.Analysts.ToListAsync();
-        holidays = await context.Holidays.ToListAsync();
-        POIpersonnames = personNameService.GetPOINames();
+        getDataContext();
+        //Generate lookup data using DbContext
+       // using var context = DbFactory.CreateDbContext();
+        // requesttypes = await context.LkRequesttypes.ToListAsync();
+        // processingdeficiencies = await context.LkProcessingdeficiencies.ToListAsync();
+        // recorddeliverymethods = await context.LkRecorddeliverymethods.ToListAsync();
+        // requeststates = await context.LkRequeststates.ToListAsync();
+        // analysts = await context.Analysts.ToListAsync();
+        // holidays = await context.Holidays.ToListAsync();
+        // POIpersonnames = personNameService.GetPOINames();
+
+
     }
+
+    public void getDataContext()
+    {
+        using (var context = DbFactory.CreateDbContext())
+        {
+            requesttypes =  context.LkRequesttypes.ToList();
+            processingdeficiencies = context.LkProcessingdeficiencies.ToList();
+            recorddeliverymethods =  context.LkRecorddeliverymethods.ToList();
+            requeststates =  context.LkRequeststates.ToList();
+            analysts =  context.Analysts.ToList();
+            holidays =  context.Holidays.ToList();
+            POIpersonnames = personNameService.GetPOINames();
+        }
+    }
+
 
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
     {
@@ -95,6 +113,8 @@
 
 }
 
+
+
 <EditForm  Model="@requestfile">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -104,7 +124,7 @@
                 <label for="lbfilenumber">
                     File Number:
                 </label>
-                <InputText id="filenumber" class="form-control" readonly="true" placeholder="FILE NUMBER" @bind-Value="requestfile.Filenumber" />
+                <InputText id="filenumber" class="form-control" readonly="true" placeholder="FILE NUMBER" @bind-Value="requestfile.Filenumber" style="background-color:lightgray" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                <span class="required">*</span> <label for="lbrequestdate">
@@ -124,7 +144,7 @@
                 <label for="lbrequestduedate">
                     Request Due Date:
                 </label>
-                <InputDate id="requestduedate" class="form-control" readonly="true" placeholder="REQUEST DUEDATE" @bind-Value="requestfile.Requestduedate" />
+                <InputDate id="requestduedate" class="form-control" readonly="true" placeholder="REQUEST DUEDATE" @bind-Value="requestfile.Requestduedate" style="background-color:lightgray" />
             </div>
         </div>
 

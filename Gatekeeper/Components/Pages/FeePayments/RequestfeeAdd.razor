@@ -8,7 +8,8 @@
 @using System.Reflection;
 @using System;
 @using Gatekeeper.Models;
-
+@implements IDisposable;
+@inject LoginState loginState;
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -18,10 +19,14 @@
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
 
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+
 
 @code {
+    
     #region "Variables"
-       [Parameter]
+    [Parameter]
     public EventCallback OnCancel { get; set; }
 
     [Parameter]
@@ -76,77 +81,61 @@
     public List<SearchRequestfee> searchrequestfees { get; set; } = new List<SearchRequestfee>();
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
+
+
+    //private GlobalSettings globalSettings = new GlobalSettings;
+
     #endregion
 
 
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        // var user = authstate.User;
-        // var name = user.Identity.Name;
-
-        // requestfees = (await RequestfeeService.GetRequestfeeList()).ToList();
+        
     }
 
+  
     protected override async Task OnParametersSetAsync()
     {
-        // var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        // var user = authState.User;
-        // userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        // analysts = (await analystService.GetAnalystsList()).ToList();
+
+
+        if (requestfile != null )
+        {
+            if (requestfile.Id > 0 && FileNumber == "")
+            {
+
+                FileNumber = requestfile.Filenumber.ToString() ;
+            }
+        }
+
     }
 
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
+    }
 
     protected async override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            //     JSRuntime.InvokeVoidAsync("showTopmenu");
-            //     JSRuntime.InvokeVoidAsync("changetab", "payment-tab");
-
-
-            //     savetype = string.Empty;
+            using var context = DbFactory.CreateDbContext();
             if (fileid == 0)
             {
                 var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-                if (RQID != "0" && RQID != null)
+                fileid = Int32.Parse(RQID);
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
                 {
-                    fileid = Int32.Parse(RQID);
-                    if (requestfile.Id == 0 && FileNumber == "")
-                    {
-                        // requestfile = await requestFileService.GetRequestfileById(fileid);
-                        // FileNumber = requestfile.Filenumber.ToString();
-
-                    }
-
-                    LoadData();
-                    requestfee.Requestid = fileid;
-
+                    loginState.SetLogin(await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid));
                 }
-            }
-            // else
-            // {
-            //     if (requestfile != null && requestfile.Id > 0)
-            //     {
-            //         FileNumber = requestfile.Filenumber.ToString();
-            //     }
-            //     else
-            //     {
-            //         try
-            //         {
-            //              requestfile = await requestFileService.GetRequestfileById(fileid);
-            //              FileNumber = requestfile.Filenumber.ToString();
+                requestfile = await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid);
+                FileNumber = requestfile.Filenumber.ToString();
 
-            //         }
-            //         catch (Exception)
-            //         {
-                        
-            //             throw;
-            //         }
-            //     }
-            // }
+              
+
+            }
+
             LoadData();
             requestfee.Requestid = fileid;
 
@@ -160,22 +149,10 @@
 
     private async void LoadData()
     {
-        // searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).AsQueryable<SearchRequestfee>();
-        searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
-
         if (searchrequestfees.Count == 0)
         {
-            // searchrequestfees = new List<SearchRequestfee>();
-            ////  searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
+            searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
         }
-
-        // if (requestfile.Id == 0 && FileNumber == "")
-        // {
-        //     requestfile = await requestFileService.GetRequestfileById(fileid);
-        //     FileNumber = requestfile.Filenumber.ToString();
-
-        // }
-
     }
 
     protected void HandleInvalidSubmit()
@@ -186,7 +163,7 @@
 
     protected async Task HandleValidSubmit()
     {
-        Saved = false;
+        // Saved = false;
 
         // requestfee.Moddate = DateTime.Now;
         // requestfee.Moduser = userReg;
@@ -221,6 +198,7 @@
 
     private async Task AuditData(string act, string type)
     {
+        auditlog = new AuditLog();
         auditlog.AccessDate = DateTime.Now;
         auditlog.RegNo = userReg;
         auditlog.Sdate = DateTime.Now;
@@ -237,38 +215,19 @@
         await auditlogService.CreateAuditlog(auditlog);
     }
 
-
-
-
-    private async void UpdateData(int id)
+    private  void UpdateData(int id)
     {
         savetype = "";
         if (id > 0)
         {
             savetype = "update";
-            orequestfee = await RequestfeeService.GetRequestfeeById(id);
-            requestfee = await RequestfeeService.GetRequestfeeById(id);
-
-
-            // await RequestfeeService.UpdateRequestfee(requestfee);
-            // await AuditData("Update Requestfee", "update");
+            //orequestfee = await RequestfeeService.GetRequestfeeById(id);
+            requestfee = requestfees.Where(x => x.Id == id).FirstOrDefault();
 
             StateHasChanged();
-
-           // requestfee = new Requestfee();
-            //GetData(id);
         }
     }
 
-    private async void GetData(int id)
-    {
-        if (id != null && id > 0)
-        {
-            // orequestfee = await RequestfeeService.GetRequestfeeById(id);
-            // requestfee = await RequestfeeService.GetRequestfeeById(id);
-            // StateHasChanged();
-        }
-    }
 
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
@@ -309,7 +268,6 @@
 
     private void setfinalcost()
     {
-
         if (requestfee.Feewaived == "Yes")
         {
             requestfee.Finalcost = 0;
@@ -319,12 +277,10 @@
             requestfee.Finalcost = requestfee.Estimatedcost;
         }
         StateHasChanged();
-
     }
 
     private void FillData()
     {
-
         // requestfee.Id = 1;
         requestfee.Requestid = fileid;
         requestfee.Description = "description";
@@ -339,15 +295,8 @@
         // requestfee.Status = "status";
 
     }
-
-
-
     #endregion
-
 }
-
-
-
 
 <EditForm Model="@requestfee" >
     <DataAnnotationsValidator />
@@ -359,7 +308,7 @@
                 <label for="lbfileid">
                     File Number:
                 </label>
-                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" />
+                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" style="background-color:lightgray" />
             </div>
             <div class="col-lg-3 col-md-4 col-sm-12">
                 <label for="lbdescription">
@@ -401,16 +350,11 @@
             </div>
         </div>
     </div>
-
-
-
 </EditForm>
-
 
 <br />
 
 <ConfirmDialog @ref="dialog" />
-
 
 <table class="table table-striped">
     <thead class="table-info">

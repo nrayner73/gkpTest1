@@ -68,19 +68,12 @@
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        // var user = authstate.User;
-        // var name = user.Identity.Name;
-        //      payments = (await PaymentService.GetPaymentList()).ToList();
+
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        // var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        // var user = authState.User;
-        // userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        // analysts = (await analystService.GetAnalystsList()).ToList();
-        // paymenttype = (await paymentTypeService.GetLkPaymenttypeList()).ToList();
+
     }
 
 
@@ -89,20 +82,11 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-
-            //     savetype = string.Empty;
-            var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-            if (RQID != "0" && RQID != null)
-            {
-                fileid = Int32.Parse(RQID);
-                // requestfile = await requestFileService.GetRequestfileById(fileid);
-                // FileNumber = requestfile.Filenumber.ToString();
-
                 LoadData();
                 payment.Requestid = fileid;
                 payment.Paymentdate = DateTime.Now;
 
-            }
+           // }
 
             StateHasChanged();
             firstRender = false;
@@ -114,50 +98,17 @@
 
     private void LoadData()
     {
-         searchpayments = new List<SearchPayment>();
-         searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
-       
-        
+        searchpayments = new List<SearchPayment>();
+        searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
+
+
     }
 
 
-    protected async Task HandleValidSubmit()
-    {
-        Saved = false;
-
-        payment.Moddate = DateTime.Now;
-        payment.Moduser = userReg;
-
-        if (savetype == "update")
-        {
-            await PaymentService.UpdatePayment(payment);
-            await AuditData("Update Payment", "update");
-        }
-        else
-        {
-            payment.Createdate = DateTime.Now;
-            payment.Createuser = userReg;
-            await PaymentService.CreatePayment(payment);
-            await AuditData("Create Payment", "create");
-
-        }
-
-        StatusClass = "alert-success";
-        Message = "Data updated successfully";
-        alertMessageShow = true;
-        await InvokeAsync(() => StateHasChanged());
-        await Task.Delay(1000);
-
-        alertMessageShow = false;
-        Saved = true;
-        navigationManager.NavigateTo($"/payment/add/{fileid}", true);
-        //LoadData();
-        //payment = new Payment();
-        //StateHasChanged();
-    }
 
     private async Task AuditData(string act, string type)
     {
+        auditlog = new AuditLog();
         auditlog.AccessDate = DateTime.Now;
         auditlog.RegNo = userReg;
         auditlog.Sdate = DateTime.Now;
@@ -188,10 +139,12 @@
         if (id > 0)
         {
             savetype = "update";
-           
-            await PaymentService.UpdatePayment(payment);
-            await AuditData("Update Payment", "update");
-           GetData(id);
+
+
+            GetData(id);
+            // await PaymentService.UpdatePayment(payment);
+            // await AuditData("Update Payment", "update");
+
         }
     }
 
@@ -199,8 +152,9 @@
     {
         if (id != null && id > 0)
         {
-            opayment = await PaymentService.GetPaymentById(id);
-            payment = await PaymentService.GetPaymentById(id);
+            //opayment = await PaymentService.GetPaymentById(id);
+            payment = payments.Where(x => x.Id == id).FirstOrDefault();
+            //await PaymentService.GetPaymentById(id);
             StateHasChanged();
         }
     }

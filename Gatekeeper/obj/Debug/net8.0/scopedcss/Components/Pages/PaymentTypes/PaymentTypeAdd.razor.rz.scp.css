@@ -1,0 +1,17 @@
+[b-yu3dijjj8z] table {
+    min-width: 100%;
+}
+
+[b-yu3dijjj8z] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-yu3dijjj8z] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-yu3dijjj8z] tbody tr {
+    height: 1.8rem;
+}

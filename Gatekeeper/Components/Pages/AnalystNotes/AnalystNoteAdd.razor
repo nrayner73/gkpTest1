@@ -206,7 +206,6 @@
             analystnote.Createuser = userReg;
             await AnalystnoteService.CreateAnalystnote(analystnote);
             await AuditData("Create Analyst Note", "create");
-
         }
 
         StatusClass = "alert-success";
@@ -280,7 +279,6 @@
     private void ClearData()
     {
         analystnote = new Analystnote();
-
     }
 
 

@@ -16,7 +16,6 @@
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject ISearchRequestfeeService searchrequestfeeService
-@inject IAnalystsService analystService
 @inject ISearchrequestfileService searchrequestFileService
 
 @inject IAuditlogService auditlogService
@@ -99,9 +98,6 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-
-        analysts = (await analystService.GetAnalystsList()).ToList();
-        paymenttype = (await paymentTypeService.GetLkPaymenttypeList()).ToList();
     }
 
 
@@ -155,6 +151,8 @@
         {
             //get analyst lookup data
             analysts = context.Analysts.ToList();
+            paymenttype = context.LkPaymenttypes.ToList();
+
             if (fileid > 0)
             {
                 if (loginState.gFileId == 0 || loginState.gFileId == null)
@@ -177,7 +175,6 @@
 
     private void LoadData()
     {
-
         searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
         searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
         StateHasChanged();
@@ -191,7 +188,6 @@
 
     protected async Task HandleValidSubmit()
     {
-
         Saved = false;
 
         if (fileid > 0)

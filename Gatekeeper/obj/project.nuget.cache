@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "BkpU1Ro7z+QZAZuKoKQf8DfVIkkjucTCQJ0aICv1xZ2ZskzYjfZC44/nDReQfYYJKj2shdd7tWfU9omLsIC5sQ==",
+  "dgSpecHash": "w/jBoOPDGTpzBdeHgth0PgGgbADSeUD/dtkbTMGnS7kSbNVUwpB1X8sKGjJO8PZ47KVAfegUtn8tMWWVft+wag==",
   "success": true,
-  "projectFilePath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
+  "projectFilePath": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\pol11067\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\pol11067\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

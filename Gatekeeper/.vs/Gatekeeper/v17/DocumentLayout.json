@@ -1,10 +1,30 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\",
+  "WorkspaceRootPath": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\accessrequests\\accessrequestadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\accessrequests\\accessrequestadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|e:\\projects\\gatekeeper-2024\\gatekeeper\\dataservices\\lookups\\viewlkpaymenttypeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:dataservices\\lookups\\viewlkpaymenttypeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|e:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\paymenttypes\\paymenttypeadd.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\paymenttypes\\paymenttypeadd.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|e:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\paymenttypes\\paymenttypeadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\paymenttypes\\paymenttypeadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|E:\\Projects\\gatekeeper-2024\\Gatekeeper\\components\\pages\\analystnotes\\analystnoteadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\analystnotes\\analystnoteadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|e:\\projects\\gatekeeper-2024\\gatekeeper\\models\\requestfee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:models\\requestfee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|E:\\Projects\\gatekeeper-2024\\Gatekeeper\\components\\pages\\feepayments\\feepaymentadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\feepayments\\feepaymentadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -71,15 +91,79 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AccessRequestAdd.razor",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
-              "RelativeToolTip": "Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
-              "ViewState": "AQIAAN8BAAAAAAAAAAAgwP4BAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-03-15T22:03:01.284Z",
+              "Title": "ViewLkPaymentTypeService.cs",
+              "DocumentMoniker": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\DataServices\\Lookups\\ViewLkPaymentTypeService.cs",
+              "RelativeDocumentMoniker": "DataServices\\Lookups\\ViewLkPaymentTypeService.cs",
+              "ToolTip": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\DataServices\\Lookups\\ViewLkPaymentTypeService.cs",
+              "RelativeToolTip": "DataServices\\Lookups\\ViewLkPaymentTypeService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-19T16:31:21.43Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PaymentTypeAdd.razor.css",
+              "DocumentMoniker": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\PaymentTypes\\PaymentTypeAdd.razor.css",
+              "RelativeDocumentMoniker": "Components\\Pages\\PaymentTypes\\PaymentTypeAdd.razor.css",
+              "ToolTip": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\PaymentTypes\\PaymentTypeAdd.razor.css",
+              "RelativeToolTip": "Components\\Pages\\PaymentTypes\\PaymentTypeAdd.razor.css",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2024-03-19T16:30:56.637Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PaymentTypeAdd.razor",
+              "DocumentMoniker": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\PaymentTypes\\PaymentTypeAdd.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\PaymentTypes\\PaymentTypeAdd.razor",
+              "ToolTip": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\PaymentTypes\\PaymentTypeAdd.razor",
+              "RelativeToolTip": "Components\\Pages\\PaymentTypes\\PaymentTypeAdd.razor",
+              "ViewState": "AQIAAHsAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-03-19T16:30:42.29Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Requestfee.cs",
+              "DocumentMoniker": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Models\\Requestfee.cs",
+              "RelativeDocumentMoniker": "Models\\Requestfee.cs",
+              "ToolTip": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Models\\Requestfee.cs",
+              "RelativeToolTip": "Models\\Requestfee.cs",
+              "ViewState": "AQIAAA4AAAAAAAAAAAAgwBsAAAAkAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-19T14:31:25.793Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AnalystNoteAdd.razor",
+              "DocumentMoniker": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AnalystNotes\\AnalystNoteAdd.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\AnalystNotes\\AnalystNoteAdd.razor",
+              "ToolTip": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AnalystNotes\\AnalystNoteAdd.razor",
+              "RelativeToolTip": "Components\\Pages\\AnalystNotes\\AnalystNoteAdd.razor",
+              "ViewState": "AQIAALcAAAAAAAAAAIAwwM8AAAA9AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-03-19T13:59:11.044Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FeePaymentAdd.razor",
+              "DocumentMoniker": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
+              "ToolTip": "E:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
+              "RelativeToolTip": "Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
+              "ViewState": "AQIAAJAAAAAAAAAAAAAAAL4AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-03-19T13:32:28.505Z"
             }
           ]
         }

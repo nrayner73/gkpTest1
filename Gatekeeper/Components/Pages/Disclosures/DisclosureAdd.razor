@@ -21,7 +21,7 @@
 @inject IDisclosureViewService disclosedViewService
 
 @inject NavigationManager navigationManager
-
+@inject IConfiguration Configuration
 @inject AppState appState
 @implements IDisposable
 @inject LoginState loginState;
@@ -62,6 +62,10 @@
     [Inject]
     private IDiscloseditemsService DiscloseditemService { get; set; }
 
+    [Inject]
+    private ILocationitemsService LocationitemsService { get; set; }
+
+
     private List<LkSection> sectionlist { get; set; } = new List<LkSection>();
     private List<LkLocationsearch> locationlist { get; set; } = new List<LkLocationsearch>();
 
@@ -70,29 +74,24 @@
 
     private List<Discloseditem> discloseditemsData { get; set; } = new List<Discloseditem>();
     private List<Discloseditem> odiscloseditemsData { get; set; } = new List<Discloseditem>();
-    private List<Locationitem> locationitemData { get; set; } = new List<Locationitem>();
 
-    // private List<Discloseditem> sectionuseditemsData { get; set; } = new List<Discloseditem>();
-    // private List<Discloseditem> osectionuseditemsData { get; set; } = new List<Discloseditem>();
+    private List<Locationitem> locationitemData { get; set; } = new List<Locationitem>();
+    private List<Locationitem> olocationitemData { get; set; } = new List<Locationitem>();
 
     private Requestfile requestfile { get; set; } = new Requestfile();
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
 
     private string otherTextData = string.Empty;
+
+    private bool tester = false;
+
     #endregion
 
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
         loginState.OnChange += StateHasChanged;
-
-        if (loginState.gFileId > 0)
-        {
-            fileid = (int)loginState.gFileId;
-            FileNumber = loginState.gFileNumber;
-            //  LoadData();
-            // StateHasChanged();
-        }
+        getDataContext();
     }
 
 
@@ -103,14 +102,19 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        //get user information
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-    //     discloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-    //     locationitemData = (await context.Locationitems.Where(x => x.Requestid == fileid).ToListAsync());
-    //     odiscloseditemsData = (await DiscloseditemService.GetDiscloseditemsList(fileid)).ToList();
-    //     disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
-     }
+
+        //show-hide fill data button
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
+    }
 
     protected async override void OnAfterRender(bool firstRender)
     {
@@ -118,36 +122,31 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            //highlight selected to menu and set enable child menu
             JSRuntime.InvokeVoidAsync("showTopmenu");
             JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "disclosure-tab");
 
+            //set save type
             savetype = string.Empty;
+            //read data from session
             var RQID = await sessionStorage.GetItemAsync<string>("RQID");
             if (RQID != "0" && RQID != null)
             {
-                using var context = DbFactory.CreateDbContext();
-
                 fileid = Int32.Parse(RQID);
-                if (loginState.gFileId == 0 || loginState.gFileId == null)
-                {
-                    loginState.SetLogin(await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid));
+                //get data context
+                getDataContext();
 
-                }
-                requestfile = loginState.Requestfile;
 
-                summarydisclosures = await context.Summarydisclosures.ToListAsync();
-                summarydisclosure = await context.Summarydisclosures.FirstOrDefaultAsync(x => x.Requestid == fileid);
-             
-                sectionlist = await context.LkSections.ToListAsync();
-                locationlist = await context.LkLocationsearchs.ToListAsync();
-                discloseditemsData = (await context.Discloseditems.Where(x => x.Requestid == fileid).ToListAsync());
-                locationitemData = (await context.Locationitems.Where(x=>x.Requestid==fileid).ToListAsync());
+                //   //Load data to grid
+                // await  LoadData();
 
-                odiscloseditemsData = (await context.Discloseditems.Where(x => x.Requestid == fileid).ToListAsync());
-                disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
+                // assign current date and current log on user to create date, mod date, create user and mod user
+                // summarydisclosure.Createdate = DateTime.Now;
+                // summarydisclosure.Moddate = DateTime.Now;
+                // summarydisclosure.Createuser = userReg;
+                // summarydisclosure.Moduser = userReg;
 
-                LoadData();
             }
 
             StateHasChanged();
@@ -157,6 +156,49 @@
     #endregion
 
     #region "Methods"
+
+    public void getDataContext()
+    {
+        using (var context = DbFactory.CreateDbContext())
+        {
+            //get analyst lookup data
+            analysts = context.Analysts.ToList();
+            sectionlist = context.LkSections.ToList();
+            locationlist = context.LkLocationsearchs.ToList();
+
+            if (fileid > 0)
+            {
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
+                {
+                    //set state login
+                    loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
+                }
+                requestfile = loginState.Requestfile;
+                FileNumber = loginState.Requestfile.Filenumber;
+                if (context.Summarydisclosures.Where(x => x.Requestid == fileid).FirstOrDefault() != null)
+                {
+                    summarydisclosures = context.Summarydisclosures.Where(x => x.Requestid == fileid).ToList();
+                    summarydisclosure = context.Summarydisclosures.Where(x => x.Requestid == fileid).FirstOrDefault();
+                }
+
+                if (context.Locationitems.Where(x => x.Requestid == fileid).ToList().Count > 0)
+                {
+                    locationitemData = context.Locationitems.Where(x => x.Requestid == fileid).ToList();
+                    olocationitemData = context.Locationitems.Where(x => x.Requestid == fileid).ToList();
+                }
+
+                if (context.Discloseditems.Where(x => x.Requestid == fileid).ToList().Count > 0)
+                {
+                    discloseditemsData = context.Discloseditems.Where(x => x.Requestid == fileid).ToList();
+                    odiscloseditemsData = context.Discloseditems.Where(x => x.Requestid == fileid).ToList();
+                }
+
+                LoadData();
+            }
+        }
+        StateHasChanged();
+    }
+
 
     private async void ClearData()
     {
@@ -187,15 +229,45 @@
     }
 
 
-    private async Task LoadData()
+    private void LoadData()
     {
-        if (fileid != null && fileid > 0)
+        disclosedViewData = new List<DisclosedViewitem>();
+        locationViewData = new List<LocationViewitem>();
+        using (var context = DbFactory.CreateDbContext())
         {
-            disclosedViewData = (await disclosedViewService.GetDiscloseditemsList(fileid)).ToList();
+            //load data to view + section detail
+            foreach (var item in discloseditemsData)
+            {
+                DisclosedViewitem viewitem = new DisclosedViewitem();
+                viewitem.Id = item.Id;
+                viewitem.Requestid = item.Requestid;
+                viewitem.Sectionid = item.Sectionid;
+                viewitem.Section = context.LkSections.Where(x => x.Id == item.Sectionid).FirstOrDefault().Section;
+                viewitem.Sectiontype = item.Sectiontype;
+                viewitem.Othertext = item.Othertext;
+                viewitem.Createdate = DateTime.Now;
+                viewitem.Createuser = userReg;
 
+                disclosedViewData.Add(viewitem);
+            }
+
+            //load location search data to view + location name
+            foreach (var item in locationitemData)
+            {
+                LocationViewitem viewitem = new LocationViewitem();
+                viewitem.Id = item.Id;
+                viewitem.Requestid = (int)item.Requestid;
+                viewitem.Locationid = (int)item.Locationid;
+                viewitem.Locationname = context.LkLocationsearchs.Where(x => x.Id == item.Locationid).FirstOrDefault().Detail;
+                viewitem.Createdate = DateTime.Now;
+                viewitem.Createuser = userReg;
+
+                locationViewData.Add(viewitem);
+
+            }
         }
 
-        // StateHasChanged();
+         StateHasChanged();
 
     }
 
@@ -207,9 +279,6 @@
 
     protected async Task HandleValidSubmit()
     {
-
-        //osummarydisclosures = (await disclosedViewService.GetDisclosureSummary(fileid)).ToList();
-        //  osummarydisclosure = osummarydisclosures.FirstOrDefault();
 
         Saved = false;
 
@@ -226,7 +295,6 @@
         if (savetype == "update")
         {
             await SummarydisclosureService.UpdateSummarydisclosure(summarydisclosure);
-
             await AuditData("Update Summarydisclosure", "update");
         }
         else
@@ -237,8 +305,8 @@
             await AuditData("Create Summarydisclosure", "create");
         }
 
+
         Discloseditem discloseditem = new Discloseditem();
-        // DisclosedViewitem disclosedViewitem = new DisclosedViewitem();
         //remove disclosure items that user deleted from the list
         foreach (var item in odiscloseditemsData)
         {
@@ -250,20 +318,45 @@
             }
         }
 
+
         //insert new disclosureitem
         foreach (var item in discloseditemsData)
         {
 
             Discloseditem odiscloseditem = new Discloseditem();
-
             odiscloseditem = await DiscloseditemService.GetDiscloseditemsBySectionId(item.Sectionid, fileid);
-
 
             //skip any section item that already exists in the table
             if (odiscloseditem == null)
             {
                 item.Requestid = fileid;
                 await DiscloseditemService.CreateDiscloseditems(item);
+            }
+        }
+
+        Locationitem locationitem = new Locationitem();
+        //remove location searvh items that user deleted from the list
+        foreach (var item in olocationitemData)
+        {
+            locationitem = locationitemData.Where(x => x.Locationid == item.Locationid && x.Requestid == item.Requestid).FirstOrDefault();
+
+            if (locationitem == null)
+            {
+                await LocationitemsService.DeleteLocationitem(item);
+            }
+        }
+
+        //insert new locationitem
+        foreach (var item in locationitemData)
+        {
+            Locationitem olocationitem = new Locationitem();
+            olocationitem = await LocationitemsService.GetLocationitemByLocationId((int)item.Locationid, fileid);
+
+            //don't insert if location data already exists
+            if (olocationitem == null)
+            {
+                item.Requestid = fileid;
+                await LocationitemsService.CreateLocationitem(item);
             }
         }
 
@@ -322,10 +415,10 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbenterdate">
+                <label for="lbfileid">
                     File Number:
                 </label>
-                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" />
+                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" style="background-color:lightgray" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbfileclosedate">
@@ -384,7 +477,12 @@
     <DiscloseditemAdd userReg="@userReg" requestfile="requestfile" locationlist="locationlist" sectionlist="sectionlist" File_locationitems="locationitemData" File_discloseditems="discloseditemsData" View_locationitems="locationViewData" View_discloseditems="disclosedViewData"></DiscloseditemAdd>
     <br />
 
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    
+    @if (tester)
+    {
+        <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    }
+    &nbsp;
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm>

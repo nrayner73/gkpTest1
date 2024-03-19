@@ -10,7 +10,7 @@
 @using Gatekeeper.Models;
 
 @inject IDbContextFactory<AppDbContext> DbFactory
-
+@inject IConfiguration Configuration
 
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
@@ -83,27 +83,9 @@
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        // using var context = DbFactory.CreateDbContext();
-
-
         loginState.OnChange += StateHasChanged;
+        getDataContext();
 
-        if (loginState.gFileId > 0)
-        {
-            fileid = (int)loginState.gFileId;
-            FileNumber = loginState.gFileNumber;
-
-            requestfile = loginState.Requestfile;
-
-            // requestfees = await context.Requestfees.Where(x => x.Requestid == fileid).ToListAsync();
-            // payments = await context.Payments.Where(x => x.Requestid == fileid).ToListAsync();
-
-            // requestfees = (await RequestfeeService.GetRequestfeeList(fileid)).ToList();
-            // payments = (await PaymentService.GetPaymentList(fileid)).ToList();
-
-            // LoadData();
-            // StateHasChanged();
-        }
     }
 
 
@@ -128,59 +110,69 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            //show top menu and highlight selected menu
             JSRuntime.InvokeVoidAsync("showTopmenu");
             JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "payment-tab");
 
 
+            //clear save type
             savetype = string.Empty;
 
             if (fileid == 0 || fileid == null)
             {
-                using var context = DbFactory.CreateDbContext();
-
                 var RQID = await sessionStorage.GetItemAsync<string>("RQID");
                 if (RQID != "0" && RQID != null)
                 {
                     fileid = Int32.Parse(RQID);
-                    if (loginState.gFileId == 0 || loginState.gFileId == null)
-                    {
-                        loginState.SetLogin(await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid));
-                    }
-                    requestfile = loginState.Requestfile;
-                    requestfees = await context.Requestfees.Where(x => x.Requestid == fileid).ToListAsync();
-                    payments = await context.Payments.Where(x => x.Requestid == fileid).ToListAsync();
-
-                    // if (requestfile.Id == 0 && FileNumber == "")
-                    // {
-                    //     //  searchrequestfile = searchrequestFileService.GetRequestfileById(fileid);
-                    //     // requestfile = await requestFileService.GetRequestfileById(fileid);
-
-                    //     // FileNumber = requestfile.Filenumber.ToString();
-
-
-                    //     requestfees = await context.Requestfees.Where(x => x.Requestid == fileid).ToListAsync();
-                    //     payments = await context.Payments.Where(x => x.Requestid == fileid).ToListAsync();
-
-                    //     // requestfees = requestfees.Where(x => x.Requestid == fileid).ToList();
-                    //     // //(await RequestfeeService.GetRequestfeeList(fileid)).ToList();
-                    //     // payments = payments.Where(x => x.Requestid == fileid).ToList();
-                    //     //(await PaymentService.GetPaymentList(fileid)).ToList();
-                    // }
+                    getDataContext();
                 }
+                loginState.OnChange += StateHasChanged;
+                // Load data to grid
                 LoadData();
+
             }
 
+            //assign request file id and payment date
             requestfee.Requestid = fileid;
-
             payment.Requestid = fileid;
             payment.Paymentdate = DateTime.Now;
+            payment.Createdate = DateTime.Now;
+            payment.Moddate = DateTime.Now;
+
 
             StateHasChanged();
             firstRender = false;
         }
     }
     #endregion
+
+    #region "Methods"
+    //Load Data from DbContext
+    public void getDataContext()
+    {
+        using (var context = DbFactory.CreateDbContext())
+        {
+            //get analyst lookup data
+            analysts = context.Analysts.ToList();
+            if (fileid > 0)
+            {
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
+                {
+                    //set state login
+                    loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
+                    loginState.OnChange += StateHasChanged;
+                }
+                requestfile = loginState.Requestfile;
+                FileNumber = loginState.Requestfile.Filenumber;
+                requestfees =  context.Requestfees.Where(x => x.Requestid == fileid).ToList();
+                payments =  context.Payments.Where(x => x.Requestid == fileid).ToList();
+
+
+            }
+        }
+        StateHasChanged();
+    }
 
 
     private void LoadData()
@@ -287,8 +279,6 @@
         StateHasChanged();
     }
 
-
-
     private async Task AuditData(string act, string type)
     {
         auditlog = new AuditLog();
@@ -342,6 +332,7 @@
         payment.Moduser = userReg;
         savetype = "create";
     }
+    #endregion
 }
 
 @if (alertMessageShow)

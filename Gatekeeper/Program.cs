@@ -1,3 +1,6 @@
+using System;
+using System.Net.Http;
+
 using Gatekeeper.Components;
 using Gatekeeper.Interfaces;
 using Gatekeeper.Models;
@@ -14,6 +17,9 @@ using Gatekeeper.DataServices.Audit;
 using Gatekeeper.DataServices;
 using Gatekeeper.Classes;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,40 +28,75 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Configuration.AddJsonFile("DbConn.json",
+        optional: true,
+        reloadOnChange: true);
 
 // Add session 
 builder.Services.AddBlazoredSessionStorage();
 
+string conStr = string.Empty;
+
+if (System.Environment.MachineName.ToLower() == "cps-dev-03")
+{
+    conStr = builder.Configuration.GetConnectionString("gkConnectionStringDev");
+}
+else if (System.Environment.MachineName.ToLower() == "cps-test-03")
+{
+    conStr = builder.Configuration.GetConnectionString("gkConnectionStringDev");
+}
+else if (System.Environment.MachineName.ToLower() == "cps-stage-03")
+{
+    conStr = builder.Configuration.GetConnectionString("gkConnectionStringDev");
+}
+else if (System.Environment.MachineName.ToLower() == "cps-prod-03")
+{
+    conStr = builder.Configuration.GetConnectionString("gkConnectionStringDev");
+}
+else
+{
+    //Local
+    conStr = builder.Configuration.GetConnectionString("gkConnectionStringDev");
+}
+
+
+
+
 // Gatekeeper Services
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("gkConnectionString"));
+    options.UseSqlServer(conStr);
     options.EnableSensitiveDataLogging();
 }
 );
 
 
-SqlConnectionStringBuilder Sqlbuilder = new SqlConnectionStringBuilder();
-Sqlbuilder.ConnectionString = builder.Configuration.GetConnectionString("gkConnectionString");
-
 builder.Services.AddDbContextFactory<LookupDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("gkConnectionString")));
+    options.UseSqlServer(conStr));
+
+
+////SqlConnectionStringBuilder Sqlbuilder = new SqlConnectionStringBuilder();
+////Sqlbuilder.ConnectionString = builder.Configuration.GetConnectionString("gkConnectionString");
+
+//builder.Services.AddDbContextFactory<LookupDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("gkConnectionString")));
 
 builder.Services.AddBlazorBootstrap();
 
 builder.Services.AddScoped<IRequestfileService, RequestfileService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
-builder.Services.AddScoped <IAnalystnoteService, AnalystnoteService>();
+builder.Services.AddScoped<IAnalystnoteService, AnalystnoteService>();
 builder.Services.AddScoped<IVideonoteService, VideonoteService>();
 builder.Services.AddScoped<ISummarydisclosureService, SummarydisclosureService>();
-builder.Services.AddScoped <IDiscloseditemsService,DiscloseditemsService>();
+builder.Services.AddScoped<IDiscloseditemsService, DiscloseditemsService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IRequestfeeService, RequestfeeService>();
 builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
+builder.Services.AddScoped<ILocationitemsService, LocationitemsService>();
 
 //Lookup
-builder.Services.AddScoped<ILookupService,LookupDataService>();
+builder.Services.AddScoped<ILookupService, LookupDataService>();
 
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
@@ -76,10 +117,10 @@ builder.Services.AddScoped<IAuditlogService, AuditlogService>();
 
 
 //View
-builder.Services.AddScoped<IPersonnameService,PersonnameService>();
+builder.Services.AddScoped<IPersonnameService, PersonnameService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
-builder.Services.AddScoped<IViewHolidayService,ViewHolidayService>();
+builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
 
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "OgbSJrGQkc6O9qs5Ydmr96ut/hSnCXqCuztIktifgdo=",
+  "Hash": "6YA3PifDEkrX+6NRAZn2zxBiWTU1tjuA/K4OuuEDXmk=",
   "Source": "Gatekeeper",
   "BasePath": "_content/Gatekeeper",
   "Mode": "Default",
@@ -1288,6 +1288,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\crest-cps.svg"
+    },
+    {
+      "Identity": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\DbConn.json",
+      "SourceId": "Gatekeeper",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\",
+      "BasePath": "_content/Gatekeeper",
+      "RelativePath": "DbConn.json",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\DbConn.json"
     },
     {
       "Identity": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\favicon.png",

@@ -1,0 +1,7 @@
+{
+  "LocalDb": "Server=LAP3330\\;Database=GateKeeper;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets = true;",
+  "Dev": "Server=DB_dev_CPSAPP;Database=cpsappl1;User Id=cpsapp;Password=cpsappsdns;TrustServerCertificate=True;MultipleActiveResultSets = true;",
+  "Stage": "Server=DB_dev_CPSAPP;Database=cpsappl1;User Id=cpsapp;Password=cpsappsdns;TrustServerCertificate=True;MultipleActiveResultSets = true;",
+  "Test": "Server=DB_dev_CPSAPP;Database=cpsappl1;User Id=cpsapp;Password=cpsappsdns;TrustServerCertificate=True;MultipleActiveResultSets = true;",
+  "Prod": "Server=DB_dev_CPSAPP;Database=cpsappl1;User Id=cpsapp;Password=cpsappsdns;TrustServerCertificate=True;MultipleActiveResultSets = true;"
+}

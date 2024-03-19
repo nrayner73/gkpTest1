@@ -8,6 +8,9 @@
 @using System.Reflection;
 @using System;
 
+@inject IConfiguration Configuration
+@inject IDbContextFactory<AppDbContext> DbFactory
+
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -63,34 +66,37 @@
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
     //QuickGrid<SearchVideoNotes>? grid;
 
+    bool tester = true;
     bool showpanel = true;
     bool shownotes = true;
+    bool showid = false;
+
     #endregion
 
 
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        var user = authstate.User;
-        var name = user.Identity.Name;
-
         loginState.OnChange += StateHasChanged;
+        getDataContext();
 
-        if (loginState.gFileId > 0)
-        {
-            fileid = (int)loginState.gFileId;
-            FileNumber = loginState.gFileNumber;
+        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        // var user = authstate.User;
+        // var name = user.Identity.Name;
 
-            requestfile = loginState.Requestfile;
-            videonote.Requestid = fileid;
+        // loginState.OnChange += StateHasChanged;
 
-            LoadData();
-            StateHasChanged();
-        }
-       
+        // if (loginState.gFileId > 0)
+        // {
+        //     fileid = (int)loginState.gFileId;
+        //     FileNumber = loginState.gFileNumber;
 
+        //     requestfile = loginState.Requestfile;
+        //     videonote.Requestid = fileid;
 
+        //     LoadData();
+        //     StateHasChanged();
+        // }
     }
 
     public void Dispose()
@@ -112,30 +118,34 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            //highlight selected to menu and set enable child menu
             JSRuntime.InvokeVoidAsync("showTopmenu");
             JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "video-tab");
 
-
+            //set save type
             savetype = string.Empty;
+
+            //read data from session
             var RQID = await sessionStorage.GetItemAsync<string>("RQID");
             if (RQID != "0" && RQID != null)
             {
                 fileid = Int32.Parse(RQID);
-                if (loginState.gFileId == 0)
-                {
-                    loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
-                }
-                requestfile = loginState.Requestfile;
+                // get data context
+                getDataContext();
 
-
-               //  requestfile = await requestFileService.GetRequestfileById(fileid);
-               //  FileNumber = requestfile.Filenumber.ToString();
-                //searchanalystnotes = searchnoteService.GetAnalystnoteList(fileid).AsQueryable<SearchAnalystNotes>();
+                loginState.OnChange += StateHasChanged;
+                // Load data to grid
                 LoadData();
+
+                // assign current date and current log on user to create date, mod date, create user and mod user
+                videonote.Createuser = userReg;
+                videonote.Moduser = userReg;
+                videonote.Analystid = analysts.Where(x => x.Regno == userReg).FirstOrDefault().Id;
+                videonote.Moddate = DateTime.Today;
                 videonote.Enterdate = DateTime.Today;
                 videonote.Requestid = fileid;
-               // videonotes = (await VideonotesService.GetVideonoteList(fileid)).ToList();
+
             }
 
             StateHasChanged();
@@ -144,6 +154,26 @@
     }
     #endregion
     #region "Methods"
+    public void getDataContext()
+    {
+        using (var context = DbFactory.CreateDbContext())
+        {
+            //get analyst lookup data
+            analysts = context.Analysts.ToList();
+            if (fileid > 0)
+            {
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
+                {
+                    //set state login
+                    loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
+                }
+                requestfile = loginState.Requestfile;
+                FileNumber = loginState.Requestfile.Filenumber;
+
+            }
+        }
+        StateHasChanged();
+    }
 
     private void LoadData()
     {
@@ -166,7 +196,7 @@
         if (savetype == "update")
         {
             await VideonotesService.UpdateVideonote(videonote);
-            await  AuditData("Update Videonotes", "update");
+            await AuditData("Update Videonotes", "update");
         }
         else
         {
@@ -190,13 +220,12 @@
         navigationManager.NavigateTo($"/videonotes/add/{fileid}", true);
 
         //LoadData();
-
         //StateHasChanged();
     }
 
     private void FillData()
     {
-    videonote.Requestid = fileid;
+        videonote.Requestid = fileid;
         videonote.Enterdate = DateTime.Now;
         videonote.Analystid = 1;
         videonote.Notes = "notes";
@@ -230,19 +259,6 @@
     }
 
 
-    protected async Task SaveVideonotesData()
-    {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        var user = authstate.User;
-        var username = user.Identity.Name;
-        // videonotes = await VideonotesService.CreateVideonotes(videonotes);
-        //videonotes.{firstuppercolname} = videonotes.{fieldname};
-
-        videonote.Moduser = username;
-        videonote.Createdate = DateTime.Now;
-        videonote.Moddate = DateTime.Now;
-        videonote = await VideonotesService.CreateVideonote(videonote);
-    }
 
     private async void UpdateData(int id)
     {
@@ -250,17 +266,16 @@
         if (id > 0)
         {
             savetype = "update";
-            GetData(id);
-        }
-    }
+            using (var context = DbFactory.CreateDbContext())
+            {
+                if (id != null && id > 0)
+                {
 
-    private async void GetData(int id)
-    {
-        if (id != null && id > 0)
-        {
-            ovideonote = await VideonotesService.GetVideonoteById(id);
-            videonote = await VideonotesService.GetVideonoteById(id);
-            StateHasChanged();
+                    videonote = context.Videonotes.Where(x => x.Id == id).FirstOrDefault();
+                    ovideonote = (Videonote)context.Entry(videonote).GetDatabaseValues().ToObject();
+                    StateHasChanged();
+                }
+            }
         }
     }
 
@@ -293,10 +308,7 @@
             LoadData();
             StateHasChanged();
         }
-        else
-        {
-            // do something
-        }
+       
     }
 
     private void ClearData()
@@ -318,7 +330,7 @@
                 <label for="lbfileid">
                     File Number:
                 </label>
-                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" />
+                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" style="background-color:lightgray" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbenterdate">
@@ -355,7 +367,11 @@
     </div>
 
     <hr />
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    @if (tester)
+    {
+        <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+
+    }
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 
@@ -392,6 +408,10 @@
 
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchvideonotes" Virtualize="true" Pagination="@pagination">
+        @if (showid)
+        {
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
+        }
         @if (shownotes)
         {
             <PropertyColumn Property="@(r => r.Notes)" Title="Notes" Sortable="true" class="col-width" />

@@ -7,7 +7,7 @@
 @using BlazorBootstrap
 @using System.Reflection;
 @using System;
-
+@inject IConfiguration Configuration
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
@@ -72,39 +72,48 @@
     private IQueryable<SearchExtension> searchextensions;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
     QuickGrid<Searchrequestfile>? grid;
+
+    bool tester = false;
+    bool showpanel = true;
+    bool shownotes = true;
+    bool showid = false;
     #endregion
 
 
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        var user = authstate.User;
-        var name = user.Identity.Name;
-
         loginState.OnChange += StateHasChanged;
+        getDataContext();
+        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        // var user = authstate.User;
+        // var name = user.Identity.Name;
 
-        if (loginState.gFileId > 0)
-        {
-            fileid = (int)loginState.gFileId;
-            FileNumber = loginState.gFileNumber;
+        // loginState.OnChange += StateHasChanged;
+
+        // if (loginState.gFileId > 0)
+        // {
+        //     fileid = (int)loginState.gFileId;
+        //     FileNumber = loginState.gFileNumber;
 
 
-        }
-        extensions = (await ExtensionsService.GetExtensionsList(fileid)).ToList();
+        // }
+        //extensions = (await ExtensionsService.GetExtensionsList(fileid)).ToList();
+    }
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-
+        //using var context = DbFactory.CreateDbContext();
+        //get user information
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
+
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        analysts = (await analystService.GetAnalystsList()).ToList();
-        lksectionlist = (await lksectionService.GetLkSectionsList()).Where(x => x.Sectiontype.ToLower() == "extension").ToList();
-        lkextensionlist = (await lkextensionService.GetLkExtensionsList()).ToList();
-        holidays = await context.Holidays.ToListAsync();
     }
 
 
@@ -113,33 +122,31 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            //highlight selected to menu and set enable child menu
             JSRuntime.InvokeVoidAsync("showTopmenu");
             JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "extension-tab");
 
-
+            //set save type
             savetype = string.Empty;
+            //read data from session
             var RQID = await sessionStorage.GetItemAsync<string>("RQID");
-            var objRequest = await sessionStorage.GetItemAsync<Requestfile>("objFileRequest");
+            //  var objRequest = await sessionStorage.GetItemAsync<Requestfile>("objFileRequest");
             if (RQID != "0" && RQID != null)
             {
                 fileid = Int32.Parse(RQID);
-                requestfile = objRequest;
+                // get data context
+                getDataContext();
 
-                if (loginState.gFileId == 0 || loginState.gFileId == null)
-                {
-                    loginState.SetLogin(objRequest);
-                }
-
-                // requestfile = loginState.Requestfile;
-                FileNumber = objRequest.Filenumber;
-
-                fileid = Int32.Parse(RQID);
-          
-                //await requestFileService.GetRequestfileById(fileid);
-                
-                
+                loginState.OnChange += StateHasChanged;
+                // Load data to grid
                 LoadData();
+
+                // assign current date and current log on user to create date, mod date, create user and mod user
+                extension.Createdate = DateTime.Now;
+                extension.Moddate = DateTime.Now;
+                extension.Createuser = userReg;
+                extension.Moduser = userReg;
                 extension.Requestid = fileid;
 
             }
@@ -149,13 +156,35 @@
         }
     }
 
-    public void Dispose()
-    {
-        loginState.OnChange -= StateHasChanged;
-    }
 
     #endregion
     #region "Methods"
+
+    public void getDataContext()
+    {
+        using (var context = DbFactory.CreateDbContext())
+        {
+            //get analyst lookup data
+            analysts = context.Analysts.ToList();
+
+            lksectionlist = context.LkSections.Where(x => x.Sectiontype.ToLower() == "extension").ToList();
+            lkextensionlist = context.LkExtensions.ToList();
+            holidays = context.Holidays.ToList();
+
+            if (fileid > 0)
+            {
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
+                {
+                    //set state login
+                    loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
+                }
+                requestfile = loginState.Requestfile;
+                FileNumber = loginState.Requestfile.Filenumber;
+            }
+        }
+        StateHasChanged();
+    }
+
 
     private void LoadData()
     {
@@ -173,6 +202,7 @@
             DateTime dueDate = (DateTime)requestfile.Receivedate;
             DateTime setDate;
 
+            oDuedate = ((DateTime)requestfile.Receivedate).AddDays(30).ToString();
             dueDate = ((DateTime)requestfile.Receivedate).AddDays(30 + (int)extDays);
 
             for (int i = 1; i < 11; i++)
@@ -240,7 +270,6 @@
             {
                 extDays = extDays + item.Dayamount;
             }
-
         }
 
         requestfile = await requestFileService.GetRequestfileById(fileid);
@@ -279,7 +308,7 @@
         }
         else if (type == "updateduedate")
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(oDuedate,requestfile.Requestduedate.ToString(), act).ToString();
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oDuedate, requestfile.Requestduedate.ToString(), act).ToString();
 
         }
 
@@ -293,20 +322,22 @@
         savetype = "";
         if (id > 0)
         {
+            //set save type
             savetype = "update";
-            GetData(id);
+            using (var context = DbFactory.CreateDbContext())
+            {
+                if (id != null && id > 0)
+                {
+
+                    extension = context.Extensions.Where(x => x.Id == id).FirstOrDefault();
+                    oextension = (Extension)context.Entry(extension).GetDatabaseValues().ToObject();
+
+                    StateHasChanged();
+                }
+            }
         }
     }
 
-    private async void GetData(int id)
-    {
-        if (id != null && id > 0)
-        {
-            oextension = await ExtensionsService.GetExtensionsById(id);
-            extension = await ExtensionsService.GetExtensionsById(id);
-            StateHasChanged();
-        }
-    }
 
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
@@ -339,21 +370,16 @@
             LoadData();
             StateHasChanged();
         }
-        else
-        {
-            // do something
-        }
+      
     }
 
     private void ClearData()
     {
-        extension = new Extension();    
+        extension = new Extension();
     }
 
     private void FillData()
     {
-
-
         extension.Requestid = fileid;
         extension.Extensionid = 1;
         extension.Sectionid = 72;
@@ -389,7 +415,7 @@
                 <label for="lbfileid">
                     File Number:
                 </label>
-                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" />
+                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" style="background-color:lightgray" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbextensionid">
@@ -444,6 +470,11 @@
 <br />
 
 <div class="row" style="width:100%;padding-bottom: 1em;">
+        <div class="col-lg-5" style="float:left">
+        Show:
+        <label><input type="checkbox" @bind="showid" /> Record Id</label>
+     
+    </div>
 
     <div class="col-lg-5" style="float:left">
         <div class="page-size-chooser">
@@ -466,6 +497,10 @@
 
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchextensions" Virtualize="true" Pagination="@pagination">
+        @if (showid)
+        {
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
+        }
         <PropertyColumn Property="@(r => r.Extension)" Title="Extension" Sortable="true" class="col-width" />
         <PropertyColumn Property="@(r => r.Section)" Title="Section" Sortable="true" />
         <PropertyColumn Property="@(r => r.Extensiondate)" Title="Extension Date" Sortable="true" />

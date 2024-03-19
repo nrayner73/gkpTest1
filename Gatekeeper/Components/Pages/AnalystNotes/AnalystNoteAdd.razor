@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @using System.Text
 @using BlazorBootstrap
 @using Microsoft.AspNetCore.Components.Authorization
@@ -206,7 +206,6 @@
             analystnote.Createuser = userReg;
             await AnalystnoteService.CreateAnalystnote(analystnote);
             await AuditData("Create Analyst Note", "create");
-
         }
 
         StatusClass = "alert-success";

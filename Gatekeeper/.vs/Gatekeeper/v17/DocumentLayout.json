@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\accessrequests\\accessrequestadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\accessrequests\\accessrequestadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\analystnotes\\analystnoteadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\analystnotes\\analystnoteadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\videonotes\\videonoteadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\videonotes\\videonoteadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\feepayments\\feepaymentadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\feepayments\\feepaymentadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 13,
+          "SelectedChildIndex": 14,
           "Children": [
             {
               "$type": "Bookmark",
@@ -71,14 +79,70 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+<<<<<<< Updated upstream
               "Title": "AccessRequestAdd.razor",
               "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
               "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
               "RelativeToolTip": "Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
               "ViewState": "AQIAAMQBAAAAAAAAAAAgwP8BAAAMAAAA",
+=======
+              "Title": "AnalystNoteAdd.razor",
+              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AnalystNotes\\AnalystNoteAdd.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\AnalystNotes\\AnalystNoteAdd.razor",
+              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AnalystNotes\\AnalystNoteAdd.razor",
+              "RelativeToolTip": "Components\\Pages\\AnalystNotes\\AnalystNoteAdd.razor",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAAAAAA",
+>>>>>>> Stashed changes
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-03-15T22:03:01.284Z",
+              "WhenOpened": "2024-03-19T13:59:11.044Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FeePaymentAdd.razor",
+              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
+              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
+              "RelativeToolTip": "Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
+              "ViewState": "AQIAAHIAAAAAAAAAAAAwwJIAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-03-19T13:32:28.505Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "FloatingWindowState": {
+        "Id": "4b8b4c79-08d3-4f87-9766-7e5361d2c9d6",
+        "Display": 0,
+        "X": 643,
+        "Y": 18,
+        "Width": 1161,
+        "Height": 964,
+        "WindowState": 0
+      },
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "VideoNoteAdd.razor",
+              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\VideoNotes\\VideoNoteAdd.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\VideoNotes\\VideoNoteAdd.razor",
+              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\VideoNotes\\VideoNoteAdd.razor",
+              "RelativeToolTip": "Components\\Pages\\VideoNotes\\VideoNoteAdd.razor",
+              "ViewState": "AQIAAIMAAAAAAAAAAAAAAJYAAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-03-19T13:33:43.631Z",
               "EditorCaption": ""
             }
           ]

@@ -152,3 +152,4 @@ C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\Gatekeeper.genruntimec
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\ref\Gatekeeper.dll
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\scopedcss\Components\Layout\TopMenu.razor.rz.scp.css
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\Gatekeeper.csproj.Up2Date
+C:\Projects\gatekeeper-2024\Gatekeeper\obj\Release\net8.0\scopedcss\Components\Pages\PaymentTypes\PaymentTypeAdd.razor.rz.scp.css

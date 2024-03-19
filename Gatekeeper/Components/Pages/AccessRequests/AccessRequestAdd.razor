@@ -13,7 +13,7 @@
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService session
 @inject IDbContextFactory<AppDbContext> DbFactory
-@inject IPersonnameService personNameService
+
 
 @inject IAuditlogService auditlogService
 @inject IJSRuntime JSRuntime
@@ -188,6 +188,7 @@
                     getDataContext();
                 }
             }
+            getDataContext();
 
             #region "set tab and top menu "
             if (fileid > 0)
@@ -219,6 +220,7 @@
         {
             holidays = context.Holidays.ToList();
             requesttypes = context.LkRequesttypes.ToList();
+            requestfiles = context.Requestfiles.ToList();
             if (fileid > 0)
             {
                 //assigned Access Request File object

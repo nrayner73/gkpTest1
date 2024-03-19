@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gatekeeper.Models;
 
-[Table("lk_locationsearch", Schema = "gkp")]
+[Table("lk_location", Schema = "gkp")]
 public partial class LkLocationsearch
 {
  [Key]

@@ -11,14 +11,10 @@
 
 @using BlazorBootstrap
 
-
 @inject IServiceScopeFactory serviceScopeFactory
 @inject IDbContextFactory<AppDbContext> DbFactory
-@inject IAnalystsService analystService
-@inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
 @inject IDiscloseditemsService discloseditemsService
-@inject IDisclosureViewService disclosedViewService
 
 @inject NavigationManager navigationManager
 @inject IConfiguration Configuration
@@ -136,16 +132,6 @@
                 fileid = Int32.Parse(RQID);
                 //get data context
                 getDataContext();
-
-
-                //   //Load data to grid
-                // await  LoadData();
-
-                // assign current date and current log on user to create date, mod date, create user and mod user
-                // summarydisclosure.Createdate = DateTime.Now;
-                // summarydisclosure.Moddate = DateTime.Now;
-                // summarydisclosure.Createuser = userReg;
-                // summarydisclosure.Moduser = userReg;
 
             }
 

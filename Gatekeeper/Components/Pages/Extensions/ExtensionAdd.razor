@@ -12,11 +12,7 @@
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-
-@inject ILkExtensionsService lkextensionService
-@inject ILkSectionsService lksectionService
 @inject ISearchExtensionService searchextensionService
-@inject IAnalystsService analystService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
@@ -272,7 +268,8 @@
             }
         }
 
-        requestfile = await requestFileService.GetRequestfileById(fileid);
+        // requestfile = await requestFileService.GetRequestfileById(fileid);
+
         setDuedate();
         await requestFileService.UpdateRequestfile(requestfile);
         //  await AuditData("Update Extensions - Modify Due Date", "updateduedate");

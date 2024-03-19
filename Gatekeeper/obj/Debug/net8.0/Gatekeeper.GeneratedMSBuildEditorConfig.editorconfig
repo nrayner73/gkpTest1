@@ -9,119 +9,119 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Gatekeeper
 build_property.RootNamespace = Gatekeeper
-build_property.ProjectDir = E:\Projects\gatekeeper-2024\Gatekeeper\
+build_property.ProjectDir = C:\Projects\gatekeeper-2024\Gatekeeper\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = E:\Projects\gatekeeper-2024\Gatekeeper
+build_property.MSBuildProjectDirectory = C:\Projects\gatekeeper-2024\Gatekeeper
 build_property._RazorSourceGeneratorDebug = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/App.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/App.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/AccessRequestAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/AccessRequestAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBY2Nlc3NSZXF1ZXN0c1xBY2Nlc3NSZXF1ZXN0QWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/PersonRequestForm.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/PersonRequestForm.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBY2Nlc3NSZXF1ZXN0c1xQZXJzb25SZXF1ZXN0Rm9ybS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/RequestFileForm.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/RequestFileForm.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBY2Nlc3NSZXF1ZXN0c1xSZXF1ZXN0RmlsZUZvcm0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Counter.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Counter.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb3VudGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Disclosures/DiscloseditemAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Disclosures/DiscloseditemAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEaXNjbG9zdXJlc1xEaXNjbG9zZWRpdGVtQWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Disclosures/DisclosureAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Disclosures/DisclosureAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEaXNjbG9zdXJlc1xEaXNjbG9zdXJlQWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Error.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Error.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/FeePayments/FeePaymentAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/FeePayments/FeePaymentAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xGZWVQYXltZW50c1xGZWVQYXltZW50QWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/FeePayments/PaymentAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/FeePayments/PaymentAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xGZWVQYXltZW50c1xQYXltZW50QWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/FeePayments/RequestfeeAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/FeePayments/RequestfeeAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xGZWVQYXltZW50c1xSZXF1ZXN0ZmVlQWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Home.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/NoAccess.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/NoAccess.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xOb0FjY2Vzcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Weather.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Weather.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXZWF0aGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Routes.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/_Imports.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/MainLayout.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-bqdrc1gtje
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/NavMenu.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTmF2TWVudS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-e4iuz7yxhz
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/TopMenu.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Layout/TopMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcVG9wTWVudS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-bbh6r6pxsf
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/AccessRequestSearch.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AccessRequests/AccessRequestSearch.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBY2Nlc3NSZXF1ZXN0c1xBY2Nlc3NSZXF1ZXN0U2VhcmNoLnJhem9y
 build_metadata.AdditionalFiles.CssScope = b-vrjkvxbnqu
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AnalystNotes/AnalystNoteAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/AnalystNotes/AnalystNoteAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBbmFseXN0Tm90ZXNcQW5hbHlzdE5vdGVBZGQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-l5pgvhum4i
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Analysts/AnalystAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Analysts/AnalystAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBbmFseXN0c1xBbmFseXN0QWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = b-c731o5n56r
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Extensions/ExtensionAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Extensions/ExtensionAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFeHRlbnNpb25zXEV4dGVuc2lvbkFkZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-m2q7303c84
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Holidays/HolidayAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/Holidays/HolidayAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb2xpZGF5c1xIb2xpZGF5QWRkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = b-obm1x2umhb
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/MyTasks/MytaskSearch.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/MyTasks/MytaskSearch.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNeVRhc2tzXE15dGFza1NlYXJjaC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-cnhds8r9c9
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/PaymentTypes/PaymentTypeAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/PaymentTypes/PaymentTypeAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQYXltZW50VHlwZXNcUGF5bWVudFR5cGVBZGQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-yu3dijjj8z
 
-[E:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/VideoNotes/VideoNoteAdd.razor]
+[C:/Projects/gatekeeper-2024/Gatekeeper/Components/Pages/VideoNotes/VideoNoteAdd.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xWaWRlb05vdGVzXFZpZGVvTm90ZUFkZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-60pe458clh

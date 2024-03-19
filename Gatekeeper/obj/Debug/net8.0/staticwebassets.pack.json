@@ -5,6 +5,10 @@
       "PackagePath": "staticwebassets\\Gatekeeper.bundle.scp.css"
     },
     {
+      "Id": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\DbConn.json",
+      "PackagePath": "staticwebassets\\DbConn.json"
+    },
+    {
       "Id": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\wwwroot\\app.css",
       "PackagePath": "staticwebassets\\app.css"
     },

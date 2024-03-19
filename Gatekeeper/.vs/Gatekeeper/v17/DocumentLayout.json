@@ -3,24 +3,8 @@
   "WorkspaceRootPath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\disclosures\\discloseditemadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\disclosures\\discloseditemadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\disclosures\\disclosureadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\disclosures\\disclosureadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\dataservices\\lookups\\disclosureviewservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:dataservices\\lookups\\disclosureviewservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\interfaces\\lookups\\idisclosureviewservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:interfaces\\lookups\\idisclosureviewservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\models\\lookups\\lookupdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:models\\lookups\\lookupdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\accessrequests\\accessrequestadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\accessrequests\\accessrequestadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 16,
+          "SelectedChildIndex": 13,
           "Children": [
             {
               "$type": "Bookmark",
@@ -86,67 +70,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "LookupDbContext.cs",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Models\\Lookups\\LookupDbContext.cs",
-              "RelativeDocumentMoniker": "Models\\Lookups\\LookupDbContext.cs",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Models\\Lookups\\LookupDbContext.cs",
-              "RelativeToolTip": "Models\\Lookups\\LookupDbContext.cs",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAAB0AAAAtAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T19:56:34.863Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "IDisclosureViewService.cs",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Interfaces\\Lookups\\IDisclosureViewService.cs",
-              "RelativeDocumentMoniker": "Interfaces\\Lookups\\IDisclosureViewService.cs",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Interfaces\\Lookups\\IDisclosureViewService.cs",
-              "RelativeToolTip": "Interfaces\\Lookups\\IDisclosureViewService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAABAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T19:54:35.439Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "DisclosureViewService.cs",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\DataServices\\Lookups\\DisclosureViewService.cs",
-              "RelativeDocumentMoniker": "DataServices\\Lookups\\DisclosureViewService.cs",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\DataServices\\Lookups\\DisclosureViewService.cs",
-              "RelativeToolTip": "DataServices\\Lookups\\DisclosureViewService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABkAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T19:44:16.871Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "DiscloseditemAdd.razor",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\Disclosures\\DiscloseditemAdd.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\Disclosures\\DiscloseditemAdd.razor",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\Disclosures\\DiscloseditemAdd.razor",
-              "RelativeToolTip": "Components\\Pages\\Disclosures\\DiscloseditemAdd.razor",
-              "ViewState": "AQIAABYAAAAAAAAAAIAwwDkAAAAAAAAA",
+              "Title": "AccessRequestAdd.razor",
+              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
+              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
+              "RelativeToolTip": "Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
+              "ViewState": "AQIAAN8BAAAAAAAAAAAgwP4BAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-03-07T17:55:07.859Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "DisclosureAdd.razor",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\Disclosures\\DisclosureAdd.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\Disclosures\\DisclosureAdd.razor",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\Disclosures\\DisclosureAdd.razor",
-              "RelativeToolTip": "Components\\Pages\\Disclosures\\DisclosureAdd.razor",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAH8BAADaAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-03-07T16:23:08.526Z",
+              "WhenOpened": "2024-03-15T22:03:01.284Z",
               "EditorCaption": ""
             }
           ]

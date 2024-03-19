@@ -9,6 +9,8 @@
 
 
 @code {
+
+    #region "Variables"
     [Parameter]
     public Person person { get; set; } = new Person();
     [Parameter]
@@ -52,7 +54,9 @@
     private ContactInfo email { get; set; } = new ContactInfo();
     #endregion
 
+    #endregion
 
+    #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
         EditContext editContext = new EditContext(person);
@@ -63,11 +67,10 @@
         alternatephones = contactService.GetContactInfo();
         faxphones = contactService.GetContactInfo();
         emails = contactService.GetContactInfo();
-
         addresses = addressService.GetAddress();
 
     }
- 
+ #endregion
 
     #region TypeAhead function
     private async Task<IEnumerable<PersonName>> SearchPersonName(string searchText)

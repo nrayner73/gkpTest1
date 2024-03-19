@@ -62,6 +62,7 @@
 
         disclosuredlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "disclose").ToList();
         sectionusedlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "redac").ToList();
+        locationsearchlist = View_locationitems.ToList();
         StateHasChanged();
         ClearData();
 
@@ -81,6 +82,8 @@
     #endregion
 
     #region "Methods"
+
+
     private void ClearData()
     {
 
@@ -135,8 +138,6 @@
                 Lklocationsearch.Remove(lklocationsearch);
             }
         }
-
-
     }
 
     private async Task locationSearchAdd()
@@ -162,13 +163,13 @@
                 _litem.Createuser = userReg;
 
                 File_locationitems.Add(_litem);
+                locationsearchlist.Add(_vitem);
 
                 locationitem = new Locationitem();
                 locationitem.Locationid = -1;
 
                 ClearData();
                 StateHasChanged();
-
             }
 
         }
@@ -202,7 +203,6 @@
                 _ditem.Createuser = userReg;
 
                 File_discloseditems.Add(_ditem);
-
                 disclosuredlist.Add(_vitem);
                 //  Lkdisclosured.Remove(item);
 
@@ -300,7 +300,6 @@
         }
     }
 
-
     private void sectionusedDelete(int id)
     {
         if (id > 0)
@@ -346,64 +345,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-3 col-md-5 col-sm-12">
-            <EditForm Model="@locationitem">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <InputSelect id="disclosureitem" class="form-select d-inline" style="width:250px;" @bind-Value="discloseditem.Sectionid">
-                    <option value="-1">Select...</option>
-                    @foreach (var lktype in Lklocationsearch)
-                    {
-                        <option value="@lktype.Id">@lktype.Detail</option>
-                    }
-                </InputSelect>
-                <Button id="addLocationitem" Color="ButtonColor.Primary" @onclick="locationSearchAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
-
-            </EditForm>
-        </div>
-
-
-        <div class="col-lg-3 col-md-5 col-sm-12">
-            <EditForm Model="@discloseditem">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <InputSelect id="disclosureitem" class="form-select d-inline" style="width:250px;" @bind-Value="discloseditem.Sectionid">
-                    <option value="-1">Select...</option>
-                    @foreach (var lktype in Lkdisclosured)
-                    {
-                        <option value="@lktype.Id">@lktype.Section</option>
-                    }
-                </InputSelect>
-                <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="disclosuredAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
-
-            </EditForm>
-        </div>
-
-        <div class="col-lg-3 col-md-5 col-sm-12">
-            <EditForm Model="@sectionuseditem">
-                <InputSelect id="sectionuseditem" class="form-select d-inline" style="width:250px;" onchange="@OtherText()" @bind-Value="sectionuseditem.Sectionid">
-                    <option value="-1">Select...</option>
-                    @foreach (var lktype in Lksectionused)
-                    {
-                        <option value="@lktype.Id">@lktype.Section</option>
-                    }
-                </InputSelect>
-
-                <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="sectionusedAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
-                &nbsp;
-                @if (showOthertext)
-                {
-                    <InputText id="othertext" @bind-Value="sectionuseditem.Othertext" />
-                }
-
-            </EditForm>
-        </div>
-    </div>
-
-
-    <div class="row">
-
-        <div class="col-lg-3 col-md-5 col-sm-12">
+        <div class="col-lg-4 col-md-5 col-sm-12">
             <EditForm Model="@locationitem">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -415,11 +357,9 @@
                     }
                 </InputSelect>
                 <Button id="addLocationitem" Color="ButtonColor.Primary" @onclick="locationSearchAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
-
             </EditForm>
         </div>
-
-        <div class="col-lg-3 col-md-5 col-sm-12">
+        <div class="col-lg-4 col-md-5 col-sm-12">
             <EditForm Model="@discloseditem">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -434,8 +374,7 @@
 
             </EditForm>
         </div>
-
-        <div class="col-lg-3 col-md-5 col-sm-12">
+        <div class="col-lg-4 col-md-5 col-sm-12">
             <EditForm Model="@sectionuseditem">
                 <InputSelect id="sectionuseditem" class="form-select d-inline" style="width:250px;" onchange="@OtherText()" @bind-Value="sectionuseditem.Sectionid">
                     <option value="-1">Select...</option>
@@ -456,9 +395,9 @@
         </div>
     </div>
 
+
+  
     <div class="row">
-
-
         <div class="col-lg-4 col-md-5 col-sm-12">
             <table class="table table-striped">
                 <thead>
@@ -519,7 +458,6 @@
                     }
                     else
                     {
-
                         <tr>
                             <td>  </td>
                             <td>  </td>
@@ -530,7 +468,7 @@
         </div>
 
 
-        <div class="col-lg-5 col-md-5 col-sm-12">
+        <div class="col-lg-4 col-md-5 col-sm-12">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -556,7 +494,6 @@
                     }
                     else
                     {
-
                         <tr>
                             <td>  </td>
                             <td>  </td>

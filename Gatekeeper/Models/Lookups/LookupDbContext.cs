@@ -41,6 +41,8 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<HolidayView> HolidayInfos { get; set; }
 
+        public virtual DbSet<SearchLkPaymentTypes> LkPaymentTypeInfos { get; set; }
+
         public virtual DbSet<LkSection> LkSections { get; set; }
 
 

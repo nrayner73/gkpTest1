@@ -4,14 +4,14 @@ namespace Gatekeeper.Interfaces
 {
     public interface ILkPaymenttypeService
     {
-        Task<IEnumerable<LkPaymenttype>> GetLkPaymenttypeList();
+        Task<IEnumerable<LkPaymenttype>> GetLkPaymentTypeList();
         
-        Task<LkPaymenttype> GetLkPaymenttypeById(int id);
+        Task<LkPaymenttype> GetLkPaymentTypeById(int id);
         
-        Task<LkPaymenttype> CreateLkPaymenttype(LkPaymenttype lkpaymenttype);
+        Task<LkPaymenttype> CreateLkPaymentType(LkPaymenttype lkpaymenttype);
         
-        Task UpdateLkPaymenttype(LkPaymenttype lkpaymenttype);
+        Task UpdateLkPaymentType(LkPaymenttype lkpaymenttype);
 
-        Task DeleteLkPaymenttype(LkPaymenttype lkpaymenttype);
+        Task DeleteLkPaymentType(LkPaymenttype lkpaymenttype);
     }
 }

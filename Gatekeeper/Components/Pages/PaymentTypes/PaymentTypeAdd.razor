@@ -1,111 +1,142 @@
 ﻿@rendermode InteractiveServer
 @using System.Text
+@using BlazorBootstrap
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Text.Encodings.Web
+@using Gatekeeper.Classes;
+@using Gatekeeper.DataServices;
+@using Gatekeeper.DataServices.Lookups;
+@using Gatekeeper.Models;
+@using System.Xml.Linq;
 @using System.Text.RegularExpressions
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using BlazorBootstrap
-@using System.Reflection;
-@using System;
 
-@inject IViewLkPaymentTypeService ViewLkPaymentTypeService
+@inject IConfiguration Configuration
+@inject IDbContextFactory<AppDbContext> DbFactory
+
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-Service
+@inject ISearchLkPaymentTypeService searchlkpaymenttypeservice
+@inject ILkPaymenttypeService lkPaymentTypeService
+
 @inject IAuditlogService auditlogService
+
 @inject NavigationManager navigationManager
+@inject AppState appState
+@implements IDisposable
+@inject LoginState loginState;
 
 @page "/lkpaymenttype/add"
 
-
 @code {
     #region "Variables"
+
     private System.Security.Claims.ClaimsPrincipal user;
     private string? userReg;
     protected string Message = string.Empty;
     protected string StatusClass = string.Empty;
     private bool Saved;
     private string savetype = string.Empty;
-    private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
 
-    [Parameter]
-    public int fileid { get; set; }
+    [Inject]
+    private ILkPaymenttypeService lkpaymenttypeservice { get; set; }
+
+    private LkPaymenttype lkpaymenttype { get; set; } = new LkPaymenttype();
+    private LkPaymenttype olkpaymenttype { get; set; } = new LkPaymenttype();
+
+    private List<LkPaymenttype> lkpaymenttypes { get; set; } = new List<LkPaymenttype>();
 
     //Audit
     private AuditLog auditlog = new AuditLog();
 
-    [Inject]
-    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
-
-    [Inject]
-    private ILkPaymenttypeService lkPaymenttypeService { get; set; }
-    private LkPaymenttype lkPaymenttype { get; set; } = new LkPaymenttype();
-    private LkPaymenttype olkPaymenttype { get; set; } = new LkPaymenttype();
-    private List<LkPaymenttype> lkPaymenttypes { get; set; } = new List<LkPaymenttype>();
-
-
-    //Data Grid -- Blazor QuickGrid
-    private IQueryable<LkPaymentTypeView> searchlkPaymentTypes;
+    private IQueryable<SearchLkPaymentTypes> searchlkpaymenttypes;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
-    string nameFilter;
-    //int minMedals;
-    //int maxMedals = 120;
-
-    //bool showpanel = true;
+    bool tester = false;
+    bool showpanel = true;
     bool showid = false;
+
     #endregion
 
-
     #region "Component Lifecycle"
+
+
     protected async override Task OnInitializedAsync()
     {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        var user = authstate.User;
-        var name = user.Identity.Name;
+    }
 
-        lkPaymenttypes = (await lkPaymenttypeService.GetLkPaymenttypeList()).ToList();
-        LoadData();
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
     {
+        //get user information
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-    }
 
+        //show-hide fill data button
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
+    }
 
     protected async override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            //set save type
             savetype = string.Empty;
+            
+            // Load data to grid
+            LoadData();
+
+            // assign current date and current log on user to create date, mod date, create user and mod user
+            lkpaymenttype.Createuser = userReg;
+            lkpaymenttype.Moduser = userReg;
+            lkpaymenttype.Createdate = DateTime.Today;
+            
             StateHasChanged();
             firstRender = false;
         }
     }
+
     #endregion
 
     #region "Methods"
 
-    IQueryable<LkPaymentTypeView> LkPaymentTypeView
+    private void LoadData()
     {
-        get
-        {
-            var result = searchlkPaymentTypes;
-
-            return result;
-        }
+        searchlkpaymenttypes = searchlkpaymenttypeservice.GetLkPaymentTypeList().AsQueryable<SearchLkPaymentTypes>();
+        StateHasChanged();
     }
 
-    private  async void LoadData()
+    private async Task AuditData(string act, string type)
     {
-        searchlkPaymentTypes = ViewLkPaymentTypeService.GetLkPaymenttypeList().AsQueryable<LkPaymentTypeView>();
+        auditlog = new AuditLog();
+
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olkpaymenttype, lkpaymenttype, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
     }
 
     protected void HandleInvalidSubmit()
@@ -118,21 +149,20 @@ Service
     {
         Saved = false;
 
-        lkPaymenttype.Moddate = DateTime.Now;
-        lkPaymenttype.Moduser = userReg;
+        lkpaymenttype.Moddate = DateTime.Now;
+        lkpaymenttype.Moduser = userReg;
 
         if (savetype == "update")
         {
-            await lkPaymenttypeService.UpdateLkPaymenttype(lkPaymenttype);
-            await AuditData("Update LkPaymentTypes", "update");
+            await lkpaymenttypeservice.UpdateLkPaymentType(lkpaymenttype);
+            await AuditData("Update Payment Type", "update");
         }
         else
         {
-            lkPaymenttype.Createdate = DateTime.Now;
-            lkPaymenttype.Createuser = userReg;
-            await lkPaymenttypeService.CreateLkPaymenttype(lkPaymenttype);
-            await AuditData("Create LkPaymentTypes", "create");
-
+            lkpaymenttype.Createdate = DateTime.Now;
+            lkpaymenttype.Createuser = userReg;
+            await lkpaymenttypeservice.CreateLkPaymentType(lkpaymenttype);
+            await AuditData("Create Payment Type", "create");
         }
 
         StatusClass = "alert-success";
@@ -144,24 +174,9 @@ Service
         alertMessageShow = false;
         Saved = true;
         navigationManager.NavigateTo($"/lkpaymenttype/add", true);
-    }
-
-    private async Task AuditData(string act, string type)
-    {
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-        auditlog.ActivityXml = auditlogService.GetAuditxml(olkPaymenttype, lkPaymenttype, act).ToString();
-
-        if (type == "update" || type == "delete")
-        {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(olkPaymenttype, lkPaymenttype, act).ToString();
-        }
-
-        await auditlogService.CreateAuditlog(auditlog);
+        LoadData();
+        lkpaymenttype = new LkPaymenttype();
+        StateHasChanged();
     }
 
     private async void UpdateData(int id)
@@ -170,19 +185,19 @@ Service
         if (id > 0)
         {
             savetype = "update";
-            GetData(id);
+            using (var context = DbFactory.CreateDbContext())
+            {
+                if (id != null && id > 0)
+                {
+                    lkpaymenttype = context.LkPaymenttypes.Where(x => x.Id == id).FirstOrDefault();
+                    olkpaymenttype = (LkPaymenttype)context.Entry(lkpaymenttype).GetDatabaseValues().ToObject();
+
+                    StateHasChanged();
+                }
+            }
         }
     }
 
-    private async void GetData(int id)
-    {
-        if (id != null && id > 0)
-        {
-            olkPaymenttype = await lkPaymenttypeService.GetLkPaymenttypeById(id);
-            lkPaymenttype = await lkPaymenttypeService.GetLkPaymenttypeById(id);
-            StateHasChanged();
-        }
-    }
 
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
@@ -196,9 +211,9 @@ Service
         {
             if (id != null && id > 0)
             {
-                olkPaymenttype = await lkPaymenttypeService.GetLkPaymenttypeById(id);
-                await lkPaymenttypeService.DeleteLkPaymenttype(olkPaymenttype);
-                AuditData("Delete LkPaymentTypes", "delete");
+                lkpaymenttype = await lkpaymenttypeservice.GetLkPaymentTypeById(id);
+                await lkpaymenttypeservice.DeleteLkPaymentType(lkpaymenttype);
+                AuditData("Delete Payment Type", "delete");
             }
 
             StatusClass = "alert-success";
@@ -209,61 +224,45 @@ Service
 
             alertMessageShow = false;
             Saved = true;
-            navigationManager.NavigateTo($"/lkpaymenttype/add", true);
 
-            LoadData();
-            StateHasChanged();
+            navigationManager.NavigateTo($"/lkpaymenttype/add/", true);
         }
-        else
-        {
-            // do something
-        }
+
     }
 
     private void ClearData()
     {
-        lkPaymenttype = new LkPaymenttype();
-
+        lkpaymenttype = new LkPaymenttype();
     }
-
-    private void FillData()
-    {
-        lkPaymenttype.Detail = "Payment Type Detail";
-        lkPaymenttype.Createdate = DateTime.Now;
-        lkPaymenttype.Createuser = userReg;
-        lkPaymenttype.Status = "status";
-        lkPaymenttype.Sortby = 0;
-        lkPaymenttype.Moddate = DateTime.Now;
-        lkPaymenttype.Moduser = userReg;
-    }
+    
     #endregion
 }
 
-@if (alertMessageShow)
+   @if (alertMessageShow)
 {
     <br />
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Payment Type:</h5>
+<h5>Notes: </h5>
 
-<EditForm Model="@lkPaymenttype" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+<EditForm Model="@lkpaymenttype" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbPaymentType">
-                    Payment Type Detail:
-                </label>
-                <InputText id="detail" class="form-control" placeholder="PAYMENTTYPE" @bind-Value="lkPaymenttype.Detail" />
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label for="lbPaymentType">
+                        Payment Type Detail:
+                    </label>
+                    <InputText id="detail" class="form-control" placeholder="PAYMENTTYPE" @bind-Value="lkpaymenttype.Detail" />
+                </div>
             </div>
         </div>
     </div>
+    <br />
 
-    <hr />
-
-    @*<button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>*@
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm>
@@ -273,7 +272,8 @@ Service
 <div class="row" style="width:100%;padding-bottom: 1em;">
     <div class="col-lg-5" style="float:left">
         Show:
-        <label><input type="checkbox" @bind="showid" /> ID Column</label>
+        <label><input type="checkbox" @bind="showid" /> Record Id</label>
+        &nbsp;&nbsp;&nbsp;
     </div>
     <div class="col-lg-5" style="float:left">
         <div class="page-size-chooser">
@@ -283,7 +283,6 @@ Service
                 <option>5</option>
                 <option>10</option>
             </select>
-
         </div>
     </div>
     <div class="col-lg-2" style="float:revert">
@@ -294,19 +293,19 @@ Service
 
 <ConfirmDialog @ref="dialog" />
 
-<div class="grid">
-    <QuickGrid Items="@LkPaymentTypeView" Virtualize="true" Pagination="@pagination">
+<div class="grid" tabindex="-1">
+    <QuickGrid Items="@searchlkpaymenttypes" Virtualize="true" Pagination="@pagination">
         @if (showid)
         {
-            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
         }
-       
-        <PropertyColumn Property="@(r => r.Detail)" Title="Payment Type Detail" Sortable="true" />
+        
+        <PropertyColumn Property="@(r => r.Detail)" Title="Detail" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
             <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
         </TemplateColumn>
     </QuickGrid>
-</div> 
+</div>
 
 <Paginator State="@pagination" />

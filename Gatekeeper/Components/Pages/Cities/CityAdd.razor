@@ -1,0 +1,311 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using BlazorBootstrap
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using Gatekeeper.Classes;
+@using Gatekeeper.DataServices;
+@using Gatekeeper.DataServices.Lookups;
+@using Gatekeeper.Models;
+@using System.Xml.Linq;
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject IConfiguration Configuration
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@inject ISearchLkCityService searchlkcityservice
+@inject ILkCityService lkCityService
+
+@inject IAuditlogService auditlogService
+
+@inject NavigationManager navigationManager
+@inject AppState appState
+@implements IDisposable
+@inject LoginState loginState;
+
+@page "/lkcity/add"
+
+@code {
+    #region "Variables"
+
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    private string savetype = string.Empty;
+    private bool alertMessageShow = false;
+
+    [Inject]
+    private ILkCityService lkcityservice { get; set; }
+
+    private LkCity lkcity { get; set; } = new LkCity();
+    private LkCity olkcity { get; set; } = new LkCity();
+
+    private List<LkCity> lkcities { get; set; } = new List<LkCity>();
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    private IQueryable<SearchLkCity> searchlkcities;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+
+    bool tester = false;
+    bool showpanel = true;
+    bool showid = false;
+
+    #endregion
+
+    #region "Component Lifecycle"
+
+
+    protected async override Task OnInitializedAsync()
+    {
+    }
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //get user information
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+
+        //show-hide fill data button
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
+    }
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            //set save type
+            savetype = string.Empty;
+            
+            // Load data to grid
+            LoadData();
+
+            // assign current date and current log on user to create date, mod date, create user and mod user
+            lkcity.Createuser = userReg;
+            lkcity.Moduser = userReg;
+            lkcity.Createdate = DateTime.Today;
+            
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+
+    #endregion
+
+    #region "Methods"
+
+    private void LoadData()
+    {
+        searchlkcities = searchlkcityservice.GetLkCityList().AsQueryable<SearchLkCity>();
+        StateHasChanged();
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olkcity, lkcity, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        Saved = false;
+
+        lkcity.Moddate = DateTime.Now;
+        lkcity.Moduser = userReg;
+
+        if (savetype == "update")
+        {
+            await lkcityservice.UpdateLkCity(lkcity);
+            await AuditData("Update City", "update");
+        }
+        else
+        {
+            lkcity.Createdate = DateTime.Now;
+            lkcity.Createuser = userReg;
+            await lkcityservice.CreateLkCity(lkcity);
+            await AuditData("Create City", "create");
+        }
+
+        StatusClass = "alert-success";
+        Message = "Data updated successfully";
+        alertMessageShow = true;
+        await InvokeAsync(() => StateHasChanged());
+        await Task.Delay(1000);
+
+        alertMessageShow = false;
+        Saved = true;
+        navigationManager.NavigateTo($"/lkcity/add", true);
+        LoadData();
+        lkcity = new LkCity();
+        StateHasChanged();
+    }
+
+    private async void UpdateData(int id)
+    {
+        savetype = "";
+        if (id > 0)
+        {
+            savetype = "update";
+            using (var context = DbFactory.CreateDbContext())
+            {
+                if (id != null && id > 0)
+                {
+                    lkcity = context.LkCities.Where(x => x.Id == id).FirstOrDefault();
+                    olkcity = (LkCity)context.Entry(lkcity).GetDatabaseValues().ToObject();
+
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+
+
+    private ConfirmDialog dialog = default!;
+    private async Task ShowConfirmationAsync(int id)
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Are you sure you want to delete this?",
+            message1: "This will delete the record. Once deleted can not be rolled back.",
+            message2: "Do you want to proceed?");
+
+        if (confirmation)
+        {
+            if (id != null && id > 0)
+            {
+                lkcity = await lkcityservice.GetLkCityById(id);
+                await lkcityservice.DeleteLkCity(lkcity);
+                AuditData("Delete City", "delete");
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data deleted successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+
+            navigationManager.NavigateTo($"/lkcity/add/", true);
+        }
+
+    }
+
+    private void ClearData()
+    {
+        lkcity = new LkCity();
+    }
+    
+    #endregion
+}
+
+   @if (alertMessageShow)
+{
+    <br />
+    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
+}
+
+<h5>Notes: </h5>
+
+<EditForm Model="@lkcity" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label for="lbCity">
+                        City Detail:
+                    </label>
+                    <InputText id="detail" class="form-control" placeholder="CITY" @bind-Value="lkcity.Detail" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+<br />
+
+<div class="row" style="width:100%;padding-bottom: 1em;">
+    <div class="col-lg-5" style="float:left">
+        Show:
+        <label><input type="checkbox" @bind="showid" /> Record Id</label>
+        &nbsp;&nbsp;&nbsp;
+    </div>
+    <div class="col-lg-5" style="float:left">
+        <div class="page-size-chooser">
+            Items per page:
+            <select @bind="@pagination.ItemsPerPage">
+                <option>3</option>
+                <option>5</option>
+                <option>10</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-lg-2" style="float:revert">
+        <div class="page-size-chooser">
+        </div>
+    </div>
+</div>
+
+<ConfirmDialog @ref="dialog" />
+
+<div class="grid" tabindex="-1">
+    <QuickGrid Items="@searchlkcities" Virtualize="true" Pagination="@pagination">
+        @if (showid)
+        {
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
+        }
+        
+        <PropertyColumn Property="@(r => r.Detail)" Title="Detail" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
+            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />

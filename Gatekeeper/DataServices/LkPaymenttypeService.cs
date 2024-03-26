@@ -4,7 +4,7 @@ using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class LkPaymenttypeService : ILkPaymenttypeService
     {
@@ -19,7 +19,7 @@ namespace Gatekeeper.Services
         {
             return await _context.LkPaymenttypes.ToListAsync();
         }
-    
+
         public async Task<LkPaymenttype> GetLkPaymentTypeById(int id)
         {
             return await _context.LkPaymenttypes.FirstOrDefaultAsync(x => x.Id == id);
@@ -31,13 +31,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return lkpaymenttype;
         }
-        public async System.Threading.Tasks.Task UpdateLkPaymentType(LkPaymenttype lkpaymenttype)
+        public async Task UpdateLkPaymentType(LkPaymenttype lkpaymenttype)
         {
             _context.LkPaymenttypes.Update(lkpaymenttype);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteLkPaymentType(LkPaymenttype lkpaymenttype)
+        public async Task DeleteLkPaymentType(LkPaymenttype lkpaymenttype)
         {
             _context.LkPaymenttypes.Remove(lkpaymenttype);
             await _context.SaveChangesAsync();

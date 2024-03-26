@@ -7,7 +7,7 @@ using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
 using System.Linq;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class SummarydisclosureService : ISummarydisclosureService
     {

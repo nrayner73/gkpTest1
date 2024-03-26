@@ -4,7 +4,6 @@ using System.Net.Http;
 using Gatekeeper.Components;
 using Gatekeeper.Interfaces;
 using Gatekeeper.Models;
-using Gatekeeper.Services;
 using Microsoft.EntityFrameworkCore;
 using Gatekeeper.DataServices.Lookups;
 using Gatekeeper.Interfaces.Lookups;

@@ -4,7 +4,7 @@ using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class LocationitemsService : ILocationitemsService
     {
@@ -20,14 +20,14 @@ namespace Gatekeeper.Services
             return await _context.Locationitems
                     .ToListAsync();
         }
-    
+
         public async Task<Locationitem> GetLocationitemById(int id)
         {
             return await _context.Locationitems
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<Locationitem> GetLocationitemByLocationId(int locationid,int fileid)
+        public async Task<Locationitem> GetLocationitemByLocationId(int locationid, int fileid)
         {
             Locationitem locationitem = new Locationitem();
 
@@ -44,13 +44,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return locationitem;
         }
-        public async System.Threading.Tasks.Task UpdateLocationitem(Locationitem locationitem)
+        public async Task UpdateLocationitem(Locationitem locationitem)
         {
             _context.Locationitems.Update(locationitem);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteLocationitem(Locationitem locationitem)
+        public async Task DeleteLocationitem(Locationitem locationitem)
         {
             _context.Locationitems.Remove(locationitem);
             await _context.SaveChangesAsync();

@@ -4,7 +4,7 @@ using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices.Lookups
 {
     public class LkSectionsService : ILkSectionsService
     {
@@ -20,7 +20,7 @@ namespace Gatekeeper.Services
             return await _context.LkSections
                     .ToListAsync();
         }
-    
+
         public async Task<LkSection> GetLkSectionsById(int id)
         {
             return await _context.LkSections
@@ -33,13 +33,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return lksections;
         }
-        public async System.Threading.Tasks.Task UpdateLkSections(LkSection lksections)
+        public async Task UpdateLkSections(LkSection lksections)
         {
             _context.LkSections.Update(lksections);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteLkSections(LkSection lksections)
+        public async Task DeleteLkSections(LkSection lksections)
         {
             _context.LkSections.Remove(lksections);
             await _context.SaveChangesAsync();

@@ -5,7 +5,7 @@ using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 using Gatekeeper.Models;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class RequestfeeService : IRequestfeeService
     {
@@ -18,10 +18,10 @@ namespace Gatekeeper.Services
 
         public async Task<IEnumerable<Requestfee>> GetRequestfeeList(int fileid)
         {
-            return await _context.Requestfees.Where(x=>x.Requestid==fileid)
+            return await _context.Requestfees.Where(x => x.Requestid == fileid)
                     .ToListAsync();
         }
-    
+
         public async Task<Requestfee> GetRequestfeeById(int id)
         {
             return await _context.Requestfees
@@ -34,13 +34,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return requestfee;
         }
-        public async System.Threading.Tasks.Task UpdateRequestfee(Requestfee requestfee)
+        public async Task UpdateRequestfee(Requestfee requestfee)
         {
             _context.Requestfees.Update(requestfee);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteRequestfee(Requestfee requestfee)
+        public async Task DeleteRequestfee(Requestfee requestfee)
         {
             _context.Requestfees.Remove(requestfee);
             await _context.SaveChangesAsync();

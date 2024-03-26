@@ -4,7 +4,6 @@ using System.Net.Http;
 using Gatekeeper.Components;
 using Gatekeeper.Interfaces;
 using Gatekeeper.Models;
-using Gatekeeper.Services;
 using Microsoft.EntityFrameworkCore;
 using Gatekeeper.DataServices.Lookups;
 using Gatekeeper.Interfaces.Lookups;
@@ -121,6 +120,7 @@ builder.Services.AddScoped<IPersonnameService, PersonnameService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
+builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
 
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();

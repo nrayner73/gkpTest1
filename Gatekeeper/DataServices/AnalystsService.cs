@@ -4,7 +4,7 @@ using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class AnalystsService : IAnalystsService
     {

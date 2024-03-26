@@ -6,7 +6,7 @@ using Gatekeeper.Interfaces;
 using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class AnalystnoteService : IAnalystnoteService
     {

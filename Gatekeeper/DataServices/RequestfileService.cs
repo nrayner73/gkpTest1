@@ -8,7 +8,7 @@ using System.Diagnostics.Eventing.Reader;
 using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class RequestfileService : IRequestfileService
     {

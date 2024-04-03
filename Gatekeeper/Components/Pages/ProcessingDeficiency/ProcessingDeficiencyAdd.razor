@@ -147,11 +147,6 @@
             processingDeficiency.Createdate = DateTime.Now;
             processingDeficiency.Createuser = userReg;
 
-            //
-            //processingDeficiency.Id = 99;
-
-
-
             await ProcessingDeficiencyService.CreateLkProcessingdeficiency(processingDeficiency);
             await AuditData("Create Processing Deficiency", "create");
 

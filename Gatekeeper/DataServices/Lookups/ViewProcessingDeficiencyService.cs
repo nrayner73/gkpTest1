@@ -17,9 +17,11 @@ namespace Gatekeeper.DataServices.Lookups
 
         public List<ProcessingDeficiencyView> GetProcessingDeficiencyList()
         {
-            //SqlParameter parms = new SqlParameter { ParameterName = "@year", Value = string.IsNullOrEmpty(year)  ? DBNull.Value : year };
+            //TO DO - create Stored procedure as part of migration?
             List<ProcessingDeficiencyView> items = new List<ProcessingDeficiencyView>();
             items = _context?.ProcessingDeficiencyInfos.FromSqlRaw("Execute [gkp].[GetProcessingDeficiency]").ToList();
+
+            items = items.Where(c => c.Status != "del").ToList();
 
             return items;
         }

@@ -43,6 +43,8 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<SearchLkPaymentTypes> LkPaymentTypeInfos { get; set; }
 
+        public virtual DbSet<SearchLkSections> LkSectionInfos { get; set; }
+
         public virtual DbSet<LkSection> LkSections { get; set; }
 
 

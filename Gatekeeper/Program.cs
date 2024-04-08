@@ -102,7 +102,7 @@ builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
 builder.Services.AddScoped<ILkRecorddeliverymethodService, LkRecorddeliverymethodService>();
 builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
-builder.Services.AddScoped<ILkSectionsService, LkSectionsService>();
+builder.Services.AddScoped<ILkSectionService, LkSectionService>();
 builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
 
 builder.Services.AddScoped<IAnalystsService, AnalystsService>();
@@ -121,6 +121,7 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
 builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
+builder.Services.AddScoped<ISearchLkSectionService, SearchLkSectionService>();
 
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();

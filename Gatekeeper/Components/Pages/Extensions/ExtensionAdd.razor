@@ -162,7 +162,8 @@
         {
             //get analyst lookup data
             analysts = context.Analysts.ToList();
-
+           
+            //(await ExtensionsService.GetExtensionsList(fileid)).ToList();
             lksectionlist = context.LkSections.Where(x => x.Sectiontype.ToLower() == "extension").ToList();
             lkextensionlist = context.LkExtensions.ToList();
             holidays = context.Holidays.ToList();
@@ -174,6 +175,7 @@
                     //set state login
                     loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
                 }
+                extensions = context.Extensions.Where(x => x.Requestid == fileid).ToList();
                 requestfile = loginState.Requestfile;
                 FileNumber = loginState.Requestfile.Filenumber;
             }

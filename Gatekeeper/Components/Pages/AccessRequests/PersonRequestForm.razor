@@ -18,7 +18,7 @@
 
     [Parameter]
     public EventCallback<bool> OnSubmit { get; set; }
-    
+
     #region TypeAhead Parameters
     public List<PersonName>? personnames { get; set; } = new List<PersonName>();
     private PersonName selectedpersonname;
@@ -59,16 +59,27 @@
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-        EditContext editContext = new EditContext(person);
-        personnames = personNameService.GetNames();
-        companynames = personNameService.GetCompanyNames();
+        // EditContext editContext = new EditContext(person);
 
-        daytimephones = contactService.GetContactInfo();
-        alternatephones = contactService.GetContactInfo();
-        faxphones = contactService.GetContactInfo();
-        emails = contactService.GetContactInfo();
-        addresses = addressService.GetAddress();
 
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            personnames = personNameService.GetNames();
+            companynames = personNameService.GetCompanyNames();
+
+            daytimephones = contactService.GetContactInfo();
+            alternatephones = contactService.GetContactInfo();
+            faxphones = contactService.GetContactInfo();
+            emails = contactService.GetContactInfo();
+            addresses = addressService.GetAddress();
+
+            StateHasChanged();
+            firstRender = false;
+        }
     }
  #endregion
 

@@ -6,6 +6,8 @@
 
         public int? Requestid { get; set; }
 
+       // public int? Paytypeid { get; set; }
+
         public string? Description { get; set; }
 
         public decimal? Estimatedcost { get; set; }

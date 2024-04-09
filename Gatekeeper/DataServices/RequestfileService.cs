@@ -7,8 +7,9 @@ using System;
 using System.Diagnostics.Eventing.Reader;
 using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
-namespace Gatekeeper.DataServices
+namespace Gatekeeper.Services
 {
     public class RequestfileService : IRequestfileService
     {
@@ -114,6 +115,7 @@ namespace Gatekeeper.DataServices
             _context.Requestfiles.Remove(requestfile);
             await _context.SaveChangesAsync();
         }
+        
     }
 }
 

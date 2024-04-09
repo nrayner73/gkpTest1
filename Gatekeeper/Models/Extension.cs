@@ -26,4 +26,6 @@ public string? Moduser{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Status{ get; set; }
 
+
+
 }

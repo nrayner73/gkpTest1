@@ -3,20 +3,8 @@
   "WorkspaceRootPath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\feepayments\\paymentadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\feepayments\\paymentadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\components\\pages\\feepayments\\feepaymentadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\feepayments\\feepaymentadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|C:\\Projects\\gatekeeper-2024\\Gatekeeper\\components\\pages\\feepayments\\requestfeeadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\feepayments\\requestfeeadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|C:\\Projects\\gatekeeper-2024\\Gatekeeper\\models\\requestfee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:models\\requestfee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\projects\\gatekeeper-2024\\gatekeeper\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 18,
+          "SelectedChildIndex": 14,
           "Children": [
             {
               "$type": "Bookmark",
@@ -86,53 +74,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "FeePaymentAdd.razor",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
-              "RelativeToolTip": "Components\\Pages\\FeePayments\\FeePaymentAdd.razor",
-              "ViewState": "AQIAAFkAAAAAAAAAAAAvwAkBAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-04-09T13:34:30.973Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Requestfee.cs",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Models\\Requestfee.cs",
-              "RelativeDocumentMoniker": "Models\\Requestfee.cs",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Models\\Requestfee.cs",
-              "RelativeToolTip": "Models\\Requestfee.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-08T22:13:58.032Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "RequestfeeAdd.razor",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\RequestfeeAdd.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\FeePayments\\RequestfeeAdd.razor",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\RequestfeeAdd.razor",
-              "RelativeToolTip": "Components\\Pages\\FeePayments\\RequestfeeAdd.razor",
-              "ViewState": "AQIAAGgAAAAAAAAAAAAvwHwAAAAMAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-04-08T22:06:52.064Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "PaymentAdd.razor",
-              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\PaymentAdd.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\FeePayments\\PaymentAdd.razor",
-              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Components\\Pages\\FeePayments\\PaymentAdd.razor",
-              "RelativeToolTip": "Components\\Pages\\FeePayments\\PaymentAdd.razor",
-              "ViewState": "AQIAANoAAAAAAAAAAAAAwPgAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-04-08T22:05:51.945Z",
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAABEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-04-09T15:28:24.152Z",
               "EditorCaption": ""
             }
           ]

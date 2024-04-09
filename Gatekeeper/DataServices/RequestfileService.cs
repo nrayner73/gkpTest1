@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics.Eventing.Reader;
 using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace Gatekeeper.Services
 {
@@ -114,6 +115,7 @@ namespace Gatekeeper.Services
             _context.Requestfiles.Remove(requestfile);
             await _context.SaveChangesAsync();
         }
+        
     }
 }
 

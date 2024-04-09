@@ -60,15 +60,20 @@ else
 }
 
 
-
-
-// Gatekeeper Services
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
-{
-    options.UseSqlServer(conStr);
-    options.EnableSensitiveDataLogging();
-}
-);
+options.UseSqlServer(conStr),
+          ServiceLifetime.Scoped); // This is the default lifetime if not specified.
+
+
+
+//// Gatekeeper Services
+//builder.Services.AddDbContextFactory<AppDbContext>(options =>
+//{
+//    options.UseSqlServer(conStr);
+//    options.EnableSensitiveDataLogging();
+
+//}
+//);
 
 
 builder.Services.AddDbContextFactory<LookupDbContext>(options =>

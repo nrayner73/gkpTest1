@@ -86,11 +86,11 @@
 
     protected async override Task OnParametersSetAsync()
     {
-        loginState.OnChange += StateHasChanged;
-        if (fileid > 0)
-        {
-            getDataContext();
-        }
+        // loginState.OnChange += StateHasChanged;
+        // if (fileid > 0)
+        // {
+        //     getDataContext();
+        // }
 
         if (requestfile.Yearid == 0 || requestfile.Yearid is null)
         {
@@ -185,7 +185,7 @@
                     //     getDataContext();
                     // }
                     // requestfile = loginState.Requestfile;
-                    getDataContext();
+                    // getDataContext();
                 }
             }
             getDataContext();
@@ -262,7 +262,7 @@
         }
     }
 
-    private void FillData()
+    private void FillData() 
     {
         setTestdata = true;
         person.Firstname = "Donald";
@@ -385,6 +385,8 @@
             await Task.Delay(1000);
             alertMessageShow = false;
         }
+
+        navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
     }
 
     private async void UpdateFileNumber(int fileid)

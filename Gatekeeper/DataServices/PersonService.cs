@@ -33,17 +33,30 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return person;
         }
-        public async System.Threading.Tasks.Task UpdatePerson(Person person)
+
+        public async Task UpdatePerson(Person person)
         {
             _context.People.Update(person);
             await _context.SaveChangesAsync();
         }
+
+        //public async System.Threading.Tasks.Task UpdatePerson(Person person)
+        //{
+        //    _context.People.Update(person);
+        //    await _context.SaveChangesAsync();
+        //}
 
         public async System.Threading.Tasks.Task DeletePerson(Person person)
         {
             _context.People.Remove(person);
             await _context.SaveChangesAsync();
         }
+
+        //public async System.Threading.Tasks.Task DeletePerson(Person person)
+        //{
+        //    _context.People.Remove(person);
+        //    await _context.SaveChangesAsync();
+        //}
 
     }
 }

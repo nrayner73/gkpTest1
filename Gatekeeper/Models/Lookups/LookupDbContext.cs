@@ -48,6 +48,8 @@ namespace Gatekeeper.Models.Lookups
         public virtual DbSet<LkSection> LkSections { get; set; }
 
 
+        public virtual DbSet<ProcessingDeficiencyView> ProcessingDeficiencyInfos { get; set; }   
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -66,6 +68,7 @@ namespace Gatekeeper.Models.Lookups
             modelBuilder.Entity<SearchRequestfee>().HasNoKey();
             modelBuilder.Entity<SearchExtension>().HasNoKey();
             modelBuilder.Entity<HolidayView>().HasNoKey();
+            modelBuilder.Entity<ProcessingDeficiencyView>().HasNoKey();
             modelBuilder.Entity<LkSection>().HasNoKey();
          
 

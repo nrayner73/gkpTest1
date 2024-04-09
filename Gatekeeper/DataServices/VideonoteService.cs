@@ -4,7 +4,7 @@ using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class VideonoteService : IVideonoteService
     {
@@ -20,7 +20,7 @@ namespace Gatekeeper.Services
             return await _context.Videonotes
                     .ToListAsync();
         }
-    
+
         public async Task<Videonote> GetVideonoteById(int id)
         {
             return await _context.Videonotes
@@ -33,13 +33,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return videonote;
         }
-        public async System.Threading.Tasks.Task UpdateVideonote(Videonote videonote)
+        public async Task UpdateVideonote(Videonote videonote)
         {
             _context.Videonotes.Update(videonote);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteVideonote(Videonote videonote)
+        public async Task DeleteVideonote(Videonote videonote)
         {
             _context.Videonotes.Remove(videonote);
             await _context.SaveChangesAsync();

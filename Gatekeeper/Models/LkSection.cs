@@ -23,4 +23,9 @@ public string? Createuser{ get; set; }
 public string? Status{ get; set; }
 public int? Sortby{ get; set; }
 
+public DateTime? Moddate { get; set; }
+
+[Column(TypeName = "varchar(45)")]
+public string? Moduser { get; set; }
+
 }

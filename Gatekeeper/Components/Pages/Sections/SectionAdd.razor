@@ -1,0 +1,318 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using BlazorBootstrap
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using Gatekeeper.Classes;
+@using Gatekeeper.DataServices;
+@using Gatekeeper.DataServices.Lookups;
+@using Gatekeeper.Models;
+@using System.Xml.Linq;
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject IConfiguration Configuration
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@inject ISearchLkSectionService searchlksectionservice
+@inject ILkSectionService lkSectionService
+
+@inject IAuditlogService auditlogService
+
+@inject NavigationManager navigationManager
+@inject AppState appState
+@implements IDisposable
+@inject LoginState loginState;
+
+@page "/lksection/add"
+
+@code {
+    #region "Variables"
+
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    private string savetype = string.Empty;
+    private bool alertMessageShow = false;
+
+    [Inject]
+    private ILkSectionService lksectionservice { get; set; }
+
+    private LkSection lksection { get; set; } = new LkSection();
+    private LkSection olksection { get; set; } = new LkSection();
+
+    private List<LkSection> lksections { get; set; } = new List<LkSection>();
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    private IQueryable<SearchLkSections> searchlksections;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+
+    bool tester = false;
+    bool showpanel = true;
+    bool showid = false;
+
+    #endregion
+
+    #region "Component Lifecycle"
+
+
+    protected async override Task OnInitializedAsync()
+    {
+    }
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //get user information
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+
+        //show-hide fill data button
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
+    }
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            //set save type
+            savetype = string.Empty;
+
+            // Load data to grid
+            LoadData();
+
+            // assign current date and current log on user to create date, mod date, create user and mod user
+            lksection.Createuser = userReg;
+            lksection.Moduser = userReg;
+            lksection.Createdate = DateTime.Today;
+
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+
+    #endregion
+
+    #region "Methods"
+
+    private void LoadData()
+    {
+        searchlksections = searchlksectionservice.GetLkSectionList().AsQueryable<SearchLkSections>();
+        StateHasChanged();
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olksection, lksection, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        Saved = false;
+
+        lksection.Moddate = DateTime.Now;
+        lksection.Moduser = userReg;
+
+        if (savetype == "update")
+        {
+            await lksectionservice.UpdateLkSection(lksection);
+            await AuditData("Update Section", "update");
+        }
+        else
+        {
+            lksection.Createdate = DateTime.Now;
+            lksection.Createuser = userReg;
+            await lksectionservice.CreateLkSection(lksection);
+            await AuditData("Create Section", "create");
+        }
+
+        StatusClass = "alert-success";
+        Message = "Data updated successfully";
+        alertMessageShow = true;
+        await InvokeAsync(() => StateHasChanged());
+        await Task.Delay(1000);
+
+        alertMessageShow = false;
+        Saved = true;
+        navigationManager.NavigateTo($"/lksection/add", true);
+        LoadData();
+        lksection = new LkSection();
+        StateHasChanged();
+    }
+
+    private async void UpdateData(int id)
+    {
+        savetype = "";
+        if (id > 0)
+        {
+            savetype = "update";
+            using (var context = DbFactory.CreateDbContext())
+            {
+                if (id != null && id > 0)
+                {
+                    lksection = context.LkSections.Where(x => x.Id == id).FirstOrDefault();
+                    olksection = (LkSection)context.Entry(lksection).GetDatabaseValues().ToObject();
+
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+
+
+    private ConfirmDialog dialog = default!;
+    private async Task ShowConfirmationAsync(int id)
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Are you sure you want to delete this?",
+            message1: "This will delete the record. Once deleted can not be rolled back.",
+            message2: "Do you want to proceed?");
+
+        if (confirmation)
+        {
+            if (id != null && id > 0)
+            {
+                lksection = await lksectionservice.GetLkSectionById(id);
+                await lksectionservice.DeleteLkSection(lksection);
+                AuditData("Delete Section", "delete");
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data deleted successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+
+            navigationManager.NavigateTo($"/lksection/add/", true);
+        }
+
+    }
+
+    private void ClearData()
+    {
+        lksection = new LkSection();
+    }
+    
+    #endregion
+}
+
+   @if (alertMessageShow)
+{
+    <br />
+    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
+}
+
+<h5>Notes: </h5>
+
+<EditForm Model="@lksection" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label for="lbSectionType">
+                        Section Type:
+                    </label>
+                    <InputText id="detail" class="form-control" placeholder="SECTION TYPE" @bind-Value="lksection.Sectiontype" />
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label for="lbSectionType">
+                        Section:
+                    </label>
+                    <InputText id="detail" class="form-control" placeholder="SECTION" @bind-Value="lksection.Section" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+<br />
+
+<div class="row" style="width:100%;padding-bottom: 1em;">
+    <div class="col-lg-5" style="float:left">
+        Show:
+        <label><input type="checkbox" @bind="showid" /> Record Id</label>
+        &nbsp;&nbsp;&nbsp;
+    </div>
+    <div class="col-lg-5" style="float:left">
+        <div class="page-size-chooser">
+            Items per page:
+            <select @bind="@pagination.ItemsPerPage">
+                <option>3</option>
+                <option>5</option>
+                <option>10</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-lg-2" style="float:revert">
+        <div class="page-size-chooser">
+        </div>
+    </div>
+</div>
+
+<ConfirmDialog @ref="dialog" />
+
+<div class="grid" tabindex="-1">
+    <QuickGrid Items="@searchlksections" Virtualize="true" Pagination="@pagination">
+        @if (showid)
+        {
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
+        }
+
+        <PropertyColumn Property="@(r => r.SectionType)" Title="Section Type" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Section)" Title="Section" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
+            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />

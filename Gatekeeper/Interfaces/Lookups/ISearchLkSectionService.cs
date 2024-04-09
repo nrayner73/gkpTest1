@@ -1,10 +1,11 @@
-﻿using Gatekeeper.Models;
+using Gatekeeper.Models;
 using Gatekeeper.Models.Lookups;
 
 namespace Gatekeeper.Interfaces.Lookups
 {
-    public interface ISearchLkPaymentTypeService
+    public interface ISearchLkSectionService
     {
-        List<SearchLkPaymentTypes> GetLkPaymentTypeList();
+        List<SearchLkSections> GetLkSectionList();
     }
 }
+

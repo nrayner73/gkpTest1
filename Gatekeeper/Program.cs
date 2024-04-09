@@ -98,7 +98,8 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IRequestfeeService, RequestfeeService>();
 builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
-builder.Services.AddScoped<IProcessingDeficiencyService, ProcessingDeficiencyService>();
+builder.Services.AddScoped<ILocationitemsService, LocationitemsService>();
+
 //Lookup
 builder.Services.AddScoped<ILookupService, LookupDataService>();
 
@@ -109,6 +110,7 @@ builder.Services.AddScoped<ILkRecorddeliverymethodService, LkRecorddeliverymetho
 builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
 builder.Services.AddScoped<ILkSectionsService, LkSectionsService>();
 builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
+builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
 
 builder.Services.AddScoped<IAnalystsService, AnalystsService>();
 

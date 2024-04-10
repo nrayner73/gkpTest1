@@ -34,7 +34,7 @@
 
         getDataContext();
         //Generate lookup data using DbContext
-       // using var context = DbFactory.CreateDbContext();
+        // using var context = DbFactory.CreateDbContext();
         // requesttypes = await context.LkRequesttypes.ToListAsync();
         // processingdeficiencies = await context.LkProcessingdeficiencies.ToListAsync();
         // recorddeliverymethods = await context.LkRecorddeliverymethods.ToListAsync();
@@ -52,6 +52,7 @@
         {
             requesttypes =  context.LkRequesttypes.ToList();
             processingdeficiencies = context.LkProcessingdeficiencies.ToList();
+            processingdeficiencies = processingdeficiencies.Where(d => d.Status != "del").OrderBy(x => x.SortBy).ToList();
             recorddeliverymethods =  context.LkRecorddeliverymethods.ToList();
             requeststates =  context.LkRequeststates.ToList();
             analysts =  context.Analysts.ToList();
@@ -59,6 +60,8 @@
             POIpersonnames = personNameService.GetPOINames();
         }
     }
+
+    
 
 
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
@@ -184,7 +187,7 @@
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbprocessingdeficiency">
-                    Processingdeficiency:
+                    Processing Deficiency:
                 </label>
                 <InputSelect id="processingdeficiency" class="form-control" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
                     <option value="-1">Select...</option>

@@ -46,9 +46,11 @@ namespace Gatekeeper.Models.Lookups
         public virtual DbSet<SearchLkSections> LkSectionInfos { get; set; }
 
         public virtual DbSet<LkSection> LkSections { get; set; }
+        public virtual DbSet<ProcessingDeficiencyView> ProcessingDeficiencyInfos { get; set; }
 
+        public virtual DbSet<SearchLkRequestState> LkRequestStateInfos { get; set; }
 
-        public virtual DbSet<ProcessingDeficiencyView> ProcessingDeficiencyInfos { get; set; }   
+        public virtual DbSet<LkRequeststate> LkRequeststates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

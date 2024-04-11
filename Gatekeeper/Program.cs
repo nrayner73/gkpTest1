@@ -135,6 +135,7 @@ builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>(
 builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
 builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
 builder.Services.AddScoped<ISearchLkSectionService, SearchLkSectionService>();
+builder.Services.AddScoped<ISearchLkRequestStateService, SearchLkRequestStateService>();
 
 
 builder.Services.AddScoped<AppState>();

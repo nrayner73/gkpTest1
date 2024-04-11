@@ -52,6 +52,8 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<LkRequeststate> LkRequeststates { get; set; }
 
+        public virtual DbSet<SearchLkRecordDeliveryMethod> LkRecordDeliveryMethodInfos { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -106,7 +106,7 @@ builder.Services.AddScoped<ILookupService, LookupDataService>();
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
-builder.Services.AddScoped<ILkRecorddeliverymethodService, LkRecorddeliverymethodService>();
+builder.Services.AddScoped<ILkRecordDeliveryMethodService, LkRecordDeliveryMethodService>();
 builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
 builder.Services.AddScoped<ILkSectionService, LkSectionService>();
 builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
@@ -136,6 +136,8 @@ builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
 builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
 builder.Services.AddScoped<ISearchLkSectionService, SearchLkSectionService>();
 builder.Services.AddScoped<ISearchLkRequestStateService, SearchLkRequestStateService>();
+builder.Services.AddScoped<ISearchLkRecordDeliveryMethodService, SearchLkRecordDeliveryMethodService>();
+builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
 
 
 builder.Services.AddScoped<AppState>();

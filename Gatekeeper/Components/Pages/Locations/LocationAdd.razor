@@ -18,17 +18,18 @@
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-@inject ISearchLkSectionService searchlksectionservice
-@inject ILkSectionService lkSectionService
+
+@inject ISearchLkLocationService searchlklocationservice
+@inject ILkLocationService lkLocationService
 
 @inject IAuditlogService auditlogService
 
 @inject NavigationManager navigationManager
-@inject AppState appState
+@* @inject AppState appState *@
 @implements IDisposable
-@inject LoginState loginState;
+@* @inject LoginState loginState; *@
 
-@page "/lksection/add"
+@page "/lklocation/add"
 
 @code {
     #region "Variables"
@@ -42,17 +43,18 @@
     private bool alertMessageShow = false;
 
     [Inject]
-    private ILkSectionService lksectionservice { get; set; }
+    private ILkLocationService lklocationservice { get; set; }
 
-    private LkSection lksection { get; set; } = new LkSection();
-    private LkSection olksection { get; set; } = new LkSection();
+    private LkLocation lklocation { get; set; } = new LkLocation();
+    private LkLocation olklocation { get; set; } = new LkLocation();
 
-    private List<LkSection> lksections { get; set; } = new List<LkSection>();
+    private List<LkLocation> lklocations { get; set; } = new List<LkLocation>();
 
     //Audit
     private AuditLog auditlog = new AuditLog();
 
-    private IQueryable<SearchLkSections> searchlksections;
+    private IQueryable<SearchLkLocation> searchlklocations;
+        
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
     bool tester = false;
@@ -70,7 +72,7 @@
 
     public void Dispose()
     {
-        loginState.OnChange -= StateHasChanged;
+        // loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -101,9 +103,9 @@
             LoadData();
 
             // assign current date and current log on user to create date, mod date, create user and mod user
-            lksection.Createuser = userReg;
-            lksection.Moduser = userReg;
-            lksection.Createdate = DateTime.Today;
+            lklocation.Createuser = userReg;
+            lklocation.Moduser = userReg;
+            lklocation.Createdate = DateTime.Today;
 
             StateHasChanged();
             firstRender = false;
@@ -116,7 +118,9 @@
 
     private void LoadData()
     {
-        searchlksections = searchlksectionservice.GetLkSectionList().AsQueryable<SearchLkSections>();
+        searchlklocations = searchlklocationservice.GetLkLocationList().AsQueryable<SearchLkLocation>();
+
+        //searchlkrecorddeliverymethods = searchlkrecorddeliverymethodservice.GetLkRecordDeliveryMethodList().AsQueryable<SearchLkRecordDeliveryMethod>();
         StateHasChanged();
     }
 
@@ -133,7 +137,7 @@
 
         if (type == "update" || type == "delete")
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(olksection, lksection, act).ToString();
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olklocation, lklocation, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
@@ -149,20 +153,20 @@
     {
         Saved = false;
 
-        lksection.Moddate = DateTime.Now;
-        lksection.Moduser = userReg;
+        lklocation.Moddate = DateTime.Now;
+        lklocation.Moduser = userReg;
 
         if (savetype == "update")
         {
-            await lksectionservice.UpdateLkSection(lksection);
-            await AuditData("Update Section", "update");
+            await lklocationservice.UpdateLkLocation(lklocation);
+            await AuditData("Update Location", "update");
         }
         else
         {
-            lksection.Createdate = DateTime.Now;
-            lksection.Createuser = userReg;
-            await lksectionservice.CreateLkSection(lksection);
-            await AuditData("Create Section", "create");
+            lklocation.Createdate = DateTime.Now;
+            lklocation.Createuser = userReg;
+            await lklocationservice.CreateLkLocation(lklocation);
+            await AuditData("Create Location", "create");
         }
 
         StatusClass = "alert-success";
@@ -173,9 +177,9 @@
 
         alertMessageShow = false;
         Saved = true;
-        navigationManager.NavigateTo($"/lksection/add", true);
+        navigationManager.NavigateTo($"/lklocation/add", true);
         LoadData();
-        lksection = new LkSection();
+        lklocation = new LkLocation();
         StateHasChanged();
     }
 
@@ -189,8 +193,8 @@
             {
                 if (id != null && id > 0)
                 {
-                    lksection = context.LkSections.Where(x => x.Id == id).FirstOrDefault();
-                    olksection = (LkSection)context.Entry(lksection).GetDatabaseValues().ToObject();
+                    lklocation = context.LkLocationsearchs.Where(x => x.Id == id).FirstOrDefault();
+                    olklocation = (LkLocation)context.Entry(lklocation).GetDatabaseValues().ToObject();
 
                     StateHasChanged();
                 }
@@ -211,9 +215,9 @@
         {
             if (id != null && id > 0)
             {
-                lksection = await lksectionservice.GetLkSectionById(id);
-                await lksectionservice.DeleteLkSection(lksection);
-                AuditData("Delete Section", "delete");
+                lklocation = await lklocationservice.GetLkLocationById(id);
+                await lklocationservice.DeleteLkLocation(lklocation);
+                AuditData("Delete Location", "delete");
             }
 
             StatusClass = "alert-success";
@@ -225,16 +229,16 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/lksection/add/", true);
+            navigationManager.NavigateTo($"/lklocation/add/", true);
         }
 
     }
 
     private void ClearData()
     {
-        lksection = new LkSection();
+        lklocation = new LkLocation();
     }
-    
+
     #endregion
 }
 
@@ -244,25 +248,19 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Sections: </h5>
+<h5>Locations: </h5>
 
-<EditForm Model="@lksection" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+<EditForm Model="@lklocation" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="container-fluid">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12">
-                    <label for="lbSectionType">
-                        Section Type:
+                    <label for="lbLocation">
+                        Location Detail:
                     </label>
-                    <InputText id="detail" class="form-control" placeholder="SECTION TYPE" @bind-Value="lksection.Sectiontype" />
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
-                    <label for="lbSectionType">
-                        Section:
-                    </label>
-                    <InputText id="detail" class="form-control" placeholder="SECTION" @bind-Value="lksection.Section" />
+                    <InputText id="detail" class="form-control" placeholder="LOCATION" @bind-Value="lklocation.Detail" />
                 </div>
             </div>
         </div>
@@ -300,14 +298,13 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@searchlksections" Virtualize="true" Pagination="@pagination">
+    <QuickGrid Items="@searchlklocations" Virtualize="true" Pagination="@pagination">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
         }
 
-        <PropertyColumn Property="@(r => r.SectionType)" Title="Section Type" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Section)" Title="Section" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Detail)" Title="Detail" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
             <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>

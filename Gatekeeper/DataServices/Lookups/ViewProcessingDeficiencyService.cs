@@ -21,7 +21,7 @@ namespace Gatekeeper.DataServices.Lookups
             List<ProcessingDeficiencyView> items = new List<ProcessingDeficiencyView>();
             items = _context?.ProcessingDeficiencyInfos.FromSqlRaw("Execute [gkp].[GetProcessingDeficiency]").ToList();
 
-            items = items.Where(c => c.Status != "del").ToList();
+            items = items.Where(c => c.Status != "del").OrderBy(x => x.SortBy).ToList();
 
             return items;
         }

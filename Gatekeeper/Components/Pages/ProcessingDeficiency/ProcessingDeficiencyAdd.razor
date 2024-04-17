@@ -50,8 +50,6 @@
 
     private LkProcessingdeficiency oprocessingDeficiency { get; set; } = new LkProcessingdeficiency();
 
-    // private List<LkProcessingdeficiency> processingDeficiencies { get; set; } = new List<LkProcessingdeficiency>();
-
     private IQueryable<LkProcessingdeficiency> searchProcessingDeficiencies;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
@@ -97,7 +95,6 @@
         get
         {
             var result = searchProcessingDeficiencies;
-
             return result;
         }
     }
@@ -122,8 +119,6 @@
 
         processingDeficiency.Moddate = DateTime.Now;
         processingDeficiency.Moduser = userReg;
-
-
 
         if (savetype == "update")
         {
@@ -278,7 +273,6 @@
                 <label for="lbSortBy">
                     Order:
                 </label>
-                @* TODO - default to ID of next entry *@
                 <InputText id="sortby" class="form-control" @bind-Value="processingDeficiency.SortBy" />
             </div>
         </div>

@@ -8,7 +8,7 @@
 @using System.Reflection;
 @using System;
 
-@inject IViewProcessingDeficiencyService searchProcessingDeficiencyService
+@inject ILkProcessingdeficiencyService searchProcessingDeficiencyService
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -52,7 +52,7 @@
 
     // private List<LkProcessingdeficiency> processingDeficiencies { get; set; } = new List<LkProcessingdeficiency>();
 
-    private IQueryable<ProcessingDeficiencyView> searchProcessingDeficiencies;
+    private IQueryable<LkProcessingdeficiency> searchProcessingDeficiencies;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
     string nameFilter;
@@ -84,7 +84,6 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-
             StateHasChanged();
             firstRender = false;
         }
@@ -93,7 +92,7 @@
 
     #region "Methods"
 
-    IQueryable<ProcessingDeficiencyView> UnfilteredProcessingDeficiencies
+    IQueryable<LkProcessingdeficiency> UnfilteredProcessingDeficiencies
     {
         get
         {
@@ -106,7 +105,7 @@
 
     private  async void LoadData()
     {
-        searchProcessingDeficiencies = searchProcessingDeficiencyService.GetProcessingDeficiencyList().AsQueryable<ProcessingDeficiencyView>();
+        searchProcessingDeficiencies = searchProcessingDeficiencyService.GetLkProcessingdeficiencyList().AsQueryable<LkProcessingdeficiency>();
         nextId = (searchProcessingDeficiencies.Max(x => x.Id) + 1).ToString();
         processingDeficiency.SortBy = nextId;
     }

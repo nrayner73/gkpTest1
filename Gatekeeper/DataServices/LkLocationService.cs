@@ -29,8 +29,6 @@ namespace Gatekeeper.Services
 
         public async Task<LkLocation> CreateLkLocation(LkLocation lklocation)
         {
-            lklocation.Status = "1";
-
             var lastRecord = await _context?.LkLocationsearchs.OrderByDescending(x => x.Sortby)
                 .FirstOrDefaultAsync();
 
@@ -54,7 +52,7 @@ namespace Gatekeeper.Services
 
         public async System.Threading.Tasks.Task DeleteLkLocation(LkLocation lklocation)
         {
-            lklocation.Status = "0";
+            lklocation.Status = "del";
 
             _context.LkLocationsearchs.Update(lklocation);
             await _context.SaveChangesAsync();

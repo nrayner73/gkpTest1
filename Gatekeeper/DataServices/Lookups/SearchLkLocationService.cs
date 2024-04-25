@@ -1,4 +1,4 @@
-﻿using Gatekeeper.Interfaces.Lookups;
+using Gatekeeper.Interfaces.Lookups;
 using Gatekeeper.Models;
 using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
@@ -17,7 +17,9 @@ namespace Gatekeeper.DataServices.Lookups
         public List<SearchLkLocation> GetLkLocationList()
         {
             List<SearchLkLocation> items = new List<SearchLkLocation>();
-            items = _context?.LkLocationInfos.FromSqlRaw("Execute [gkp].[GetLocations] @status = '1'").ToList();
+            items = _context?.LkLocationInfos.FromSqlRaw("Execute [gkp].[GetLocations]").ToList();
+
+             items = items.Where(c => c.Status != "del").ToList();
 
             return items;
         }

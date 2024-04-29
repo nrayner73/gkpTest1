@@ -4,7 +4,7 @@ using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 
-namespace Gatekeeper.Services
+namespace Gatekeeper.DataServices
 {
     public class LkPaymenttypeService : ILkPaymenttypeService
     {
@@ -15,33 +15,45 @@ namespace Gatekeeper.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<LkPaymenttype>> GetLkPaymenttypeList()
+        public async Task<IEnumerable<LkPaymenttype>> GetLkPaymentTypeList()
         {
-            return await _context.LkPaymenttypes
-                    .ToListAsync();
-        }
-    
-        public async Task<LkPaymenttype> GetLkPaymenttypeById(int id)
-        {
-            return await _context.LkPaymenttypes
-                .FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.LkPaymenttypes.ToListAsync();
         }
 
-        public async Task<LkPaymenttype> CreateLkPaymenttype(LkPaymenttype lkpaymenttype)
+        public async Task<LkPaymenttype> GetLkPaymentTypeById(int id)
         {
+            return await _context.LkPaymenttypes.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<LkPaymenttype> CreateLkPaymentType(LkPaymenttype lkpaymenttype)
+        {
+
+            var lastRecord = await _context?.LkPaymenttypes.OrderByDescending(x => x.Sortby)
+                .FirstOrDefaultAsync();
+
+            if (lastRecord is not null)
+            {
+                lkpaymenttype.Sortby = lastRecord.Sortby + 1;
+            }
+            else
+            {
+                lkpaymenttype.Sortby = 1; //1st Request State record
+            }
+
             _context.LkPaymenttypes.Add(lkpaymenttype);
             await _context.SaveChangesAsync();
             return lkpaymenttype;
         }
-        public async System.Threading.Tasks.Task UpdateLkPaymenttype(LkPaymenttype lkpaymenttype)
+        public async Task UpdateLkPaymentType(LkPaymenttype lkpaymenttype)
         {
             _context.LkPaymenttypes.Update(lkpaymenttype);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteLkPaymenttype(LkPaymenttype lkpaymenttype)
+        public async Task DeleteLkPaymentType(LkPaymenttype lkpaymenttype)
         {
-            _context.LkPaymenttypes.Remove(lkpaymenttype);
+            lkpaymenttype.Status = "del"; 
+            _context.LkPaymenttypes.Update(lkpaymenttype);
             await _context.SaveChangesAsync();
         }
 

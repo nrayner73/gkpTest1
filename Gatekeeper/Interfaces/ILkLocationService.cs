@@ -4,11 +4,11 @@ namespace Gatekeeper.Interfaces
 {
     public interface ILkLocationService
     {
-        Task<IEnumerable<LkLocation>> GetLkLocationList();
+        Task<IEnumerable<LkLocationsearch>> GetLkLocationList();
        
-        Task<LkLocation> GetLkLocationById(int id);
-        Task<LkLocation> CreateLkLocation(LkLocation lkLocation);
-        Task UpdateLkLocation(LkLocation lkLocation);
-        Task DeleteLkLocation(LkLocation lkLocation);
+        Task<LkLocationsearch> GetLkLocationById(int id);
+        Task<LkLocationsearch> CreateLkLocation(LkLocationsearch lkLocation);
+        Task UpdateLkLocation(LkLocationsearch lkLocation);
+        Task DeleteLkLocation(LkLocationsearch lkLocation);
     }
 }

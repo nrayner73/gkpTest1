@@ -17,7 +17,10 @@ namespace Gatekeeper.DataServices.Lookups
         public List<SearchLkRecordDeliveryMethod> GetLkRecordDeliveryMethodList()
         {
             List<SearchLkRecordDeliveryMethod> items = new List<SearchLkRecordDeliveryMethod>();
-            items = _context?.LkRecordDeliveryMethodInfos.FromSqlRaw("exec [gkp].[GetRecordDeliveryMethods] @status = '1'").ToList();
+            items = _context?.LkRecordDeliveryMethodInfos.FromSqlRaw("exec [gkp].[GetRecordDeliveryMethods]").ToList();
+
+            items = items.Where(c => c.Status != "del").ToList();
+
             return items;
         }
     }

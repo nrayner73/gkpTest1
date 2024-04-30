@@ -26,7 +26,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<LkCity> LkCities { get; set; }
     public virtual DbSet<LkExtension> LkExtensions { get; set; }
     
-    public virtual DbSet<LkLocation> LkLocationsearchs { get; set; }
+    public virtual DbSet<LkLocationsearch> LkLocationsearchs { get; set; }
     public virtual DbSet<LkMytaskstatus> LkMytaskstatuses { get; set; }
     public virtual DbSet<LkPage> LkPages { get; set; }
     public virtual DbSet<LkPaymenttype> LkPaymenttypes { get; set; }

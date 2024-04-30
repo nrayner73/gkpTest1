@@ -27,7 +27,6 @@ namespace Gatekeeper.DataServices
 
         public async Task<LkPaymenttype> CreateLkPaymentType(LkPaymenttype lkpaymenttype)
         {
-            lkpaymenttype.Status = "1";
 
             var lastRecord = await _context?.LkPaymenttypes.OrderByDescending(x => x.Sortby)
                 .FirstOrDefaultAsync();
@@ -53,7 +52,7 @@ namespace Gatekeeper.DataServices
 
         public async Task DeleteLkPaymentType(LkPaymenttype lkpaymenttype)
         {
-            lkpaymenttype.Status = "0"; 
+            lkpaymenttype.Status = "del"; 
             _context.LkPaymenttypes.Update(lkpaymenttype);
             await _context.SaveChangesAsync();
         }

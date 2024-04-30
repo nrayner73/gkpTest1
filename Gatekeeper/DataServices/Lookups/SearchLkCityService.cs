@@ -18,6 +18,9 @@ namespace Gatekeeper.DataServices.Lookups
         {
             List<SearchLkCity> items = new List<SearchLkCity>();
             items = _context?.LkCityInfos.FromSqlRaw("Execute [gkp].[GetCities]").ToList();
+
+            items = items.Where(c => c.Status != "del").ToList();
+
             return items;
         }
     }

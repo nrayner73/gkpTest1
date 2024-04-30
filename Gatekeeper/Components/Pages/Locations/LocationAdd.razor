@@ -45,10 +45,10 @@
     [Inject]
     private ILkLocationService lklocationservice { get; set; }
 
-    private LkLocation lklocation { get; set; } = new LkLocation();
-    private LkLocation olklocation { get; set; } = new LkLocation();
+    private LkLocationsearch lklocation { get; set; } = new LkLocationsearch();
+    private LkLocationsearch olklocation { get; set; } = new LkLocationsearch();
 
-    private List<LkLocation> lklocations { get; set; } = new List<LkLocation>();
+    private List<LkLocationsearch> lklocations { get; set; } = new List<LkLocationsearch>();
 
     //Audit
     private AuditLog auditlog = new AuditLog();
@@ -179,7 +179,7 @@
         Saved = true;
         navigationManager.NavigateTo($"/lklocation/add", true);
         LoadData();
-        lklocation = new LkLocation();
+        lklocation = new LkLocationsearch();
         StateHasChanged();
     }
 
@@ -194,7 +194,7 @@
                 if (id != null && id > 0)
                 {
                     lklocation = context.LkLocationsearchs.Where(x => x.Id == id).FirstOrDefault();
-                    olklocation = (LkLocation)context.Entry(lklocation).GetDatabaseValues().ToObject();
+                    olklocation = (LkLocationsearch)context.Entry(lklocation).GetDatabaseValues().ToObject();
 
                     StateHasChanged();
                 }
@@ -236,7 +236,7 @@
 
     private void ClearData()
     {
-        lklocation = new LkLocation();
+        lklocation = new LkLocationsearch();
     }
 
     #endregion

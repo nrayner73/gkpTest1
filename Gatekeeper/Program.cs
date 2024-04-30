@@ -112,19 +112,14 @@ builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficienc
 builder.Services.AddScoped<ILkRecordDeliveryMethodService, LkRecordDeliveryMethodService>();
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
-<<<<<<< a4833c3629a0ac5b71651f7eb296410f5b9bdf20
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
-builder.Services.AddScoped<ILkRecorddeliverymethodService, LkRecorddeliverymethodService>();
 builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
 builder.Services.AddScoped<ILkCityService, LkCityService>();
-builder.Services.AddScoped<ILkSectionsService, LkSectionsService>();
 builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
 
 builder.Services.AddScoped<IAnalystsService, AnalystsService>();
 
 builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
-=======
->>>>>>> 6b33230d13a6bec174da50ace0a2dab960fc53f3
 builder.Services.AddScoped<ISearchRequestfeeService, SearchRequestfeeService>();
 builder.Services.AddScoped<ILkSectionService, LkSectionService>();
 builder.Services.AddScoped<ISearchExtensionService, SearchExtensionService>();
@@ -136,16 +131,13 @@ builder.Services.AddScoped<IAuditlogService, AuditlogService>();
 //View
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
-<<<<<<< a4833c3629a0ac5b71651f7eb296410f5b9bdf20
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
 builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
 builder.Services.AddScoped<ISearchLkCityService, SearchLkCityService>();
 
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
-=======
 builder.Services.AddScoped<IPersonnameService, PersonnameService>();
->>>>>>> 6b33230d13a6bec174da50ace0a2dab960fc53f3
 builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
 builder.Services.AddScoped<ISearchLkLocationService, SearchLkLocationService>();
 builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();

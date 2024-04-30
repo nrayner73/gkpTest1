@@ -18,18 +18,17 @@
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-
-@inject ISearchLkLocationService searchlklocationservice
-@inject ILkLocationService lkLocationService
+@inject ISearchLkCityService searchlkcityservice
+@inject ILkCityService lkCityService
 
 @inject IAuditlogService auditlogService
 
 @inject NavigationManager navigationManager
-@* @inject AppState appState *@
+@inject AppState appState
 @implements IDisposable
-@* @inject LoginState loginState; *@
+@inject LoginState loginState;
 
-@page "/lklocation/add"
+@page "/lkcity/add"
 
 @code {
     #region "Variables"
@@ -43,18 +42,17 @@
     private bool alertMessageShow = false;
 
     [Inject]
-    private ILkLocationService lklocationservice { get; set; }
+    private ILkCityService lkcityservice { get; set; }
 
-    private LkLocationsearch lklocation { get; set; } = new LkLocationsearch();
-    private LkLocationsearch olklocation { get; set; } = new LkLocationsearch();
+    private LkCity lkcity { get; set; } = new LkCity();
+    private LkCity olkcity { get; set; } = new LkCity();
 
-    private List<LkLocationsearch> lklocations { get; set; } = new List<LkLocationsearch>();
+    private List<LkCity> lkcities { get; set; } = new List<LkCity>();
 
     //Audit
     private AuditLog auditlog = new AuditLog();
 
-    private IQueryable<SearchLkLocation> searchlklocations;
-        
+    private IQueryable<SearchLkCity> searchlkcities;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
     bool tester = false;
@@ -72,7 +70,7 @@
 
     public void Dispose()
     {
-        // loginState.OnChange -= StateHasChanged;
+        loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -98,15 +96,15 @@
         {
             //set save type
             savetype = string.Empty;
-
+            
             // Load data to grid
             LoadData();
 
             // assign current date and current log on user to create date, mod date, create user and mod user
-            lklocation.Createuser = userReg;
-            lklocation.Moduser = userReg;
-            lklocation.Createdate = DateTime.Today;
-
+            lkcity.Createuser = userReg;
+            lkcity.Moduser = userReg;
+            lkcity.Createdate = DateTime.Today;
+            
             StateHasChanged();
             firstRender = false;
         }
@@ -118,9 +116,7 @@
 
     private void LoadData()
     {
-        searchlklocations = searchlklocationservice.GetLkLocationList().AsQueryable<SearchLkLocation>();
-
-        //searchlkrecorddeliverymethods = searchlkrecorddeliverymethodservice.GetLkRecordDeliveryMethodList().AsQueryable<SearchLkRecordDeliveryMethod>();
+        searchlkcities = searchlkcityservice.GetLkCityList().AsQueryable<SearchLkCity>();
         StateHasChanged();
     }
 
@@ -137,7 +133,7 @@
 
         if (type == "update" || type == "delete")
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(olklocation, lklocation, act).ToString();
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olkcity, lkcity, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
@@ -153,20 +149,20 @@
     {
         Saved = false;
 
-        lklocation.Moddate = DateTime.Now;
-        lklocation.Moduser = userReg;
+        lkcity.Moddate = DateTime.Now;
+        lkcity.Moduser = userReg;
 
         if (savetype == "update")
         {
-            await lklocationservice.UpdateLkLocation(lklocation);
-            await AuditData("Update Location", "update");
+            await lkcityservice.UpdateLkCity(lkcity);
+            await AuditData("Update City", "update");
         }
         else
         {
-            lklocation.Createdate = DateTime.Now;
-            lklocation.Createuser = userReg;
-            await lklocationservice.CreateLkLocation(lklocation);
-            await AuditData("Create Location", "create");
+            lkcity.Createdate = DateTime.Now;
+            lkcity.Createuser = userReg;
+            await lkcityservice.CreateLkCity(lkcity);
+            await AuditData("Create City", "create");
         }
 
         StatusClass = "alert-success";
@@ -177,9 +173,9 @@
 
         alertMessageShow = false;
         Saved = true;
-        navigationManager.NavigateTo($"/lklocation/add", true);
+        navigationManager.NavigateTo($"/lkcity/add", true);
         LoadData();
-        lklocation = new LkLocationsearch();
+        lkcity = new LkCity();
         StateHasChanged();
     }
 
@@ -193,8 +189,8 @@
             {
                 if (id != null && id > 0)
                 {
-                    lklocation = context.LkLocationsearchs.Where(x => x.Id == id).FirstOrDefault();
-                    olklocation = (LkLocationsearch)context.Entry(lklocation).GetDatabaseValues().ToObject();
+                    lkcity = context.LkCities.Where(x => x.Id == id).FirstOrDefault();
+                    olkcity = (LkCity)context.Entry(lkcity).GetDatabaseValues().ToObject();
 
                     StateHasChanged();
                 }
@@ -215,9 +211,9 @@
         {
             if (id != null && id > 0)
             {
-                lklocation = await lklocationservice.GetLkLocationById(id);
-                await lklocationservice.DeleteLkLocation(lklocation);
-                AuditData("Delete Location", "delete");
+                lkcity = await lkcityservice.GetLkCityById(id);
+                await lkcityservice.DeleteLkCity(lkcity);
+                AuditData("Delete City", "delete");
             }
 
             StatusClass = "alert-success";
@@ -229,16 +225,16 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/lklocation/add/", true);
+            navigationManager.NavigateTo($"/lkcity/add/", true);
         }
 
     }
 
     private void ClearData()
     {
-        lklocation = new LkLocationsearch();
+        lkcity = new LkCity();
     }
-
+    
     #endregion
 }
 
@@ -248,19 +244,19 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Locations: </h5>
+<h5>Notes: </h5>
 
-<EditForm Model="@lklocation" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+<EditForm Model="@lkcity" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="container-fluid">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12">
-                    <label for="lbLocation">
-                        Location Detail:
+                    <label for="lbCity">
+                        City Detail:
                     </label>
-                    <InputText id="detail" class="form-control" placeholder="LOCATION" @bind-Value="lklocation.Detail" />
+                    <InputText id="detail" class="form-control" placeholder="CITY" @bind-Value="lkcity.Detail" />
                 </div>
             </div>
         </div>
@@ -298,12 +294,12 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@searchlklocations" Virtualize="true" Pagination="@pagination">
+    <QuickGrid Items="@searchlkcities" Virtualize="true" Pagination="@pagination">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
         }
-
+        
         <PropertyColumn Property="@(r => r.Detail)" Title="Detail" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>

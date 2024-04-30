@@ -17,7 +17,10 @@ namespace Gatekeeper.DataServices.Lookups
         public List<SearchLkRequestState> GetLkRequestStateList()
         {
             List<SearchLkRequestState> items = new List<SearchLkRequestState>();
-            items = _context?.LkRequestStateInfos.FromSqlRaw("exec [gkp].[GetRequestStates] @status = '1'").ToList();
+            items = _context?.LkRequestStateInfos.FromSqlRaw("exec [gkp].[GetRequestStates]").ToList();
+
+            items = items.Where(c => c.Status != "del").ToList();
+
             return items;
         }
     }

@@ -30,8 +30,6 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task<LkRequeststate> CreateLkRequestState(LkRequeststate lkrequeststate)
         {
-            lkrequeststate.Status = "1";
-
             var lastRecord = await _context?.LkRequeststates.OrderByDescending(x => x.Sortby)
                 .FirstOrDefaultAsync();
 
@@ -56,7 +54,7 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task DeleteLkRequestState(LkRequeststate lkrequeststate)
         {
-            lkrequeststate.Status = "0";
+            lkrequeststate.Status = "del";
             _context.LkRequeststates.Update(lkrequeststate);
             await _context.SaveChangesAsync();
         }

@@ -17,17 +17,17 @@ namespace Gatekeeper.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<LkLocation>> GetLkLocationList()
+        public async Task<IEnumerable<LkLocationsearch>> GetLkLocationList()
         {
             return await _context.LkLocationsearchs
                     .ToListAsync();
         }
-        public async Task<LkLocation> GetLkLocationById(int id)
+        public async Task<LkLocationsearch> GetLkLocationById(int id)
         {
             return await _context.LkLocationsearchs.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<LkLocation> CreateLkLocation(LkLocation lklocation)
+        public async Task<LkLocationsearch> CreateLkLocation(LkLocationsearch lklocation)
         {
             var lastRecord = await _context?.LkLocationsearchs.OrderByDescending(x => x.Sortby)
                 .FirstOrDefaultAsync();
@@ -44,13 +44,13 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return lklocation;
         }
-        public async System.Threading.Tasks.Task UpdateLkLocation(LkLocation lklocation)
+        public async System.Threading.Tasks.Task UpdateLkLocation(LkLocationsearch lklocation)
         {
             _context.LkLocationsearchs.Update(lklocation);
             await _context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task DeleteLkLocation(LkLocation lklocation)
+        public async System.Threading.Tasks.Task DeleteLkLocation(LkLocationsearch lklocation)
         {
             lklocation.Status = "del";
 

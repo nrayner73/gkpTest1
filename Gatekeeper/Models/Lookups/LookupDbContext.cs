@@ -26,10 +26,14 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<SearchLkPaymentTypes> LkPaymentTypeInfos { get; set; }
 
+
+        public virtual DbSet<SearchLkCity> LkCityInfos { get; set; }
+
         //public virtual DbSet<LkRequeststate> LkRequeststates { get; set; }
         public virtual DbSet<SearchLkRequestState> LkRequestStateInfos { get; set; }
         
         public virtual DbSet<SearchLkRecordDeliveryMethod> LkRecordDeliveryMethodInfos { get; set; }
+
 
         public virtual DbSet<LkSection> LkSections { get; set; }
 

@@ -112,6 +112,14 @@ builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficienc
 builder.Services.AddScoped<ILkRecordDeliveryMethodService, LkRecordDeliveryMethodService>();
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
+builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
+builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
+builder.Services.AddScoped<ILkCityService, LkCityService>();
+builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
+
+builder.Services.AddScoped<IAnalystsService, AnalystsService>();
+
+builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
 builder.Services.AddScoped<ISearchRequestfeeService, SearchRequestfeeService>();
 builder.Services.AddScoped<ILkSectionService, LkSectionService>();
 builder.Services.AddScoped<ISearchExtensionService, SearchExtensionService>();
@@ -123,6 +131,12 @@ builder.Services.AddScoped<IAuditlogService, AuditlogService>();
 //View
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
+builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
+builder.Services.AddScoped<ISearchLkCityService, SearchLkCityService>();
+
+builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
+builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
 builder.Services.AddScoped<IPersonnameService, PersonnameService>();
 builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
 builder.Services.AddScoped<ISearchLkLocationService, SearchLkLocationService>();

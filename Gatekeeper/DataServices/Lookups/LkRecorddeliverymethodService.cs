@@ -29,9 +29,6 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task<LkRecorddeliverymethod> CreateLkRecorddeliverymethod(LkRecorddeliverymethod lkrecorddeliverymethod)
         {
-
-            lkrecorddeliverymethod.Status = "1";
-
             var lastRecord = await _context?.LkRecorddeliverymethods.OrderByDescending(x => x.Sortby)
                 .FirstOrDefaultAsync();
 
@@ -56,7 +53,7 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task DeleteLkRecorddeliverymethod(LkRecorddeliverymethod lkrecorddeliverymethod)
         {
-            lkrecorddeliverymethod.Status = "0";
+            lkrecorddeliverymethod.Status = "del";
             _context.LkRecorddeliverymethods.Update(lkrecorddeliverymethod);
             await _context.SaveChangesAsync();
         }

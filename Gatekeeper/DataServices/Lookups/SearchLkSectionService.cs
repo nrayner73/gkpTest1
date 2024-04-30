@@ -17,7 +17,10 @@ namespace Gatekeeper.DataServices.Lookups
         public List<SearchLkSections> GetLkSectionList()
         {
             List<SearchLkSections> items = new List<SearchLkSections>();
-            items = _context?.LkSectionInfos.FromSqlRaw("exec [gkp].[GetSections] @status = '1'").ToList();
+            items = _context?.LkSectionInfos.FromSqlRaw("exec [gkp].[GetSections]").ToList();
+
+            items = items.Where(c => c.Status != "del").ToList();
+
             return items;
         }
     }

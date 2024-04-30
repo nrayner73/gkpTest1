@@ -14,9 +14,9 @@ public partial class Requestfee
 public int Id{ get; set; }
 public int? Requestid{ get; set; }
 public int? Paytypeid{ get; set; }
-[Column(TypeName = "varchar(250)")]
-public string? Description{ get; set; }
-public decimal? Estimatedcost{ get; set; }
+    [Column(TypeName = "varchar(250)")]
+    public string? Description { get; set; }
+    public decimal? Estimatedcost{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Requested{ get; set; }
 [Column(TypeName = "varchar(5)")]

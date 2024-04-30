@@ -6,11 +6,11 @@ using Gatekeeper.Interfaces.Lookups;
 
 namespace Gatekeeper.DataServices.Lookups
 {
-    public class LkRecorddeliverymethodService : ILkRecorddeliverymethodService
+    public class LkRecordDeliveryMethodService : ILkRecordDeliveryMethodService
     {
         private AppDbContext _context;
 
-        public LkRecorddeliverymethodService(AppDbContext context)
+        public LkRecordDeliveryMethodService(AppDbContext context)
         {
             _context = context;
         }
@@ -29,6 +29,21 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task<LkRecorddeliverymethod> CreateLkRecorddeliverymethod(LkRecorddeliverymethod lkrecorddeliverymethod)
         {
+
+            lkrecorddeliverymethod.Status = "1";
+
+            var lastRecord = await _context?.LkRecorddeliverymethods.OrderByDescending(x => x.Sortby)
+                .FirstOrDefaultAsync();
+
+            if (lastRecord is not null)
+            {
+                lkrecorddeliverymethod.Sortby = lastRecord.Sortby + 1;
+            }
+            else
+            {
+                lkrecorddeliverymethod.Sortby = 1; //1st Record Delivery Method record
+            }
+
             _context.LkRecorddeliverymethods.Add(lkrecorddeliverymethod);
             await _context.SaveChangesAsync();
             return lkrecorddeliverymethod;
@@ -41,7 +56,8 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task DeleteLkRecorddeliverymethod(LkRecorddeliverymethod lkrecorddeliverymethod)
         {
-            _context.LkRecorddeliverymethods.Remove(lkrecorddeliverymethod);
+            lkrecorddeliverymethod.Status = "0";
+            _context.LkRecorddeliverymethods.Update(lkrecorddeliverymethod);
             await _context.SaveChangesAsync();
         }
 

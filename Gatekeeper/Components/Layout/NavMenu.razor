@@ -47,16 +47,43 @@
                     </NavLink>
                 </div>
                 <div class="nav-item px-2">
+                    <NavLink class="nav-link" @onclick="HideMenu" href="/lklocation/add">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Locations
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-2">
                     <NavLink class="nav-link" @onclick="HideMenu" href="/lkpaymenttype/add">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Payment Types
                     </NavLink>
                 </div>
                 <div class="nav-item px-2">
+<<<<<<< a4833c3629a0ac5b71651f7eb296410f5b9bdf20
                     <NavLink class="nav-link" @onclick="HideMenu" href="/lkcity/add">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cities
+=======
+                    <NavLink class="nav-link" @onclick="HideMenu" href="/processingDeficiency/add">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Processing Deficiency
+>>>>>>> 6b33230d13a6bec174da50ace0a2dab960fc53f3
                     </NavLink>
                 </div>
 
+                <div class="nav-item px-2">
+                    <NavLink class="nav-link" @onclick="HideMenu" href="/lkrecorddeliverymethod/add">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Record Delivery Methods
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-2">
+                    <NavLink class="nav-link" @onclick="HideMenu" href="/lkrequeststate/add">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Request States
+                    </NavLink>
+                </div>
+                <div class="nav-item px-2">
+                    <NavLink class="nav-link" @onclick="HideMenu" href="/lksection/add">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Sections
+                    </NavLink>
+                </div>
             }
         </nav>
     }

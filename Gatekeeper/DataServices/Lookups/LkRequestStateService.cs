@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces.Lookups;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Gatekeeper.DataServices.Lookups
 {
@@ -29,6 +30,20 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task<LkRequeststate> CreateLkRequestState(LkRequeststate lkrequeststate)
         {
+            lkrequeststate.Status = "1";
+
+            var lastRecord = await _context?.LkRequeststates.OrderByDescending(x => x.Sortby)
+                .FirstOrDefaultAsync();
+
+            if (lastRecord is not null)
+            {
+                lkrequeststate.Sortby = lastRecord.Sortby + 1;
+            }
+            else
+            {
+                lkrequeststate.Sortby = 1; //1st Request State record
+            }
+
             _context.LkRequeststates.Add(lkrequeststate);
             await _context.SaveChangesAsync();
             return lkrequeststate;
@@ -41,7 +56,8 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task DeleteLkRequestState(LkRequeststate lkrequeststate)
         {
-            _context.LkRequeststates.Remove(lkrequeststate);
+            lkrequeststate.Status = "0";
+            _context.LkRequeststates.Update(lkrequeststate);
             await _context.SaveChangesAsync();
         }
     }

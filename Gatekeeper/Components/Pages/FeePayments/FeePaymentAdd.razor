@@ -145,7 +145,7 @@
 
     #region "Methods"
     //Load Data from DbContext
-    public void getDataContext()
+    private void getDataContext()
     {
         using (var context = DbFactory.CreateDbContext())
         {
@@ -175,9 +175,9 @@
 
     private void LoadData()
     {
-        searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
-        searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
-        StateHasChanged();
+        // searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
+        // searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
+        // StateHasChanged();
     }
 
     protected void HandleInvalidSubmit()
@@ -266,10 +266,11 @@
 
             alertMessageShow = false;
             Saved = true;
-            // navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
+             navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
         }
 
-        LoadData();
+        //LoadData();
+        getDataContext();
         requestfee = new Requestfee();
         payment = new Payment();
         StateHasChanged();
@@ -340,7 +341,6 @@
 <EditForm Model="@requestfile" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
 
     <RequestfeeAdd savetype=""
-                   searchrequestfees="@searchrequestfees"
                    analysts="@analysts"
                    fileid="@fileid"
                    requestfile="@requestfile"

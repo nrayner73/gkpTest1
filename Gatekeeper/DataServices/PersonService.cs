@@ -4,7 +4,7 @@ using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 
-namespace Gatekeeper.DataServices
+namespace Gatekeeper.Services
 {
     public class PersonService : IPersonService
     {
@@ -20,7 +20,7 @@ namespace Gatekeeper.DataServices
             return await _context.People
                     .ToListAsync();
         }
-
+    
         public async Task<Person> GetPersonById(int id)
         {
             return await _context.People
@@ -33,17 +33,30 @@ namespace Gatekeeper.DataServices
             await _context.SaveChangesAsync();
             return person;
         }
+
         public async Task UpdatePerson(Person person)
         {
             _context.People.Update(person);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePerson(Person person)
+        //public async System.Threading.Tasks.Task UpdatePerson(Person person)
+        //{
+        //    _context.People.Update(person);
+        //    await _context.SaveChangesAsync();
+        //}
+
+        public async System.Threading.Tasks.Task DeletePerson(Person person)
         {
             _context.People.Remove(person);
             await _context.SaveChangesAsync();
         }
+
+        //public async System.Threading.Tasks.Task DeletePerson(Person person)
+        //{
+        //    _context.People.Remove(person);
+        //    await _context.SaveChangesAsync();
+        //}
 
     }
 }

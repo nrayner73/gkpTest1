@@ -34,7 +34,7 @@
 
         getDataContext();
         //Generate lookup data using DbContext
-       // using var context = DbFactory.CreateDbContext();
+        // using var context = DbFactory.CreateDbContext();
         // requesttypes = await context.LkRequesttypes.ToListAsync();
         // processingdeficiencies = await context.LkProcessingdeficiencies.ToListAsync();
         // recorddeliverymethods = await context.LkRecorddeliverymethods.ToListAsync();
@@ -51,6 +51,7 @@
         using (var context = DbFactory.CreateDbContext())
         {
             requesttypes =  context.LkRequesttypes.ToList();
+            requesttypes = requesttypes.Where(t => t.Status != "del").OrderBy(x => x.Sortby).ToList();
             processingdeficiencies = context.LkProcessingdeficiencies.ToList();
             recorddeliverymethods =  context.LkRecorddeliverymethods.ToList();
             requeststates =  context.LkRequeststates.ToList();

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces.Lookups;
+using System.ComponentModel;
+using Gatekeeper.Models.Lookups;
 
 namespace Gatekeeper.DataServices.Lookups
 {
@@ -15,10 +17,12 @@ namespace Gatekeeper.DataServices.Lookups
             _context = context;
         }
 
-        public async Task<IEnumerable<LkRequesttype>> GetLkRequesttypeList()
+        public List<LkRequesttype> GetLkRequesttypeList()
         {
-            return await _context.LkRequesttypes
-                    .ToListAsync();
+            List<LkRequesttype> items = new List<LkRequesttype>();
+            items = _context?.LkRequesttypes.ToList();
+            items = items.Where(c => c.Status != "del").OrderBy(x => x.Sortby).ToList();
+            return items;
         }
 
         public async Task<LkRequesttype> GetLkRequesttypeById(int id)
@@ -41,7 +45,8 @@ namespace Gatekeeper.DataServices.Lookups
 
         public async Task DeleteLkRequesttype(LkRequesttype lkrequesttype)
         {
-            _context.LkRequesttypes.Remove(lkrequesttype);
+            lkrequesttype.Status = "del";
+            _context.LkRequesttypes.Update(lkrequesttype);
             await _context.SaveChangesAsync();
         }
 

@@ -164,8 +164,8 @@
             analysts = context.Analysts.ToList();
            
             //(await ExtensionsService.GetExtensionsList(fileid)).ToList();
-            lksectionlist = context.LkSections.Where(x => x.Sectiontype.ToLower() == "extension").ToList();
-            lkextensionlist = context.LkExtensions.ToList();
+            lksectionlist = context.LkSections.Where(x => x.Sectiontype.ToLower() == "extension" && x.Status != "del").ToList();
+            lkextensionlist = context.LkExtensions.Where(x => x.Status != "del").ToList();
             holidays = context.Holidays.ToList();
 
             if (fileid > 0)

@@ -39,9 +39,9 @@
 
     private Locationitem locationitem { get; set; } = new Locationitem();
 
-    public List<DisclosedViewitem> disclosuredlist { get; set; } = new List<DisclosedViewitem>();
-    public List<DisclosedViewitem> sectionusedlist { get; set; } = new List<DisclosedViewitem>();
-    public List<LocationViewitem> locationsearchlist { get; set; } = new List<LocationViewitem>();
+    public List<DisclosedViewitem> disclosuresUsedList { get; set; } = new List<DisclosedViewitem>();
+    public List<DisclosedViewitem> sectionsUsedList { get; set; } = new List<DisclosedViewitem>();
+    public List<LocationViewitem> locationsSearchedList { get; set; } = new List<LocationViewitem>();
 
     public List<LkSection> Lkdisclosured { get; set; } = new List<LkSection>();
     public List<LkSection> Lksectionused { get; set; } = new List<LkSection>();
@@ -55,9 +55,9 @@
     protected override async Task OnParametersSetAsync()
     {
 
-        disclosuredlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "disclose").ToList();
-        sectionusedlist = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "redac").ToList();
-        locationsearchlist = View_locationitems.ToList();
+        disclosuresUsedList = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "disclose").ToList();
+        sectionsUsedList = View_discloseditems.Where(x => x.Sectiontype.ToLower() == "redac").ToList();
+        locationsSearchedList = View_locationitems.ToList();
         StateHasChanged();
         ClearData();
 
@@ -86,15 +86,14 @@
 
         if (sectionlist.Count > 0)
         {
-            Lkdisclosured = sectionlist.Where(x => x.Sectiontype.ToLower() == "disclose").OrderBy(x => x.Sortby).ToList();
-            Lksectionused = sectionlist.Where(x => x.Sectiontype.ToLower() == "redac").OrderBy(x => x.Sortby).ToList();
-
+            Lkdisclosured = sectionlist.Where(x => x.Sectiontype.ToLower() == "disclose" && x.Status != "del").OrderBy(x => x.Sortby).ToList();
+            Lksectionused = sectionlist.Where(x => x.Sectiontype.ToLower() == "redac" && x.Status != "del").OrderBy(x => x.Sortby).ToList();
         }
 
         //remove disclosureAuth item from combobox so user can't add item twice
-        if (disclosuredlist.Count > 0)
+        if (disclosuresUsedList.Count > 0)
         {
-            foreach (var item in disclosuredlist)
+            foreach (var item in disclosuresUsedList)
             {
                 lksection = new LkSection();
                 lksection = sectionlist.Where(x => x.Id == item.Sectionid).FirstOrDefault();
@@ -104,9 +103,9 @@
             StateHasChanged();
         }
 
-        if (sectionusedlist.Count > 0)
+        if (sectionsUsedList.Count > 0)
         {
-            foreach (var item in sectionusedlist)
+            foreach (var item in sectionsUsedList)
             {
                 lksection = new LkSection();
                 lksection = sectionlist.Where(x => x.Id == item.Sectionid).FirstOrDefault();
@@ -120,12 +119,12 @@
 
         if (locationlist.Count > 0)
         {
-            Lklocationsearch = locationlist.ToList();
+            Lklocationsearch = locationlist.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
         }
 
         if (locationlist.Count > 0)
         {
-            foreach (var item in locationsearchlist)
+            foreach (var item in locationsSearchedList)
             {
                 lklocationsearch = new LkLocationsearch();
                 lklocationsearch = locationlist.Where(x => x.Id == item.Locationid).FirstOrDefault();
@@ -157,7 +156,7 @@
                 _litem.Createuser = userReg;
 
                 File_locationitems.Add(_litem);
-                locationsearchlist.Add(_vitem);
+                locationsSearchedList.Add(_vitem);
 
                 locationitem = new Locationitem();
                 locationitem.Locationid = -1;
@@ -197,7 +196,7 @@
                 _ditem.Createuser = userReg;
 
                 File_discloseditems.Add(_ditem);
-                disclosuredlist.Add(_vitem);
+                disclosuresUsedList.Add(_vitem);
                 //  Lkdisclosured.Remove(item);
 
                 discloseditem = new Discloseditem();
@@ -238,7 +237,7 @@
 
 
                 File_discloseditems.Add(_ditem);
-                sectionusedlist.Add(_vitem);
+                sectionsUsedList.Add(_vitem);
              
                 sectionuseditem = new Discloseditem();
                 sectionuseditem.Sectionid = -1;
@@ -263,7 +262,7 @@
 
             if (_litem != null)
             {
-                locationsearchlist.Remove(_vitem);
+                locationsSearchedList.Remove(_vitem);
                 File_locationitems.Remove(_litem);
             }
             ClearData();
@@ -286,7 +285,7 @@
             if (_vitem != null)
             {
                 // Lkdisclosured.Add(sectionlist.Where(x => x.Id == id).FirstOrDefault());
-                disclosuredlist.Remove(_vitem);
+                disclosuresUsedList.Remove(_vitem);
                 File_discloseditems.Remove(_ditem);
             }
             ClearData();
@@ -307,7 +306,7 @@
             if (_ditem != null)
             {
                 // Lksectionused.Add(sectionlist.Where(x => x.Id == id).FirstOrDefault());
-                sectionusedlist.Remove(_vitem);
+                sectionsUsedList.Remove(_vitem);
                 File_discloseditems.Remove(_ditem);
 
             }
@@ -402,9 +401,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (locationsearchlist != null && locationsearchlist.Count > 0)
+                    @if (locationsSearchedList != null && locationsSearchedList.Count > 0)
                     {
-                        @foreach (var item in locationsearchlist)
+                        @foreach (var item in locationsSearchedList)
                         {
                             @if (item != null)
                             {
@@ -437,9 +436,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (disclosuredlist != null && disclosuredlist.Count > 0)
+                    @if (disclosuresUsedList != null && disclosuresUsedList.Count > 0)
                     {
-                        @foreach (var item in disclosuredlist)
+                        @foreach (var item in disclosuresUsedList)
                         {
                             @if (item != null)
                             {
@@ -472,9 +471,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (sectionusedlist != null && sectionusedlist.Count > 0)
+                    @if (sectionsUsedList != null && sectionsUsedList.Count > 0)
                     {
-                        @foreach (var item in sectionusedlist.ToList())
+                        @foreach (var item in sectionsUsedList.ToList())
                         {
                             @if (item != null)
                             {

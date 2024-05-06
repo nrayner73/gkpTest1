@@ -27,6 +27,7 @@
     public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
     private POIName POIselectedpersonname;
     private POIName POIpersonname { get; set; } = new POIName();
+        
     #endregion
 
     protected async override Task OnInitializedAsync()
@@ -52,11 +53,19 @@
         {
             requesttypes =  context.LkRequesttypes.ToList();
             requesttypes = requesttypes.Where(t => t.Status != "del").OrderBy(x => x.Sortby).ToList();
+
             processingdeficiencies = context.LkProcessingdeficiencies.ToList();
+
             recorddeliverymethods =  context.LkRecorddeliverymethods.ToList();
-            requeststates =  context.LkRequeststates.ToList();
+            recorddeliverymethods = recorddeliverymethods.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+
+            requeststates = context.LkRequeststates.ToList();
+            requeststates = requeststates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+
             analysts =  context.Analysts.ToList();
+
             holidays =  context.Holidays.ToList();
+
             POIpersonnames = personNameService.GetPOINames();
         }
     }
@@ -107,14 +116,12 @@
                     }
                 }
             }
-
             requestfile.Requestduedate = dateRange2.FirstOrDefault();
+            
         }
     }
 
 }
-
-
 
 <EditForm  Model="@requestfile">
     <DataAnnotationsValidator />
@@ -136,7 +143,7 @@
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbreceivedate">
-                    Receive Date:
+                    Received Date:
                 </label>
                 <InputDate id="receivedate" class="form-control" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="requestfile.Receivedate" @bind-Value:after="setDuedate" />
                 
@@ -185,7 +192,7 @@
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbprocessingdeficiency">
-                    Processingdeficiency:
+                    Processing Deficiency:
                 </label>
                 <InputSelect id="processingdeficiency" class="form-control" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
                     <option value="-1">Select...</option>
@@ -242,7 +249,7 @@
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrecorddeliverymethodid">
-                    Record Delivery Methodid:
+                    Record Delivery Method:
                 </label>
                 <InputSelect id="recorddeliverymethodid" class="form-control" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
                     <option value="-1">Select...</option>
@@ -281,7 +288,7 @@
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrequeststate">
-                    Request State:
+                    Request State: 
                 </label>
                 <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate">
                     <option value="-1">Select...</option>
@@ -295,7 +302,7 @@
                 <label for="lbclosedate">
                     Close Date:
                 </label>
-                <InputDate id="closedate" class="form-control" placeholder="CLOSE DATE" @bind-Value="requestfile.Closedate" />
+                <InputDate id="closedate" class="form-control" placeholder="CLOSE DATE" @bind-Value="requestfile.Closedate"/>
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <span class="required">*</span>

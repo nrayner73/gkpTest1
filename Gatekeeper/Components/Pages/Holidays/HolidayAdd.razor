@@ -13,8 +13,9 @@
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-@inject IAnalystsService analystService
+@* @inject IAnalystService analystService
 @inject IRequestfileService requestFileService
+ *@
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
 
@@ -29,7 +30,7 @@
     protected string StatusClass = string.Empty;
     private bool Saved;
     private string savetype = string.Empty;
-    private string FileNumber = string.Empty;
+    // private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
 
     [Parameter]
@@ -48,7 +49,7 @@
     private List<Holiday> holidays { get; set; } = new List<Holiday>();
 
     private Requestfile requestfile { get; set; } = new Requestfile();
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    //public List<Analyst>? analysts { get; set; } = new List<Analyst>();
 
 
     //Data Grid -- Blazor QuickGrid
@@ -80,7 +81,7 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        analysts = (await analystService.GetAnalystsList()).ToList();
+        //analysts = analystService.GetAnalystsList().AsQueryable<Analyst>();
     }
 
 
@@ -160,7 +161,7 @@
 
         alertMessageShow = false;
         Saved = true;
-        navigationManager.NavigateTo($"/holidays", true);
+        navigationManager.NavigateTo($"/holiday", true);
         //LoadData();
         //holidays = new Holidays();
         //StateHasChanged();
@@ -230,7 +231,7 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/holidays/add/{fileid}", true);
+            navigationManager.NavigateTo($"/holiday/add/", true);
 
             LoadData();
             StateHasChanged();

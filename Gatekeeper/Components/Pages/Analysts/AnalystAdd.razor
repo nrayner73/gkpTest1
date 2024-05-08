@@ -1,106 +1,144 @@
 ﻿@rendermode InteractiveServer
 @using System.Text
+@using BlazorBootstrap
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Text.Encodings.Web
+@using Gatekeeper.Classes;
+@using Gatekeeper.DataServices;
+@using Gatekeeper.DataServices.Lookups;
+@using Gatekeeper.Models;
+@using System.Xml.Linq;
 @using System.Text.RegularExpressions
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using BlazorBootstrap
-@using System.Reflection;
-@using System;
 
+@inject IConfiguration Configuration
+@inject IDbContextFactory<AppDbContext> DbFactory
 
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-@inject IAnalystsService analystService
-@inject IRequestfileService requestFileService
+@* @inject ISearchLkRequestStateService searchlkrequeststateservice
+@inject ILkRequestStateService lkRequestStateService *@
+inject IAnalystService analystService
+
 @inject IAuditlogService auditlogService
+
 @inject NavigationManager navigationManager
-
-
+@inject AppState appState
+@implements IDisposable
+@inject LoginState loginState;
 
 @page "/analyst/add"
 
 @code {
     #region "Variables"
+
     private System.Security.Claims.ClaimsPrincipal user;
     private string? userReg;
     protected string Message = string.Empty;
     protected string StatusClass = string.Empty;
     private bool Saved;
     private string savetype = string.Empty;
-    private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
 
-    [Parameter]
-    public int fileid { get; set; }
+    [Inject]
+    private IAnalystService analystservice { get; set; }
+
+    private Analyst analyst { get; set; } = new Analyst();
+    private Analyst oanalyst { get; set; } = new Analyst();
+
+    private List<Analyst> analysts { get; set; } = new List<Analyst>();
 
     //Audit
     private AuditLog auditlog = new AuditLog();
 
-    [Inject]
-    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
-
-    [Inject]
-    private IAnalystsService AnalystService { get; set; }
-    private Analyst analyst { get; set; } = new Analyst();
-    private Analyst oanalyst { get; set; } = new Analyst();
-    private List<Analyst> analysts { get; set; } = new List<Analyst>();
-
-    private Requestfile requestfile { get; set; } = new Requestfile();
-
-
-
-    //Data Grid -- Blazor QuickGrid
-    private IQueryable<Analyst> searchanalysts;
+    private IQueryable<Analyst> analystList;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
-    QuickGrid<Searchrequestfile>? grid;
 
+    bool tester = false;
     bool showpanel = true;
-    bool showid = true;
+    bool showid = false;
 
     #endregion
 
-
     #region "Component Lifecycle"
+
+
     protected async override Task OnInitializedAsync()
     {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        var user = authstate.User;
-        var name = user.Identity.Name;
+    }
 
-        analysts = (await AnalystService.GetAnalystsList()).ToList();
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
     {
+        //get user information
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-        analysts = (await analystService.GetAnalystsList()).ToList();
-    }
 
+        //show-hide fill data button
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
+    }
 
     protected async override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            //set save type
+            savetype = string.Empty;
+
+            // Load data to grid
             LoadData();
 
-            savetype = string.Empty;
+            // assign current date and current log on user to create date, mod date, create user and mod user
+            analyst.Createuser = userReg;
+            analyst.Moduser = userReg;
+            analyst.Createdate = DateTime.Today;
+            analyst.Moddate = DateTime.Today;
+
             StateHasChanged();
             firstRender = false;
         }
     }
+
     #endregion
+
     #region "Methods"
 
-    private async void LoadData()
+    private void LoadData()
     {
-        searchanalysts = analysts.ToList().AsQueryable<Analyst>();
-        //(await analystService.GetAnalystsList()).ToList().AsQueryable<Analyst>();
+        analystList = analystservice.GetAnalystsList().AsQueryable<Analyst>();
+        StateHasChanged();
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oanalyst, analyst, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
     }
 
     protected void HandleInvalidSubmit()
@@ -118,16 +156,15 @@
 
         if (savetype == "update")
         {
-            await AnalystService.UpdateAnalysts(analyst);
+            await analystservice.UpdateAnalyst(analyst);
             await AuditData("Update Analyst", "update");
         }
         else
         {
             analyst.Createdate = DateTime.Now;
             analyst.Createuser = userReg;
-            await AnalystService.CreateAnalysts(analyst);
+            await analystservice.CreateAnalyst(analyst);
             await AuditData("Create Analyst", "create");
-
         }
 
         StatusClass = "alert-success";
@@ -139,45 +176,10 @@
         alertMessageShow = false;
         Saved = true;
         navigationManager.NavigateTo($"/analyst/add", true);
-        //LoadData();
-        //analyst = new Analyst();
-        //StateHasChanged();
+        LoadData();
+        analyst = new Analyst();
+        StateHasChanged();
     }
-
-    private async Task AuditData(string act, string type)
-    {
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-        // auditlog.ActivityXml = auditlogService.GetAuditxml(oanalyst, analyst, act).ToString();
-
-        if (type == "update" || type == "delete")
-        {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(oanalyst, analyst, act).ToString();
-        }
-
-        await auditlogService.CreateAuditlog(auditlog);
-    }
-
-
-
-    protected async Task SaveAnalystData()
-    {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        var user = authstate.User;
-        var username = user.Identity.Name;
-        // analyst = await AnalystService.CreateAnalyst(analyst);
-        //analyst.{firstuppercolname} = analyst.{fieldname};
-
-        analyst.Moduser = username;
-        analyst.Createdate = DateTime.Now;
-        analyst.Moddate = DateTime.Now;
-        analyst = await AnalystService.CreateAnalysts(analyst);
-    }
-
 
     private async void UpdateData(int id)
     {
@@ -185,19 +187,19 @@
         if (id > 0)
         {
             savetype = "update";
-            GetData(id);
+            using (var context = DbFactory.CreateDbContext())
+            {
+                if (id != null && id > 0)
+                {
+                    analyst = context.Analysts.Where(x => x.Id == id).FirstOrDefault();
+                    oanalyst = (Analyst)context.Entry(analyst).GetDatabaseValues().ToObject();
+
+                    StateHasChanged();
+                }
+            }
         }
     }
 
-    private async void GetData(int id)
-    {
-        if (id != null && id > 0)
-        {
-            oanalyst = await AnalystService.GetAnalystsById(id);
-            analyst = await AnalystService.GetAnalystsById(id);
-            StateHasChanged();
-        }
-    }
 
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
@@ -211,10 +213,11 @@
         {
             if (id != null && id > 0)
             {
-                analyst = await AnalystService.GetAnalystsById(id);
-                await AnalystService.DeleteAnalysts(analyst);
+                analyst = await analystservice.GetAnalystById(id);
+                await analystservice.DeleteAnalyst(analyst);
                 AuditData("Delete Analyst", "delete");
             }
+
 
             StatusClass = "alert-success";
             Message = "Data deleted successfully";
@@ -225,24 +228,31 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/analyst/add", true);
+            navigationManager.NavigateTo($"/analyst/add/", true);
+        }
 
-            LoadData();
-            StateHasChanged();
-        }
-        else
-        {
-            // do something
-        }
     }
 
     private void ClearData()
     {
-        
         analyst = new Analyst();
     }
-    
- 
+
+    private void prefilldata()
+    {
+        if (!analyst.Regno.ToLower().Contains("po"))
+        {
+            analyst.Regno = "POL" + analyst.Regno;
+            analyst.Email = analyst.Regno + "@calgarypolice.ca";
+        }
+
+        if (analyst.Localname != "" && analyst.Localname != null)
+        {
+
+            analyst.Displayname = analyst.Localname;
+        }
+        StateHasChanged();
+    }
 
     private void FillData()
     {
@@ -260,25 +270,8 @@
     }
 
 
-    private void prefilldata()
-    {
-        if (!analyst.Regno.ToLower().Contains("po"))
-        {
-            analyst.Regno = "POL" + analyst.Regno;
-            analyst.Email = analyst.Regno + "@calgarypolice.ca";
-        }
-
-        if (analyst.Localname != ""  && analyst.Localname != null)
-        {
-
-            analyst.Displayname = analyst.Localname;
-        }
-        StateHasChanged();
-    }
-
 
     #endregion
-
 }
 
    @if (alertMessageShow)
@@ -287,8 +280,7 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-
-<h5>Analyst</h5>
+<h5>Request States: </h5>
 
 <EditForm Model="@analyst" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
@@ -341,10 +333,14 @@
 
 </EditForm>
 
-
 <br />
 
 <div class="row" style="width:100%;padding-bottom: 1em;">
+    <div class="col-lg-5" style="float:left">
+        Show:
+        <label><input type="checkbox" @bind="showid" /> Record Id</label>
+        &nbsp;&nbsp;&nbsp;
+    </div>
     <div class="col-lg-5" style="float:left">
         <div class="page-size-chooser">
             Items per page:
@@ -353,26 +349,21 @@
                 <option>5</option>
                 <option>10</option>
             </select>
-
         </div>
     </div>
-    <div class="col-lg-12" style="float:revert; border-bottom:double;">
+    <div class="col-lg-2" style="float:revert">
         <div class="page-size-chooser">
-         
         </div>
-        <Paginator State="@pagination"/>
     </div>
 </div>
 
 <ConfirmDialog @ref="dialog" />
 
-
-
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@searchanalysts" Virtualize="true" Pagination="@pagination">
+    <QuickGrid Items="@analystList" Virtualize="true" Pagination="@pagination">
         <PropertyColumn Property="@(r => r.Regno)" Title="Regno" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Localname)" Title="Localname" Sortable="true" class="col-width" /> 
-        <PropertyColumn Property="@(r => r.Displayname)" Title="Displayname" Sortable="true" class="col-width" /> 
+        <PropertyColumn Property="@(r => r.Localname)" Title="Localname" Sortable="true" class="col-width" />
+        <PropertyColumn Property="@(r => r.Displayname)" Title="Displayname" Sortable="true" class="col-width" />
         <PropertyColumn Property="@(r => r.Email)" Title="Email" Sortable="true" />
         <PropertyColumn Property="@(r => r.Role)" Title="Role" Sortable="true" />
         <TemplateColumn Title="Actions">
@@ -382,4 +373,4 @@
     </QuickGrid>
 </div>
 
-
+<Paginator State="@pagination" />

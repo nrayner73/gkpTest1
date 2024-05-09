@@ -20,7 +20,7 @@
 
 @* @inject ISearchLkRequestStateService searchlkrequeststateservice
 @inject ILkRequestStateService lkRequestStateService *@
-inject IAnalystService analystService
+@inject IAnalystService analystService
 
 @inject IAuditlogService auditlogService
 
@@ -280,7 +280,7 @@ inject IAnalystService analystService
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Request States: </h5>
+<h5>Analysts: </h5>
 
 <EditForm Model="@analyst" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />

@@ -103,7 +103,7 @@ builder.Services.AddScoped<IVideonoteService, VideonoteService>();
 //Lookup
 builder.Services.AddScoped<ILookupService, LookupDataService>();
 
-builder.Services.AddScoped<IAnalystsService, AnalystsService>();
+builder.Services.AddScoped<IAnalystService, AnalystService>();
 builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
 builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
 builder.Services.AddScoped<ILkLocationService, LkLocationService>();
@@ -117,7 +117,7 @@ builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
 builder.Services.AddScoped<ILkCityService, LkCityService>();
 builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
 
-builder.Services.AddScoped<IAnalystsService, AnalystsService>();
+builder.Services.AddScoped<IAnalystService, AnalystService>();
 
 builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
 builder.Services.AddScoped<ISearchRequestfeeService, SearchRequestfeeService>();

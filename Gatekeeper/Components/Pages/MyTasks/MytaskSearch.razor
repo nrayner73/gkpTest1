@@ -390,7 +390,7 @@
         <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" />
         <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
         <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
-        
+        <PropertyColumn Property="@(r => r.Statusnote)" Title="Status Note" Sortable="true" />
         @* <TemplateColumn Title="Status">
             @if (@context.Taskstatus == "overdue")
             {

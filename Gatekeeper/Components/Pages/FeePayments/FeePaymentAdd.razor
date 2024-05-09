@@ -59,7 +59,7 @@
     private Requestfile requestfile { get; set; } = new Requestfile();
 
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
-    public List<LkPaymenttype>? paymenttype { get; set; } = new List<LkPaymenttype>();
+    public List<LkPaymenttype>? paymentTypes { get; set; } = new List<LkPaymenttype>();
 
 
     [Inject]
@@ -151,7 +151,9 @@
         {
             //get analyst lookup data
             analysts = context.Analysts.ToList();
-            paymenttype = context.LkPaymenttypes.ToList();
+            paymentTypes = context.LkPaymenttypes.ToList();
+            paymentTypes = paymentTypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+            
 
             if (fileid > 0)
             {
@@ -348,7 +350,7 @@
                    requestfee="@requestfee" />
 
 
-    <PaymentAdd savetype="@savetype" searchpayments="@searchpayments" analysts="@analysts" fileid="@fileid" paymenttype="@paymenttype" payment="@payment" payments="@payments"></PaymentAdd>
+    <PaymentAdd savetype="@savetype" searchpayments="@searchpayments" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payment="@payment" payments="@payments"></PaymentAdd>
     <div class="col-lg-3 col-md-3 col-sm-12">
         <label for="lbnotes">
             Notes:

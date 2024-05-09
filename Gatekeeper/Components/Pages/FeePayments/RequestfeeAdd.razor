@@ -16,7 +16,7 @@
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject ISearchRequestfeeService searchrequestfeeService
-@inject IAnalystsService analystService
+@inject IAnalystService analystService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
@@ -72,8 +72,10 @@
     [Parameter]
     public Requestfile requestfile { get; set; } = new Requestfile();
     private Requestfee orequestfee { get; set; } = new Requestfee();
+    
     [Parameter]
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    
 
 
     //Data Grid -- Blazor QuickGrid

@@ -368,7 +368,7 @@
         <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" />
         <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
         <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
-        
+        <PropertyColumn Property="@(r => r.Statusnote)" Title="StatusNote" Sortable="true" />
         <TemplateColumn Title="Actions">
             <a @onclick="()=>goToAddPage(context.Id)"  class="btn btn-outline-primary">
                 <i class="fas fa-edit">Edit</i>

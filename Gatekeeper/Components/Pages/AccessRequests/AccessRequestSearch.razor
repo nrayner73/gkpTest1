@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @using System
 @using System.Text
 @using Microsoft.AspNetCore.Components.QuickGrid
@@ -298,6 +298,13 @@
                         Status Update:
                     </label>
                     <InputText id="intakenotes" class="form-control" @bind-Value="fileInfo.Intakenotes" />
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        Status Note:
+                    </label>
+                    <InputText id="statusnote" class="form-control" @bind-Value="fileInfo.Statusnote" />
                 </div>
             </div>
 

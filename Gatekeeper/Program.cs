@@ -90,7 +90,7 @@ builder.Services.AddBlazorBootstrap();
 
 builder.Services.AddScoped<IAnalystnoteService, AnalystnoteService>();
 builder.Services.AddScoped<IDiscloseditemsService, DiscloseditemsService>();
-builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
+builder.Services.AddScoped<IExtensionService, ExtensionService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
 builder.Services.AddScoped<ILocationitemsService, LocationitemsService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
@@ -126,7 +126,6 @@ builder.Services.AddScoped<ISearchExtensionService, SearchExtensionService>();
 
 //Audit
 builder.Services.AddScoped<IAuditlogService, AuditlogService>();
-
 
 //View
 builder.Services.AddScoped<IAddressService, AddressService>();

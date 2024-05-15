@@ -218,8 +218,8 @@
     {
         using (var context = DbFactory.CreateDbContext())
         {
-            holidays = context.Holidays.ToList();
-            requesttypes = context.LkRequesttypes.ToList();
+            holidays = context.Holidays.Where(x => x.Status != "del").ToList();
+            requesttypes = context.LkRequesttypes.Where(x => x.Status != "del").ToList();
             requestfiles = context.Requestfiles.ToList();
             if (fileid > 0)
             {
@@ -236,7 +236,7 @@
                 {
                     requestfile.Filenumber = "TBD";
                 }
-                analysts = context.Analysts.ToList();
+                analysts = context.Analysts.Where(x => x.Status != "del").ToList();
 
                 string pattern = "&%23160;";
                 Regex defaultRegex = new Regex(pattern);

@@ -180,7 +180,7 @@
                 await AuditData("Update Payment", "update");
                 StateHasChanged();
             }
-            
+
         }
     }
 
@@ -221,12 +221,17 @@
             alertMessageShow = false;
             Saved = true;
 
-              navigationManager.NavigateTo($"/Feepayment/add/", true);
+            navigationManager.NavigateTo($"/Feepayment/add/", true);
 
             LoadData();
             StateHasChanged();
         }
-       
+
+    }
+
+    private void ClearData()
+    {
+        payment = new Payment();
     }
 
     private void FillData()
@@ -292,7 +297,10 @@
                 <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @bind-Value="payment.Payamount" />
             </div>
         </div>
+        <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+        <button type="submit" class="btn btn-primary">Save</button>
     </div>
+
 </EditForm>
 
 <br />

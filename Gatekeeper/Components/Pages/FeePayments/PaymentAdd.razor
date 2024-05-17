@@ -161,6 +161,61 @@
         Message = "There are some validation errors. Please try again.";
     }
 
+    protected async Task HandleValidSubmit()
+    {
+        Saved = false;
+
+        if (fileid > 0)
+        {
+            try
+            {
+                requestfile = await requestFileService.GetRequestfileById(fileid);
+                await requestFileService.UpdateRequestfile(requestfile);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            if (payment != null)
+            {
+                if (payment.Id == 0)
+                {
+                    if (payment.Description != "" && payment.Description != null)
+                    {
+                        payment.Createdate = DateTime.Now;
+                        payment.Createuser = userReg;
+                        await PaymentService.CreatePayment(payment);
+                    }
+                }
+                else
+                {
+                    if (payment.Description != "" && payment.Description != null)
+                    {
+                        payment.Moddate = DateTime.Now;
+                        payment.Moduser = userReg;
+                        await PaymentService.UpdatePayment(payment);
+                    }
+                }
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data updated successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+            navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
+        }
+
+        //LoadData();
+        // getDataContext();
+        payment = new Payment();
+        StateHasChanged();
+    }
+
     private async void UpdateData(int id)
     {
         savetype = "";
@@ -254,7 +309,7 @@
 
 }
 
-<EditForm Model="@payment">
+<EditForm Model="@payment" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="container-fluid">
@@ -299,6 +354,7 @@
         </div>
         <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
         <button type="submit" class="btn btn-primary">Save</button>
+        @*    TODO - move buttons to save row as entries *@
     </div>
 
 </EditForm>

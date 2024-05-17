@@ -211,37 +211,62 @@
 
     protected async Task HandleValidSubmit()
     {
-        // Saved = false;
+        Saved = false;
 
-        // requestfee.Moddate = DateTime.Now;
-        // requestfee.Moduser = userReg;
+        if (fileid > 0)
+        {
+            try
+            {
+                requestfile = await requestFileService.GetRequestfileById(fileid);
+                await requestFileService.UpdateRequestfile(requestfile);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
 
-        // if (savetype == "update")
-        // {
-        //     await RequestfeeService.UpdateRequestfee(requestfee);
-        //     await AuditData("Update Requestfee", "update");
-        // }
-        // else
-        // {
-        //     requestfee.Createdate = DateTime.Now;
-        //     requestfee.Createuser = userReg;
-        //     await RequestfeeService.CreateRequestfee(requestfee);
-        //     //await AuditData("Create Requestfee", "create");
+            requestfee.Moddate = DateTime.Now;
+            requestfee.Moduser = userReg;
 
-        // }
+            if (requestfee != null)
+            {
+                if (requestfee.Id == 0)
+                {
+                    if (requestfee.Description != "" && requestfee.Description != null)
+                    {
+                        requestfee.Createdate = DateTime.Now;
+                        requestfee.Createuser = userReg;
+                        await RequestfeeService.CreateRequestfee(requestfee);
+                        await AuditData("Create Payment", "create");
+                    }
+                }
+                else
+                {
+                    if (requestfee.Description != "" && requestfee.Description != null)
+                    {
+                        requestfee.Moddate = DateTime.Now;
+                        requestfee.Moduser = userReg;
+                        await RequestfeeService.UpdateRequestfee(requestfee);
+                        await AuditData("Update Payment", "create");
+                    }
+                }
+            }
 
-        // StatusClass = "alert-success";
-        // Message = "Data updated successfully";
-        // alertMessageShow = true;
-        // await InvokeAsync(() => StateHasChanged());
-        // await Task.Delay(1000);
+            StatusClass = "alert-success";
+            Message = "Data updated successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
 
-        // alertMessageShow = false;
-        // Saved = true;
-        // navigationManager.NavigateTo($"/requestfee/add/{fileid}", true);
-        // LoadData();
-        // requestfee = new Requestfee();
-        // StateHasChanged();
+            alertMessageShow = false;
+            Saved = true;
+            navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
+        }
+
+        //LoadData();
+        getDataContext();
+        requestfee = new Requestfee();
+        StateHasChanged();
     }
 
     private async Task AuditData(string act, string type)
@@ -352,7 +377,7 @@
     #endregion
 }
 
-<EditForm Model="@requestfee">
+<EditForm Model="@requestfee" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="container-fluid">
@@ -405,6 +430,7 @@
         </div>
         <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
         <button type="submit" class="btn btn-primary">Save</button>
+@* TODO - move buttons to same row as entries *@
     </div>
 </EditForm>
 

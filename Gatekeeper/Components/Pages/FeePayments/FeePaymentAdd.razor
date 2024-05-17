@@ -207,59 +207,6 @@
                 throw;
             }
 
-
-            requestfee.Moddate = DateTime.Now;
-            requestfee.Moduser = userReg;
-
-
-            if (requestfee != null)
-            {
-                if (requestfee.Id == 0)
-                {
-                    if (requestfee.Description != "" && requestfee.Description != null)
-                    {
-                        requestfee.Createdate = DateTime.Now;
-                        requestfee.Createuser = userReg;
-                        await RequestfeeService.CreateRequestfee(requestfee);
-                        await AuditData("Create Payment", "create");
-                    }
-                }
-                else
-                {
-
-                    if (requestfee.Description != "" && requestfee.Description != null)
-                    {
-                        requestfee.Moddate = DateTime.Now;
-                        requestfee.Moduser = userReg;
-                        await RequestfeeService.UpdateRequestfee(requestfee);
-                        await AuditData("Update Payment", "create");
-                    }
-                }
-            }
-
-
-            if (payment != null)
-            {
-                if (payment.Id == 0)
-                {
-                    if (payment.Description != "" && payment.Description != null)
-                    {
-                        payment.Createdate = DateTime.Now;
-                        payment.Createuser = userReg;
-                        await PaymentService.CreatePayment(payment);
-                    }
-                }
-                else
-                {
-                    if (payment.Description != "" && payment.Description != null)
-                    {
-                        payment.Moddate = DateTime.Now;
-                        payment.Moduser = userReg;
-                        await PaymentService.UpdatePayment(payment);
-                    }
-                }
-            }
-
             StatusClass = "alert-success";
             Message = "Data updated successfully";
             alertMessageShow = true;
@@ -359,4 +306,6 @@
     </div>
     <br />
     <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
 </EditForm>

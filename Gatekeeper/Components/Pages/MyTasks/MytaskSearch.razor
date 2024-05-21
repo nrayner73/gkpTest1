@@ -17,8 +17,6 @@
 @inject LoginState loginState;
 @inject AppState appState;
 
-
-
 @page "/mytasks/search"
 
 
@@ -41,16 +39,16 @@
 
     #region Lookup Parameters
 
-    public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
     public List<LkRequeststate>? requeststates { get; set; } = new List<LkRequeststate>();
-    public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
-    private POIName POIselectedpersonname;
-    private POIName POIpersonname { get; set; } = new POIName();
     public List<PersonName>? personnames { get; set; } = new List<PersonName>();
     private PersonName selectedpersonname;
     private PersonName personname { get; set; } = new PersonName();
+    public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
+    private POIName POIselectedpersonname;
+    private POIName POIpersonname { get; set; } = new POIName();
+
+    public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
     #endregion
 
     #endregion
@@ -67,10 +65,9 @@
             userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
             using var context = DbFactory.CreateDbContext();
             fileInfo.Regno = userReg;
-            requesttypes = await context.LkRequesttypes.ToListAsync();
-            requeststates = await context.LkRequeststates.ToListAsync();
+            requesttypes = await context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
+            requeststates = await context.LkRequeststates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
             // Requestfiles = await context.Requestfiles.ToListAsync();
-            analysts = await context.Analysts.ToListAsync();
             LoadData();
         }
     }

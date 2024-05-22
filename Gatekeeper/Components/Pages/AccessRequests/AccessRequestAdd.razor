@@ -75,60 +75,10 @@
 
     protected async override Task OnParametersSetAsync()
     {
-        // loginState.OnChange += StateHasChanged;
-        // if (fileid > 0)
-        // {
-        //     getDataContext();
-        // }
-
         if (requestfile.Yearid == 0 || requestfile.Yearid is null)
         {
             requestfile.Filenumber = "TBD";
         }
-
-        #region "oldcode"
-        // using var context = DbFactory.CreateDbContext();
-        // requesttypes = await context.LkRequesttypes.ToListAsync();
-        // persons = await context.People.ToListAsync();
-        // requestfiles = await context.Requestfiles.ToListAsync();
-
-        // holidays = await context.Holidays.ToListAsync();
-        // if (fileid > 0)
-        // {
-        //     string pattern = "&%23160;";
-        //     Regex defaultRegex = new Regex(pattern);
-        //     MatchCollection matches;
-
-        //     loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
-        //     requestfile = loginState.Requestfile;
-
-        //     var _intakeNotes = requestfile.Intakenotes;
-        //     if (!string.IsNullOrEmpty( requestfile.Intakenotes))
-        //     {
-        //         _intakeNotes = HtmlUtilities.ConvertToPlainText(requestfile.Intakenotes);
-        //         requestfile.Intakenotes = _intakeNotes.ToString().Replace("&%23160;", "");
-        //     }
-
-        //     var _requestDetails = requestfile.Requestdetails;
-        //     if (!string.IsNullOrEmpty(requestfile.Requestdetails))
-        //     {
-        //         _requestDetails = HtmlUtilities.ConvertToPlainText(requestfile.Requestdetails);
-        //         requestfile.Requestdetails = _requestDetails.ToString().Replace("&%23160;", "");
-        //     }
-
-        //     person = await personService.GetPersonById((int)requestfile.Personid);
-
-
-        // }
-
-        // if (requestfile.Yearid == 0 || requestfile.Yearid is null)
-        // {
-        //     requestfile.Filenumber = "TBD";
-        // }
-
-        // userReg = await session.GetItemAsStringAsync("SessionUser");
-
-        #endregion
 
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -158,7 +108,6 @@
                 await sessionStorage.SetItemAsync("RQID", fileid);
                 await sessionStorage.SetItemAsync("objFileRequest", requestfile);
                 getDataContext();
-                // loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
             }
             else
             {
@@ -167,14 +116,6 @@
                 if (RQID != "0" && RQID != null)
                 {
                     fileid = Int32.Parse(RQID);
-                    //  navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
-                    // if (loginState.gFileId == 0 || loginState.gFileId == null)
-                    // {
-                    //     // loginState.SetLogin(await requestFileService.GetRequestfileById(fileid));
-                    //     getDataContext();
-                    // }
-                    // requestfile = loginState.Requestfile;
-                    // getDataContext();
                 }
             }
             getDataContext();
@@ -316,7 +257,6 @@
                 await AuditData("update Person","update person");
                 await Task.Delay(1000);
                 await UpdateFileNumber(requestfile.Id);
-                // await RequestfileService.UpdateRequestfile(requestfile);
 
                 SuccessMessage = "Data updated successfully";
             }
@@ -346,9 +286,6 @@
                     await AuditData("Create RequestFile","create file");
                     await Task.Delay(1000);
                     await UpdateFileNumber(requestfile.Id);
-
-                    //await session.SetItemAsync("SessioRequestFile", requestfile);
-
                     await sessionStorage.SetItemAsync("RQID", requestfile.Id);
                     await sessionStorage.SetItemAsync("objFileRequest", requestfile);
                     loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
@@ -362,7 +299,6 @@
                         JSRuntime.InvokeVoidAsync("disabledtab");
                     }
 
-                    // await JSRuntime.InvokeVoidAsync("alert", "Data saved successfully");
                     SuccessMessage = "Data saved successfully";
                 }
 
@@ -376,7 +312,6 @@
         navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
     }
 
-    // private async void UpdateFileNumber(int fileid)
     private async Task UpdateFileNumber(int fileid)
     {
         Requestfile updatefile = requestfile;
@@ -395,7 +330,7 @@
         if (updatefile.Yearid != null)
         {
             updatefile.Filenumber = ((DateTime)requestfile.Receivedate).Year + "-" + rtype.Refertype + "-" + ((int)requestfile.Yearid).ToString("D4");
-            // // Start Test Data
+            // Start Test Data
             if (setTestdata)
             {
                 updatefile.Referencenumber = "RF " + requestfile.Filenumber;
@@ -631,8 +566,6 @@
 <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <button class="@(tab1?"nav-link active":"nav-link")" @onclick="x=>DisplayTab(1)">File Detail</button>
-       @*  <button class="@(tab2?"nav-link active":"nav-link")" @onclick="x=>DisplayTab(2)">Request Person</button>
-        <button class="@(tab3?"nav-link active":"nav-link")" @onclick="x=>DisplayTab(3)">Other</button> *@
     </div>
 </nav>
 

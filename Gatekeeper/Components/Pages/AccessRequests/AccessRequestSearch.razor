@@ -22,7 +22,6 @@
 @code {
 
     #region "Variables"
-    // private List<string> header = new List<string>();
     private IRequestfileService RequestfileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
 
@@ -36,10 +35,9 @@
     bool showpanel = false;
     bool showyear = false;
     bool showid = false;
-
+    #endregion
 
     #region Lookup Parameters
-
     public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
@@ -52,14 +50,9 @@
     private POIName POIpersonname { get; set; } = new POIName();
     #endregion
 
-    #endregion
-
-
     #region  "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
-       
-
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -70,10 +63,8 @@
         }
     }
 
-
     protected override async Task OnParametersSetAsync()
     {
-
         if (requesttypes.Count == 0)
         {
             using var context = DbFactory.CreateDbContext();
@@ -82,16 +73,12 @@
             requeststates = await context.LkRequeststates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
             LoadData();
         }
-
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            //using var context = DbFactory.CreateDbContext();
-            // LoadData();
-
             POIpersonnames = personNameService.GetPOINames();
             personnames = personNameService.GetNames();
             firstRender = false;
@@ -108,7 +95,6 @@
         searchrequestfiles = Enumerable.Empty<Searchrequestfile>().AsQueryable();
         fileInfo = new Searchrequestfile();
         LoadData();
-
     }
 
     private void FilterData()
@@ -129,31 +115,25 @@
         {
             fileInfo.Requeststateid = null;
         }
-
         searchrequestfiles = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
-
     }
 
     private void LoadData()
     {
-
         if (searchrequestfiles == null  || searchrequestfiles.Count() == 0)
         {
             searchrequestfiles = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
         }
-
     }
 
     private void goToAddPage(int fileid)
     {
         setSession(fileid);
         navigationManager.NavigateTo($"/accessrequests/add/{fileid}");
-
     }
 
     private async Task setSession(int fileid)
     {
-        //  Requestfile requestfile = new Requestfile();
         if (fileid > 0)
         {
             requestfile = await requestFileService.GetRequestfileById(fileid);
@@ -163,7 +143,6 @@
 
             loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
             requestfile = loginState.Requestfile;
-
         }
     }
 
@@ -264,7 +243,6 @@
                     fileInfo.Firstname = selectedpersonname.firstname;
                     fileInfo.Lastname = selectedpersonname.lastname;
                     fileInfo.Middlename = selectedpersonname.middlename;
-
                 }
 
                 <div class="col-lg-3 col-md-3 col-sm-12">
@@ -331,7 +309,6 @@
     }
 </EditForm>
 
-
 <br />
 
 <div class="row" style="width:100%;padding-bottom: 1em;">
@@ -363,8 +340,6 @@
     </div>
 
 </div>
-
-
 
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchrequestfiles" Virtualize="true" Pagination="@pagination">

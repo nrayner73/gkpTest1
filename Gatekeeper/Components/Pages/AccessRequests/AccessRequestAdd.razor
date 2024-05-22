@@ -330,7 +330,6 @@
                 await personService.UpdatePerson(person);
                 await AuditData("update Person","update person");
                 UpdateFileNumber(requestfile.Id);
-                // await RequestfileService.UpdateRequestfile(requestfile);
 
                 SuccessMessage = "Data updated successfully";
             }
@@ -384,9 +383,8 @@
             await InvokeAsync(() => StateHasChanged());
             await Task.Delay(1000);
             alertMessageShow = false;
+            navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
         }
-
-        navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
     }
 
     private async void UpdateFileNumber(int fileid)

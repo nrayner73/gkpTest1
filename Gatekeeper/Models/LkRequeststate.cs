@@ -21,4 +21,9 @@ public int? Sortby{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Status{ get; set; }
 
+public DateTime? Moddate { get; set; }
+
+[Column(TypeName = "varchar(45)")]
+public string? Moduser { get; set; }
+
 }

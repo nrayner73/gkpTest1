@@ -1,0 +1,340 @@
+﻿@rendermode InteractiveServer
+@using System.Text
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorBootstrap
+@using System.Reflection;
+@using System;
+
+@* @inject IViewRequestTypeService searchRequestTypeService *@
+@inject ILkRequesttypeService searchRequestTypeService
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@inject IRequestfileService requestFileService
+@inject IAuditlogService auditlogService
+@inject NavigationManager navigationManager
+
+@page "/requesttype/add"
+
+
+@code {
+    #region "Variables"
+    private System.Security.Claims.ClaimsPrincipal user;
+    private string? userReg;
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    private bool Saved;
+    private string savetype = string.Empty;
+    private string FileNumber = string.Empty;
+    private bool alertMessageShow = false;
+    private int nextId;
+
+    [Parameter]
+    public int fileid { get; set; }
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+
+    [Inject]
+    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+
+    [Inject]
+    private ILkRequesttypeService requestTypeService { get; set; }
+    private LkRequesttype requestType { get; set; } = new LkRequesttype();
+    private LkRequesttype orequestType { get; set; } = new LkRequesttype();
+
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+
+
+    //Data Grid -- Blazor QuickGrid
+    private IQueryable<LkRequesttype> searchRequestTypes;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+
+    string nameFilter;
+
+    bool showid = false;
+    #endregion
+
+
+    #region "Component Lifecycle"
+    protected async override Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity.Name;
+        LoadData();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+    }
+
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            savetype = string.Empty;
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+    #endregion
+
+    #region "Methods"
+
+    IQueryable<LkRequesttype> UnfilteredRequestTypes
+    {
+        get
+        {
+            var result = searchRequestTypes;
+            return result;
+        }
+    }
+
+    private  async void LoadData()
+    {
+        searchRequestTypes = searchRequestTypeService.GetLkRequesttypeList().AsQueryable<LkRequesttype>();
+        nextId = (searchRequestTypes.Max(x => x.Id) + 1);
+        requestType.Sortby = nextId;
+    }
+
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        Saved = false;
+
+        requestType.Moddate = DateTime.Now;
+        requestType.Moduser = userReg;
+
+        if (savetype == "update")
+        {
+
+            if (requestType.Sortby == null)
+            {
+                requestType.Sortby = requestType.Id;
+            }
+            await requestTypeService.UpdateLkRequesttype(requestType);
+            await AuditData("Update Request Types", "update");
+        }
+        else
+        {
+            requestType.Createdate = DateTime.Now;
+            requestType.Createuser = userReg;
+            if (requestType.Sortby == null)
+            {
+                requestType.Sortby = nextId;
+            }
+            await requestTypeService.CreateLkRequesttype(requestType);
+            await AuditData("Create Request Types", "create");
+
+        }
+
+        StatusClass = "alert-success";
+        Message = "Data updated successfully";
+        alertMessageShow = true;
+        await InvokeAsync(() => StateHasChanged());
+        await Task.Delay(1000);
+
+        alertMessageShow = false;
+        Saved = true;
+        navigationManager.NavigateTo($"/requesttype/add", true);
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+        auditlog.ActivityXml = auditlogService.GetAuditxml(orequestType, requestType, act).ToString();
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestType, requestType, act).ToString();
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    private async void UpdateData(int id)
+    {
+        savetype = "";
+        if (id > 0)
+        {
+            savetype = "update";
+            GetData(id);
+        }
+    }
+
+    private async void GetData(int id)
+    {
+        if (id != null && id > 0)
+        {
+            orequestType = await requestTypeService.GetLkRequesttypeById(id);
+            requestType = await requestTypeService.GetLkRequesttypeById(id);
+            StateHasChanged();
+        }
+    }
+
+    private ConfirmDialog dialog = default!;
+    private async Task ShowConfirmationAsync(int id)
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Are you sure you want to delete this?",
+            message1: "This will delete the record. Once deleted can not be rolled back.",
+            message2: "Do you want to proceed?");
+
+        if (confirmation)
+        {
+            if (id != null && id > 0)
+            {
+                requestType = await requestTypeService.GetLkRequesttypeById(id);
+                await requestTypeService.DeleteLkRequesttype(requestType);
+                AuditData("Delete Request Type", "delete");
+            }
+
+            StatusClass = "alert-success";
+            Message = "Data deleted successfully";
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+
+            alertMessageShow = false;
+            Saved = true;
+
+            navigationManager.NavigateTo($"/requesttype/add", true);
+
+            LoadData();
+            StateHasChanged();
+        }
+        else
+        {
+            // do something
+        }
+    }
+
+    private void ClearData()
+    {
+        requestType = new LkRequesttype();
+        requestType.Sortby = nextId;
+
+    }
+
+    private void FillData()
+    {
+        requestType.Detail = "requestTypeDetail";
+        requestType.Moddate = DateTime.Now;
+        requestType.Moduser = userReg;
+        requestType.Createdate = DateTime.Now;
+        requestType.Createuser = userReg;
+        requestType.Status = "status";
+        requestType.Sortby = nextId;
+    }
+    #endregion
+}
+
+@if (alertMessageShow)
+{
+    <br />
+    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
+}
+
+<h5>Request Type:</h5>
+
+<EditForm Model="@requestType" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbrequesttypename">
+                    Request Type:
+                </label>
+                <InputText id="requesttypename" class="form-control" placeholder="REQUEST TYPE" @bind-Value="requestType.Detail" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbrequesttyperefer">
+                    Reference:
+                </label>
+                <InputText id="requesttyperefer" class="form-control" placeholder="REFERENCE" @bind-Value="requestType.Refertype" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbSortBy">
+                    Order:
+                </label>
+                <InputNumber id="sortby" class="form-control" @bind-Value="requestType.Sortby" />
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+
+</EditForm>
+
+<br />
+
+<div class="row" style="width:100%;padding-bottom: 1em;">
+    <div class="col-lg-5" style="float:left">
+        Show:
+        <label><input type="checkbox" @bind="showid" /> ID Column</label>
+    </div>
+    <div class="col-lg-5" style="float:left">
+        <div class="page-size-chooser">
+            Items per page:
+            <select @bind="@pagination.ItemsPerPage">
+                <option>3</option>
+                <option>5</option>
+                <option>10</option>
+            </select>
+
+        </div>
+    </div>
+    <div class="col-lg-2" style="float:revert">
+        <div class="page-size-chooser">
+        </div>
+    </div>
+</div>
+
+<ConfirmDialog @ref="dialog" />
+
+<div class="grid">
+    <QuickGrid Items="@UnfilteredRequestTypes" Virtualize="true" Pagination="@pagination">
+        @if (showid)
+        {
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
+        }
+        <PropertyColumn Property="@(r => r.Detail)" Title="Description" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Refertype)" Title="Reference" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Moddate)" Title="Modified Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Moduser)" Title="Modified By" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Sortby)" Title="Order" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
+            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />

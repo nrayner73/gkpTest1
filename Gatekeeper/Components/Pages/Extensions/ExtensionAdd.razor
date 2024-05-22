@@ -38,7 +38,6 @@
     private int? extDays = 0;
     private string? oDuedate = string.Empty;
 
-
     [Parameter]
     public int fileid { get; set; }
 
@@ -49,7 +48,7 @@
     private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
 
     [Inject]
-    private IExtensionsService ExtensionsService { get; set; }
+    private IExtensionService ExtensionsService { get; set; }
     private Extension extension { get; set; } = new Extension();
     private Extension oextension { get; set; } = new Extension();
     private List<Extension> extensions { get; set; } = new List<Extension>();
@@ -58,11 +57,9 @@
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<Holiday>? holidays { get; set; } = new List<Holiday>();
 
-
     //Lookup
     public List<LkSection> lksectionlist { get; set; } = new List<LkSection>();
     public List<LkExtension> lkextensionlist { get; set; } = new List<LkExtension>();
-
 
     //Data Grid -- Blazor QuickGrid
     private IQueryable<SearchExtension> searchextensions;
@@ -75,26 +72,11 @@
     bool showid = false;
     #endregion
 
-
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
         loginState.OnChange += StateHasChanged;
         getDataContext();
-        // var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        // var user = authstate.User;
-        // var name = user.Identity.Name;
-
-        // loginState.OnChange += StateHasChanged;
-
-        // if (loginState.gFileId > 0)
-        // {
-        //     fileid = (int)loginState.gFileId;
-        //     FileNumber = loginState.gFileNumber;
-
-
-        // }
-        //extensions = (await ExtensionsService.GetExtensionsList(fileid)).ToList();
     }
 
     public void Dispose()
@@ -104,14 +86,11 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        //using var context = DbFactory.CreateDbContext();
         //get user information
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
     }
-
 
     protected async override void OnAfterRender(bool firstRender)
     {
@@ -125,12 +104,15 @@
 
             //set save type
             savetype = string.Empty;
+
             //read data from session
             var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+
             //  var objRequest = await sessionStorage.GetItemAsync<Requestfile>("objFileRequest");
             if (RQID != "0" && RQID != null)
             {
                 fileid = Int32.Parse(RQID);
+
                 // get data context
                 getDataContext();
 
@@ -140,19 +122,15 @@
 
                 // assign current date and current log on user to create date, mod date, create user and mod user
                 extension.Createdate = DateTime.Now;
-                extension.Moddate = DateTime.Now;
                 extension.Createuser = userReg;
+                extension.Moddate = DateTime.Now;
                 extension.Moduser = userReg;
                 extension.Requestid = fileid;
-
             }
-
             StateHasChanged();
             firstRender = false;
         }
     }
-
-
     #endregion
     #region "Methods"
 
@@ -161,12 +139,10 @@
         using (var context = DbFactory.CreateDbContext())
         {
             //get analyst lookup data
-            analysts = context.Analysts.ToList();
-           
-            //(await ExtensionsService.GetExtensionsList(fileid)).ToList();
-            lksectionlist = context.LkSections.Where(x => x.Sectiontype.ToLower() == "extension").ToList();
-            lkextensionlist = context.LkExtensions.ToList();
-            holidays = context.Holidays.ToList();
+            analysts = context.Analysts.Where(x => x.Status != "del").ToList();
+            lksectionlist = context.LkSections.Where(x => x.Sectiontype.ToLower() == "extension" && x.Status != "del").ToList();
+            lkextensionlist = context.LkExtensions.Where(x => x.Status != "del").ToList();
+            holidays = context.Holidays.Where(x => x.Status != "del").ToList();
 
             if (fileid > 0)
             {
@@ -175,7 +151,6 @@
                     //set state login
                     loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
                 }
-                extensions = context.Extensions.Where(x => x.Requestid == fileid).ToList();
                 requestfile = loginState.Requestfile;
                 FileNumber = loginState.Requestfile.Filenumber;
             }
@@ -183,55 +158,9 @@
         StateHasChanged();
     }
 
-
     private void LoadData()
     {
         searchextensions = searchextensionService.GetExtensionList(fileid).AsQueryable<SearchExtension>();
-    }
-
-    public void setDuedate()
-    {
-
-        if (requestfile.Receivedate != null)
-        {
-            List<DateTime> dateRange1 = new List<DateTime>();
-            List<DateTime> dateRange2 = new List<DateTime>();
-
-            DateTime dueDate = (DateTime)requestfile.Receivedate;
-            DateTime setDate;
-
-            oDuedate = ((DateTime)requestfile.Receivedate).AddDays(30).ToString();
-            dueDate = ((DateTime)requestfile.Receivedate).AddDays(30 + (int)extDays);
-
-            for (int i = 1; i < 11; i++)
-            {
-                setDate = dueDate.AddDays(i);
-                if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
-                {
-                    dateRange1.Add(setDate);
-                    dateRange2.Add(setDate);
-                }
-            }
-
-            //Remove holidays
-            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == ((DateTime)requestfile.Receivedate).Year);
-
-            foreach (var item in thisYearHolidays)
-            {
-                foreach (var dt in dateRange1)
-                {
-                    int y = dateRange1.IndexOf(dt);
-                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
-                    {
-                        dateRange2.RemoveAt(y);
-                    }
-                }
-            }
-
-            requestfile.Requestduedate = dateRange2.FirstOrDefault();
-            // var rtype = requesttypes.Where(x => x.Id == requestfile.Requesttypeid);
-            // filenumberDisplay = ((DateTime)requestfile.Receivedate).Year + "-" + rtype + "=" + requestfile.Id;
-        }
     }
 
     protected void HandleInvalidSubmit()
@@ -249,32 +178,17 @@
 
         if (savetype == "update")
         {
-            await ExtensionsService.UpdateExtensions(extension);
+            await ExtensionsService.UpdateExtension(extension);
             await AuditData("Update Extensions", "update");
         }
         else
         {
             extension.Createdate = DateTime.Now;
             extension.Createuser = userReg;
-            await ExtensionsService.CreateExtensions(extension);
+            await ExtensionsService.CreateExtension(extension);
             await AuditData("Create Extensions", "create");
 
         }
-
-        extDays = 0;
-        foreach (var item in extensions)
-        {
-            if (item.Dayamount != null && item.Dayamount != 0)
-            {
-                extDays = extDays + item.Dayamount;
-            }
-        }
-
-        // requestfile = await requestFileService.GetRequestfileById(fileid);
-
-        setDuedate();
-        await requestFileService.UpdateRequestfile(requestfile);
-        //  await AuditData("Update Extensions - Modify Due Date", "updateduedate");
 
         StatusClass = "alert-success";
         Message = "Data updated successfully";
@@ -282,61 +196,14 @@
         await InvokeAsync(() => StateHasChanged());
         await Task.Delay(1000);
 
+        await updateRequestFileDuedate();
+        // await AuditData("Update Extensions - Modify Due Date", "updateduedate");
+
         alertMessageShow = false;
         Saved = true;
 
         navigationManager.NavigateTo($"/extension/add", true);
-        // LoadData();
-        // extension = new Extension();
-        // StateHasChanged();
     }
-
-    private async Task AuditData(string act, string type)
-    {
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-        auditlog.ActivityXml = auditlogService.GetAuditxml(oextension, extensions, act).ToString();
-
-        if (type == "update" || type == "delete")
-        {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(oextension, extensions, act).ToString();
-        }
-        else if (type == "updateduedate")
-        {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(oDuedate, requestfile.Requestduedate.ToString(), act).ToString();
-
-        }
-
-        await auditlogService.CreateAuditlog(auditlog);
-    }
-
-
-
-    private async void UpdateData(int id)
-    {
-        savetype = "";
-        if (id > 0)
-        {
-            //set save type
-            savetype = "update";
-            using (var context = DbFactory.CreateDbContext())
-            {
-                if (id != null && id > 0)
-                {
-
-                    extension = context.Extensions.Where(x => x.Id == id).FirstOrDefault();
-                    oextension = (Extension)context.Entry(extension).GetDatabaseValues().ToObject();
-
-                    StateHasChanged();
-                }
-            }
-        }
-    }
-
 
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
@@ -350,9 +217,9 @@
         {
             if (id != null && id > 0)
             {
-                extension = await ExtensionsService.GetExtensionsById(id);
-                await ExtensionsService.DeleteExtensions(extension);
-                AuditData("Delete Extensions", "delete");
+                extension = await ExtensionsService.GetExtensionById(id);
+                await ExtensionsService.DeleteExtension(extension);
+                AuditData("Delete Extension", "delete");
             }
 
             StatusClass = "alert-success";
@@ -361,16 +228,116 @@
             await InvokeAsync(() => StateHasChanged());
             await Task.Delay(1000);
 
+            await updateRequestFileDuedate();
+            //await requestFileService.UpdateRequestfile(requestfile);
+
             alertMessageShow = false;
             Saved = true;
 
             navigationManager.NavigateTo($"/extension/add", true);
-
-            LoadData();
-            StateHasChanged();
         }
-      
     }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+        auditlog.ActivityXml = auditlogService.GetAuditxml(oextension, extension, act).ToString();
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oextension, extension, act).ToString();
+        }
+        else if (type == "updateduedate")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oDuedate, requestfile.Requestduedate.ToString(), act).ToString();
+
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    public async Task updateRequestFileDuedate()
+    {
+        if (requestfile.Receivedate != null)
+        {
+            List<DateTime> dateRange1 = new List<DateTime>();
+            List<DateTime> dateRange2 = new List<DateTime>();
+
+            DateTime dueDate = (DateTime)requestfile.Receivedate;
+            DateTime setDate;
+
+            extensions = (await ExtensionsService.GetExtensionList(fileid)).Where(x => x.Status != "del").ToList();
+
+            extDays = 0;
+            foreach (var item in extensions)
+            {
+                if (item.Dayamount != null && item.Dayamount != 0)
+                {
+                    extDays = extDays + item.Dayamount;
+                }
+            }
+
+            oDuedate = ((DateTime)requestfile.Receivedate).AddDays(30).ToString();
+            dueDate = ((DateTime)requestfile.Receivedate).AddDays(30 + (int)extDays);
+
+            // remove weekends
+            for (int i = 0; i < 11; i++)
+            {
+                setDate = dueDate.AddDays(i);
+                if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
+                {
+                    dateRange1.Add(setDate);
+                    dateRange2.Add(setDate);
+                }
+            }
+
+            // remove holidays
+            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == ((DateTime)requestfile.Receivedate).Year);
+
+            foreach (var item in thisYearHolidays)
+            {
+                foreach (var dt in dateRange1)
+                {
+                    int y = dateRange1.IndexOf(dt);
+                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
+                    {
+                        dateRange2.RemoveAt(y);
+                    }
+                }
+            }
+
+            requestfile.Requestduedate = dateRange2.FirstOrDefault();
+            requestfile.Moddate = DateTime.Now;
+            requestfile.Moduser = userReg;
+            await requestFileService.UpdateRequestfile(requestfile);
+        }
+    }
+    
+    private async void UpdateData(int id)
+    {
+        savetype = "";
+        if (id > 0)
+        {
+            //set save type
+            savetype = "update";
+            using (var context = DbFactory.CreateDbContext())
+            {
+                if (id != null && id > 0)
+                {
+                    extension = context.Extensions.Where(x => x.Id == id).FirstOrDefault();
+                    oextension = (Extension)context.Entry(extension).GetDatabaseValues().ToObject();
+
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+
 
     private void ClearData()
     {
@@ -391,10 +358,7 @@
         //   extension.Status = "status";
     }
 
-
-
     #endregion
-
 }
 
 @if (alertMessageShow)
@@ -448,7 +412,7 @@
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbdayamount">
-                    Day Amount:
+                    Number of Extension Days:
                 </label>
                 <InputNumber id="dayamount" class="form-control" placeholder="DAYAMOUNT" @bind-Value="extension.Dayamount" />
             </div>
@@ -456,7 +420,6 @@
 
         </div>
     </div>
-
     <hr />
 
     <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
@@ -464,7 +427,6 @@
     <button type="submit" class="btn btn-primary">Save</button>
 
 </EditForm>
-
 
 <br />
 
@@ -502,8 +464,8 @@
         }
         <PropertyColumn Property="@(r => r.Extension)" Title="Extension" Sortable="true" class="col-width" />
         <PropertyColumn Property="@(r => r.Section)" Title="Section" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Extensiondate)" Title="Extension Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Dayamount)" Title="Day Amount" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Extensiondate)" Format="yyyy/MM/dd" Title="Extension Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Dayamount)" Title="Number of Extension Days" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
             <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
@@ -512,4 +474,3 @@
 </div>
 
 <Paginator State="@pagination" />
-

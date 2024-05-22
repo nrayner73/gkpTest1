@@ -218,8 +218,8 @@
     {
         using (var context = DbFactory.CreateDbContext())
         {
-            holidays = context.Holidays.ToList();
-            requesttypes = context.LkRequesttypes.ToList();
+            holidays = context.Holidays.Where(x => x.Status != "del").ToList();
+            requesttypes = context.LkRequesttypes.Where(x => x.Status != "del").ToList();
             requestfiles = context.Requestfiles.ToList();
             if (fileid > 0)
             {
@@ -236,7 +236,7 @@
                 {
                     requestfile.Filenumber = "TBD";
                 }
-                analysts = context.Analysts.ToList();
+                analysts = context.Analysts.Where(x => x.Status != "del").ToList();
 
                 string pattern = "&%23160;";
                 Regex defaultRegex = new Regex(pattern);
@@ -330,7 +330,6 @@
                 await personService.UpdatePerson(person);
                 await AuditData("update Person","update person");
                 UpdateFileNumber(requestfile.Id);
-                // await RequestfileService.UpdateRequestfile(requestfile);
 
                 SuccessMessage = "Data updated successfully";
             }
@@ -384,9 +383,8 @@
             await InvokeAsync(() => StateHasChanged());
             await Task.Delay(1000);
             alertMessageShow = false;
+            navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
         }
-
-        navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
     }
 
     private async void UpdateFileNumber(int fileid)

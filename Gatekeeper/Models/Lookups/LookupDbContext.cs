@@ -9,43 +9,54 @@ namespace Gatekeeper.Models.Lookups
 
         public LookupDbContext(DbContextOptions<LookupDbContext> options) : base(options) { }
 
-        public virtual DbSet<PersonName> PersonNames { get; set; }
-
-        public virtual DbSet<CompanyName> CompanyNames { get; set; }
-
-        public virtual DbSet<POIName> POINames { get; set; }
-
         public virtual DbSet<AddressInfo> AddressInfos { get; set; }
+
+        public virtual DbSet<SearchAnalystNotes> AnalystNoteInfos { get; set; }
+        public virtual DbSet<CompanyName> CompanyNames { get; set; }
 
         public virtual DbSet<ContactInfo> ContactInfos { get; set; }
 
-        public virtual DbSet<Searchrequestfile> RequestfileInfos { get; set; }
-
-        public virtual DbSet<Searchmytask> MytaskfileInfos { get; set; }
-
-        public virtual DbSet<SearchAnalystNotes> AnalystNoteInfos { get; set; }
-
-        public virtual DbSet<SearchVideoNotes> VideoNoteInfos { get; set; }
-
-        public virtual DbSet<LocationViewitem> LocationViewitems { get; set; }
-
         public virtual DbSet<DisclosedViewitem> DisclosedViewitems { get; set; }
 
-        public virtual DbSet<Summarydisclosure> Summarydisclosures { get; set; }
-
-        public virtual DbSet<SearchPayment> PaymentInfos { get; set; }
-
-        public virtual DbSet<SearchRequestfee> RequestfeeInfos { get; set; }
-
         public virtual DbSet<SearchExtension> ExtensionInfos { get; set; }
-
+        
         public virtual DbSet<HolidayView> HolidayInfos { get; set; }
+
+        public virtual DbSet<SearchLkLocation> LkLocationInfos { get; set; }
 
         public virtual DbSet<SearchLkPaymentTypes> LkPaymentTypeInfos { get; set; }
 
-        public virtual DbSet<SearchLkSections> LkSectionInfos { get; set; }
+
+        public virtual DbSet<SearchLkCity> LkCityInfos { get; set; }
+
+        //public virtual DbSet<LkRequeststate> LkRequeststates { get; set; }
+        public virtual DbSet<SearchLkRequestState> LkRequestStateInfos { get; set; }
+        
+        public virtual DbSet<SearchLkRecordDeliveryMethod> LkRecordDeliveryMethodInfos { get; set; }
+
 
         public virtual DbSet<LkSection> LkSections { get; set; }
+
+        public virtual DbSet<SearchLkSections> LkSectionInfos { get; set; }
+        
+        public virtual DbSet<LocationViewitem> LocationViewitems { get; set; }
+
+        public virtual DbSet<Searchmytask> MytaskfileInfos { get; set; }
+
+        public virtual DbSet<SearchPayment> PaymentInfos { get; set; }
+        public virtual DbSet<PersonName> PersonNames { get; set; }
+
+        public virtual DbSet<POIName> POINames { get; set; }
+
+        public virtual DbSet<ProcessingDeficiencyView> ProcessingDeficiencyInfos { get; set; }
+
+        public virtual DbSet<SearchRequestfee> RequestfeeInfos { get; set; }
+
+        public virtual DbSet<Searchrequestfile> RequestfileInfos { get; set; }
+
+        public virtual DbSet<Summarydisclosure> Summarydisclosures { get; set; }
+
+        public virtual DbSet<SearchVideoNotes> VideoNoteInfos { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

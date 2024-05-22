@@ -33,8 +33,6 @@ namespace Gatekeeper.DataServices
 
         public async Task<LkSection> CreateLkSection(LkSection lksection)
         {
-            lksection.Status = "1";
-
             var lastRecord = await _context?.LkSections.OrderByDescending(x => x.Sortby)
                 .FirstOrDefaultAsync(x => x.Sectiontype == lksection.Sectiontype);
             
@@ -61,7 +59,7 @@ namespace Gatekeeper.DataServices
 
         public async Task DeleteLkSection(LkSection lksection)
         {
-            lksection.Status = "0"; 
+            lksection.Status = "del"; 
             _context.LkSections.Update(lksection);
             await _context.SaveChangesAsync();
         }

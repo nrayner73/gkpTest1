@@ -8,12 +8,11 @@
 @using System.Reflection;
 @using System;
 
-@inject ILkProcessingdeficiencyService searchProcessingDeficiencyService
+@inject IViewProcessingDeficiencyService searchProcessingDeficiencyService
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-@inject IAnalystsService analystService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
 @inject NavigationManager navigationManager
@@ -31,7 +30,6 @@
     private string savetype = string.Empty;
     private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
-    private string? nextId;
 
     [Parameter]
     public int fileid { get; set; }
@@ -50,11 +48,21 @@
 
     private LkProcessingdeficiency oprocessingDeficiency { get; set; } = new LkProcessingdeficiency();
 
-    private IQueryable<LkProcessingdeficiency> searchProcessingDeficiencies;
+    private List<LkProcessingdeficiency> processingDeficiencies { get; set; } = new List<LkProcessingdeficiency>();
+
+    // private Requestfile requestfile { get; set; } = new Requestfile();
+    // public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+
+
+    //Data Grid -- Blazor QuickGrid
+    private IQueryable<ProcessingDeficiencyView> searchProcessingDeficiencies;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
     string nameFilter;
+    //int minMedals;
+    //int maxMedals = 120;
 
+    //bool showpanel = true;
     bool showid = false;
     #endregion
 
@@ -66,6 +74,8 @@
         var user = authstate.User;
         var name = user.Identity.Name;
 
+        //processingDeficiencies = (await ProcessingDeficiencyService.GetLkProcessingdeficiencyList()).ToList();
+        processingDeficiencies = new List<LkProcessingdeficiency>();
         LoadData();
     }
 
@@ -74,6 +84,7 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        //analysts = (await analystService.GetAnalystsList()).ToList();
     }
 
 
@@ -82,6 +93,7 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+
             StateHasChanged();
             firstRender = false;
         }
@@ -90,11 +102,17 @@
 
     #region "Methods"
 
-    IQueryable<LkProcessingdeficiency> UnfilteredProcessingDeficiencies
+    IQueryable<ProcessingDeficiencyView> UnfilteredProcessingDeficiencies
     {
         get
         {
             var result = searchProcessingDeficiencies;
+            // if (!string.IsNullOrEmpty(nameFilter))
+            // {
+            //     result = result.Where(c => c.HolidayYear.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
+            // }
+
+
             return result;
         }
     }
@@ -102,9 +120,7 @@
 
     private  async void LoadData()
     {
-        searchProcessingDeficiencies = searchProcessingDeficiencyService.GetLkProcessingdeficiencyList().AsQueryable<LkProcessingdeficiency>();
-        nextId = (searchProcessingDeficiencies.Max(x => x.Id) + 1).ToString();
-        processingDeficiency.SortBy = nextId;
+        searchProcessingDeficiencies = searchProcessingDeficiencyService.GetProcessingDeficiencyList().AsQueryable<ProcessingDeficiencyView>();
     }
 
     protected void HandleInvalidSubmit()
@@ -122,10 +138,6 @@
 
         if (savetype == "update")
         {
-            if (String.IsNullOrWhiteSpace(processingDeficiency.SortBy))
-            {
-                processingDeficiency.SortBy = processingDeficiency.Id.ToString();
-            }
             await ProcessingDeficiencyService.UpdateLkProcessingdeficiency(processingDeficiency);
             await AuditData("Update Processing Deficiency", "update");
         }
@@ -133,11 +145,6 @@
         {
             processingDeficiency.Createdate = DateTime.Now;
             processingDeficiency.Createuser = userReg;
-
-            if (String.IsNullOrWhiteSpace(processingDeficiency.SortBy))
-            {
-                processingDeficiency.SortBy = nextId;
-            }
 
             await ProcessingDeficiencyService.CreateLkProcessingdeficiency(processingDeficiency);
             await AuditData("Create Processing Deficiency", "create");
@@ -233,19 +240,19 @@
     private void ClearData()
     {
         processingDeficiency = new LkProcessingdeficiency();
-        processingDeficiency.SortBy = nextId;
 
     }
 
     private void FillData()
     {
+
         processingDeficiency.Detail = "processingDeficiencyDescription";
         processingDeficiency.Moddate = DateTime.Now;
         processingDeficiency.Moduser = userReg;
         processingDeficiency.Createdate = DateTime.Now;
         processingDeficiency.Createuser = userReg;
         processingDeficiency.Status = "ok";
-        processingDeficiency.SortBy = nextId; 
+        processingDeficiency.SortBy = "description";
     }
     #endregion
 }
@@ -268,12 +275,6 @@
                     Description:
                 </label>
                 <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="processingDeficiency.Detail" />
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbSortBy">
-                    Order:
-                </label>
-                <InputText id="sortby" class="form-control" @bind-Value="processingDeficiency.SortBy" />
             </div>
         </div>
     </div>
@@ -318,13 +319,18 @@
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
         }
-
+@*         <PropertyColumn Property="@(c => c.HolidayYear)" Title="Year" Sortable="true" Class="filter-name">
+            <ColumnOptions>
+                <div class="search-box">
+                    <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Holiday year..." />
+                </div>
+            </ColumnOptions>
+        </PropertyColumn> *@
         
         <PropertyColumn Property="@(r => r.Detail)" Title="Description" Sortable="true" />
         <PropertyColumn Property="@(r => r.Moddate)" Title="Modified Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Moduser)" Title="Modified By" Sortable="true" />
-        <PropertyColumn Property="@(r => r.SortBy)" Title="Order" Sortable="true" />
-        @* <PropertyColumn Property="@(r => r.Status)" Title="Status" Sortable="true" /> *@
+        <PropertyColumn Property="@(r => r.Status)" Title="Status" Sortable="true" />
 
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>

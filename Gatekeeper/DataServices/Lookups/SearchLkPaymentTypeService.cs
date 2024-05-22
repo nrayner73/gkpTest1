@@ -18,6 +18,9 @@ namespace Gatekeeper.DataServices.Lookups
         {
             List<SearchLkPaymentTypes> items = new List<SearchLkPaymentTypes>();
             items = _context?.LkPaymentTypeInfos.FromSqlRaw("Execute [gkp].[GetPaymentTypes]").ToList();
+
+            items = items.Where(c => c.Status != "del").ToList();
+
             return items;
         }
     }

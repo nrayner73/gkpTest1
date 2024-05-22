@@ -88,52 +88,67 @@ builder.Services.AddDbContextFactory<LookupDbContext>(options =>
 
 builder.Services.AddBlazorBootstrap();
 
-builder.Services.AddScoped<IRequestfileService, RequestfileService>();
-builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<IAnalystnoteService, AnalystnoteService>();
-builder.Services.AddScoped<IVideonoteService, VideonoteService>();
-builder.Services.AddScoped<ISummarydisclosureService, SummarydisclosureService>();
 builder.Services.AddScoped<IDiscloseditemsService, DiscloseditemsService>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddScoped<IRequestfeeService, RequestfeeService>();
-builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
+builder.Services.AddScoped<IExtensionService, ExtensionService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
 builder.Services.AddScoped<ILocationitemsService, LocationitemsService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPersonService, PersonService>();
+builder.Services.AddScoped<IRequestfeeService, RequestfeeService>();
+builder.Services.AddScoped<IRequestfileService, RequestfileService>();
+builder.Services.AddScoped<ISummarydisclosureService, SummarydisclosureService>();
+builder.Services.AddScoped<IVideonoteService, VideonoteService>();
 
 //Lookup
 builder.Services.AddScoped<ILookupService, LookupDataService>();
 
+builder.Services.AddScoped<IAnalystService, AnalystService>();
+builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
+builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
+builder.Services.AddScoped<ILkLocationService, LkLocationService>();
+builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
+builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
+builder.Services.AddScoped<ILkRecordDeliveryMethodService, LkRecordDeliveryMethodService>();
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
-builder.Services.AddScoped<ILkRecorddeliverymethodService, LkRecorddeliverymethodService>();
 builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
-builder.Services.AddScoped<ILkSectionService, LkSectionService>();
+builder.Services.AddScoped<ILkCityService, LkCityService>();
 builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
 
-builder.Services.AddScoped<IAnalystsService, AnalystsService>();
+builder.Services.AddScoped<IAnalystService, AnalystService>();
 
 builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
 builder.Services.AddScoped<ISearchRequestfeeService, SearchRequestfeeService>();
+builder.Services.AddScoped<ILkSectionService, LkSectionService>();
 builder.Services.AddScoped<ISearchExtensionService, SearchExtensionService>();
 
 //Audit
 builder.Services.AddScoped<IAuditlogService, AuditlogService>();
 
-
 //View
-builder.Services.AddScoped<IPersonnameService, PersonnameService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
+builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
+builder.Services.AddScoped<ISearchLkCityService, SearchLkCityService>();
 
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
+builder.Services.AddScoped<IPersonnameService, PersonnameService>();
 builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>();
-builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
-builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
+builder.Services.AddScoped<ISearchLkLocationService, SearchLkLocationService>();
+builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
+builder.Services.AddScoped<ISearchLkRecordDeliveryMethodService, SearchLkRecordDeliveryMethodService>();
+builder.Services.AddScoped<ISearchLkRequestStateService, SearchLkRequestStateService>();
 builder.Services.AddScoped<ISearchLkSectionService, SearchLkSectionService>();
-
+builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
+builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
+builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
+builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
+builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
+builder.Services.AddScoped<IViewProcessingDeficiencyService, ViewProcessingDeficiencyService>();
 
 builder.Services.AddScoped<AppState>();
 builder.Services.AddScoped<LoginState>();

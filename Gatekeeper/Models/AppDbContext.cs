@@ -25,6 +25,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Holiday> Holidays { get; set; }
     public virtual DbSet<LkCity> LkCities { get; set; }
     public virtual DbSet<LkExtension> LkExtensions { get; set; }
+    
     public virtual DbSet<LkLocationsearch> LkLocationsearchs { get; set; }
     public virtual DbSet<LkMytaskstatus> LkMytaskstatuses { get; set; }
     public virtual DbSet<LkPage> LkPages { get; set; }
@@ -34,10 +35,13 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<LkReason> LkReasons { get; set; }
     public virtual DbSet<LkReasongroup> LkReasongroups { get; set; }
     public virtual DbSet<LkRecorddeliverymethod> LkRecorddeliverymethods { get; set; }
+
+    public virtual DbSet<LkReviewtype> LkReviewtypes { get; set; }
     public virtual DbSet<LkRequeststate> LkRequeststates { get; set; }
     public virtual DbSet<LkRequesttype> LkRequesttypes { get; set; }
-    public virtual DbSet<LkReviewtype> LkReviewtypes { get; set; }
+
     public virtual DbSet<LkSection> LkSections { get; set; }
+
     public virtual DbSet<Locationitem> Locationitems { get; set; }
     public virtual DbSet<Mytask> Mytasks { get; set; }
     public virtual DbSet<Oipc> Oipcs { get; set; }

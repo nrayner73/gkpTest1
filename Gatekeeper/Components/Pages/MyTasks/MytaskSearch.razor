@@ -271,7 +271,7 @@
 
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <label>
-                        Person Of Request:
+                        Subject Of Request:
                     </label>
                     <div class="input-group ">
                         <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIpersonName" @bind-Value="POIselectedpersonname">
@@ -319,7 +319,7 @@
 
                 <div class="col-lg-4 col-md-3 col-sm-12">
                     <label>
-                        Intake Notes:
+                        Status Update:
                     </label>
                     <InputText id="intakenotes" class="form-control" @bind-Value="fileInfo.Intakenotes" />
                 </div>
@@ -383,7 +383,7 @@
         <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requesttype)" Title="Request Type" Sortable="true" />
         <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" class="col-width" />
-        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Person Of Request" Sortable="true" />
+        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
         <TemplateColumn Title="Status">
             @if (@context.Taskstatus == "overdue")

@@ -361,6 +361,8 @@
 
 </div>
 
+@* Display number of items at the top, instead of bottom *@
+<Paginator State="@pagination" />
 
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchmytaskfiles" Virtualize="true" Pagination="@pagination">
@@ -400,4 +402,4 @@
     </QuickGrid>
 </div>
 
-<Paginator State="@pagination" />
+

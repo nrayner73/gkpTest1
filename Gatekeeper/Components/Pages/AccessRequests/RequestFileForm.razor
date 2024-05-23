@@ -514,7 +514,8 @@
                 </label>
                 
                 <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestFile.Requeststate">
-                    <option value="-1">Select...</option>
+                    @* make request state default to Active *@
+                    <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)
                     {
                         <option value="@lktype.Id">@lktype.Detail</option>

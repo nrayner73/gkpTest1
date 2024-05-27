@@ -255,8 +255,12 @@
 
                 await personService.UpdatePerson(person);
                 await AuditData("update Person","update person");
+<<<<<<< a582b9606c9763e735c46ea3253ec02a28ac4ae2
                 await Task.Delay(1000);
                 await UpdateFileNumber(requestfile.Id);
+=======
+                UpdateFileNumber(requestfile.Id);
+>>>>>>> 914824af089b2133760c9079c31f9c17e1d438a0
 
                 SuccessMessage = "Data updated successfully";
             }
@@ -307,9 +311,8 @@
             await InvokeAsync(() => StateHasChanged());
             await Task.Delay(1000);
             alertMessageShow = false;
+            navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
         }
-
-        navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
     }
 
     private async Task UpdateFileNumber(int fileid)

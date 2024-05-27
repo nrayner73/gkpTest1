@@ -77,7 +77,6 @@ namespace Gatekeeper.Models.Lookups
             modelBuilder.Entity<SearchRequestfee>().HasNoKey();
             modelBuilder.Entity<SearchExtension>().HasNoKey();
             modelBuilder.Entity<HolidayView>().HasNoKey();
-            modelBuilder.Entity<ProcessingDeficiencyView>().HasNoKey();
             modelBuilder.Entity<LkSection>().HasNoKey();
          
 

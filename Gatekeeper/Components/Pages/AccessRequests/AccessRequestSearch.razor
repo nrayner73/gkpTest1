@@ -354,16 +354,14 @@
         {
             <PropertyColumn Property="@(r => r.Fileyear)" Title="Year" Sortable="true" />
         }
-        <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
         <PropertyColumn Property="@(r => r.Filenumber)" Title="File Number" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Referencenumber)" Title="Reference Number" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Intakenotes)" Title="Status Update" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requesttype)" Title="Request Type" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
         <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" />
         <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
+        
         <TemplateColumn Title="Actions">
             <a @onclick="()=>goToAddPage(context.Id)"  class="btn btn-outline-primary">
                 <i class="fas fa-edit">Edit</i>

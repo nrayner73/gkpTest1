@@ -13,14 +13,11 @@
 
 @inject IConfiguration Configuration
 @inject IDbContextFactory<AppDbContext> DbFactory
-
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @inject ISearchLkRecordDeliveryMethodService searchlkrecorddeliverymethodservice
-@inject ILkSectionService lkSectionService
-
 @inject IAuditlogService auditlogService
 
 @inject NavigationManager navigationManager
@@ -62,7 +59,6 @@
     #endregion
 
     #region "Component Lifecycle"
-
 
     protected async override Task OnInitializedAsync()
     {
@@ -119,32 +115,7 @@
         searchlkrecorddeliverymethods = searchlkrecorddeliverymethodservice.GetLkRecordDeliveryMethodList().AsQueryable<SearchLkRecordDeliveryMethod>();
         StateHasChanged();
     }
-
-    private async Task AuditData(string act, string type)
-    {
-        auditlog = new AuditLog();
-
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-
-        if (type == "update" || type == "delete")
-        {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(olkrecorddeliverymethod, lkrecorddeliverymethod, act).ToString();
-        }
-
-        await auditlogService.CreateAuditlog(auditlog);
-    }
-
-    protected void HandleInvalidSubmit()
-    {
-        StatusClass = "alert-danger";
-        Message = "There are some validation errors. Please try again.";
-    }
-
+        
     protected async Task HandleValidSubmit()
     {
         Saved = false;
@@ -154,29 +125,29 @@
 
         if (savetype == "update")
         {
-            await lkrecorddeliverymethodservice.UpdateLkRecorddeliverymethod(lkrecorddeliverymethod);
-            await AuditData("Update Record Delivery Method", "update");
+           await lkrecorddeliverymethodservice.UpdateLkRecorddeliverymethod(lkrecorddeliverymethod);
+           await AuditData("Update Record Delivery Method", "update");
         }
         else
         {
-            lkrecorddeliverymethod.Createdate = DateTime.Now;
-            lkrecorddeliverymethod.Createuser = userReg;
-            await lkrecorddeliverymethodservice.CreateLkRecorddeliverymethod(lkrecorddeliverymethod);
-            await AuditData("Create Record Delivery Method", "create");
+           lkrecorddeliverymethod.Createdate = DateTime.Now;
+           lkrecorddeliverymethod.Createuser = userReg;
+           await lkrecorddeliverymethodservice.CreateLkRecorddeliverymethod(lkrecorddeliverymethod);
+           await AuditData("Create Record Delivery Method", "create");
         }
 
-        StatusClass = "alert-success";
-        Message = "Data updated successfully";
-        alertMessageShow = true;
-        await InvokeAsync(() => StateHasChanged());
-        await Task.Delay(1000);
+         StatusClass = "alert-success";
+         Message = "Data updated successfully";
+         alertMessageShow = true;
+         await InvokeAsync(() => StateHasChanged());
+         await Task.Delay(1000);
 
-        alertMessageShow = false;
-        Saved = true;
-        navigationManager.NavigateTo($"/lkrecorddeliverymethod/add", true);
-        LoadData();
-        lkrecorddeliverymethod = new LkRecorddeliverymethod();
-        StateHasChanged();
+         alertMessageShow = false;
+         Saved = true;
+         navigationManager.NavigateTo($"/lkrecorddeliverymethod/add", true);
+         LoadData();
+         lkrecorddeliverymethod = new LkRecorddeliverymethod();
+         StateHasChanged();
     }
 
     private async void UpdateData(int id)
@@ -191,14 +162,12 @@
                 {
                     lkrecorddeliverymethod = context.LkRecorddeliverymethods.Where(x => x.Id == id).FirstOrDefault();
                     olkrecorddeliverymethod = (LkRecorddeliverymethod)context.Entry(lkrecorddeliverymethod).GetDatabaseValues().ToObject();
-
                     StateHasChanged();
                 }
             }
         }
     }
-
-
+    
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
     {
@@ -230,6 +199,30 @@
 
     }
 
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olkrecorddeliverymethod, lkrecorddeliverymethod, act).ToString();
+        }
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+    
+    protected void HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "Data update failed: please provide Record Delivery Method";
+        alertMessageShow = true;
+    }
+
     private void ClearData()
     {
         lkrecorddeliverymethod = new LkRecorddeliverymethod();
@@ -248,7 +241,7 @@
 
 <EditForm Model="@lkrecorddeliverymethod" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <ValidationSummary/>
     <div class="container-fluid">
         <div class="container-fluid">
             <div class="row">
@@ -293,6 +286,8 @@
 
 <ConfirmDialog @ref="dialog" />
 
+<Paginator State="@pagination" />
+
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchlkrecorddeliverymethods" Virtualize="true" Pagination="@pagination">
         @if (showid)
@@ -308,4 +303,3 @@
     </QuickGrid>
 </div>
 
-<Paginator State="@pagination" />

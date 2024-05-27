@@ -1,3 +1,4 @@
+using Azure;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,6 +14,7 @@ public partial class LkRecorddeliverymethod
  [Key]
 public int Id{ get; set; }
 [Column(TypeName = "varchar(255)")]
+[Required(ErrorMessage = " ")]
 public string? Detail{ get; set; }
 public DateTime? Createdate{ get; set; }
 [Column(TypeName = "varchar(45)")]

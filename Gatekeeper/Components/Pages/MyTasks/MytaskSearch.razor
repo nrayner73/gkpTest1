@@ -17,8 +17,6 @@
 @inject LoginState loginState;
 @inject AppState appState;
 
-
-
 @page "/mytasks/search"
 
 
@@ -41,16 +39,16 @@
 
     #region Lookup Parameters
 
-    public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
     public List<LkRequeststate>? requeststates { get; set; } = new List<LkRequeststate>();
-    public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
-    private POIName POIselectedpersonname;
-    private POIName POIpersonname { get; set; } = new POIName();
     public List<PersonName>? personnames { get; set; } = new List<PersonName>();
     private PersonName selectedpersonname;
     private PersonName personname { get; set; } = new PersonName();
+    public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
+    private POIName POIselectedpersonname;
+    private POIName POIpersonname { get; set; } = new POIName();
+
+    public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
     #endregion
 
     #endregion
@@ -67,10 +65,9 @@
             userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
             using var context = DbFactory.CreateDbContext();
             fileInfo.Regno = userReg;
-            requesttypes = await context.LkRequesttypes.ToListAsync();
-            requeststates = await context.LkRequeststates.ToListAsync();
+            requesttypes = await context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
+            requeststates = await context.LkRequeststates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
             // Requestfiles = await context.Requestfiles.ToListAsync();
-            analysts = await context.Analysts.ToListAsync();
             LoadData();
         }
     }
@@ -364,6 +361,8 @@
 
 </div>
 
+@* Display number of items at the top, instead of bottom *@
+<Paginator State="@pagination" />
 
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchmytaskfiles" Virtualize="true" Pagination="@pagination">
@@ -377,15 +376,15 @@
             <PropertyColumn Property="@(r => r.Fileyear)" Title="Year" Sortable="true" />
         }
 
-        
         <PropertyColumn Property="@(r => r.Filenumber)" Title="File Number" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requesttype)" Title="Request Type" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" class="col-width" />
-        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
-        <TemplateColumn Title="Status">
+        <PropertyColumn Property="@(r => r.Intakenotes)" Title="Status Update" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" />
+        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
+        
+        @* <TemplateColumn Title="Status">
             @if (@context.Taskstatus == "overdue")
             {
                 <div class="flag">@context.Taskstatus </div>
@@ -394,7 +393,7 @@
             {
                 <div class="flagblue">@context.Taskstatus </div>
             }
-        </TemplateColumn>
+        </TemplateColumn> *@
         <TemplateColumn Title="Actions">
             <a @onclick="()=>goToAddPage(context.Id)"  class="btn btn-outline-primary">
                 <i class="fas fa-edit">Edit</i>
@@ -403,4 +402,4 @@
     </QuickGrid>
 </div>
 
-<Paginator State="@pagination" />
+

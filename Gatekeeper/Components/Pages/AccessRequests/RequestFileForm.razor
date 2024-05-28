@@ -1,41 +1,56 @@
-﻿
+﻿@rendermode InteractiveServer
+
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
+@inject IAddressService addressService
 
 
 @code {
-
-
     [Parameter]
     public EventCallback OnCancel { get; set; }
     [Parameter]
     public EventCallback<bool> OnSubmit { get; set; }
     [Parameter]
-    public Person person { get; set; }
-    [Parameter]
     public Requestfile requestFile { get; set; }
+    [Parameter]
+    public Person person { get; set; }
 
     #region Lookup parameters
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkRequesttype>? requestTypes { get; set; } = new List<LkRequesttype>();
-    public List<LkRequeststate>? requestStates { get; set; } = new List<LkRequeststate>();
     public List<LkProcessingdeficiency>? processingDeficiencies { get; set; } = new List<LkProcessingdeficiency>();
     public List<LkRecorddeliverymethod> recordDeliveryMethods { get; set; } = new List<LkRecorddeliverymethod>();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
+    public List<LkRequeststate>? requestStates { get; set; } = new List<LkRequeststate>();
+
     public List<Holiday>? holidays { get; set; } = new List<Holiday>();
     public List<Holiday>? thisYearHolidays { get; set; } = new List<Holiday>();
-
-    public List<POIName>? POIPersonNames { get; set; } = new List<POIName>();
-    private POIName POISelectedPersonName;
-    private POIName POIPersonName { get; set; } = new POIName();
 
     string? requestTypeDetail { get; set; } = null;
     string? processingDeficiencyDetail { get; set; } = null;
     string? recordDeliveryMethodDetail { get; set; } = null;
     string? analystAssignedName { get; set; } = null;
     string? requestStateDetail { get; set; } = null;
-
     #endregion
 
+    #region TypeAhead Parameters
+    public List<POIName>? POIPersonNames { get; set; } = new List<POIName>();
+    private POIName POISelectedPersonName;
+    private POIName POIPersonName { get; set; } = new POIName();
+
+    public List<CompanyName>? companynames { get; set; } = new List<CompanyName>();
+    private CompanyName selectedcompanyname;
+    private CompanyName companyname { get; set; } = new CompanyName();
+
+    public List<PersonName>? personnames { get; set; } = new List<PersonName>();
+    private PersonName selectedpersonname;
+    private PersonName personname { get; set; } = new PersonName();
+
+    public List<AddressInfo>? addresses { get; set; } = new List<AddressInfo>();
+    private AddressInfo selectedaddress;
+    private AddressInfo address { get; set; } = new AddressInfo();
+    #endregion
+
+    #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
         GetData(); 
@@ -49,42 +64,36 @@
             int? requestTypeID = requestFile.Requesttypeid ?? null;
             if (requestTypeID.HasValue)
             {
-                requestTypes = context.LkRequesttypes.ToList();
-                LkRequesttype requestType = requestTypes.Where(x => x.Id == requestTypeID).FirstOrDefault();
+                LkRequesttype requestType = context.LkRequesttypes.Where(x => x.Id == requestTypeID).FirstOrDefault();
                 requestTypeDetail = requestType.Detail;
             }
 
             int? processingDeficiencyID = requestFile.Processingdeficiency ?? null;
             if (processingDeficiencyID.HasValue)
             {
-                processingDeficiencies = context.LkProcessingdeficiencies.ToList();
-                LkProcessingdeficiency processingDeficiency = processingDeficiencies.Where(x => x.Id == processingDeficiencyID).FirstOrDefault();
+                LkProcessingdeficiency processingDeficiency = context.LkProcessingdeficiencies.Where(x => x.Id == processingDeficiencyID).FirstOrDefault();
                 processingDeficiencyDetail = processingDeficiency.Detail;
             }
 
             int? recordDeliveryMethodID = requestFile.Recorddeliverymethodid ?? null;
             if (recordDeliveryMethodID.HasValue)
             {
-                recordDeliveryMethods = context.LkRecorddeliverymethods.ToList(); 
-                LkRecorddeliverymethod recordDeliveryMethod = recordDeliveryMethods.Where(x => x.Id == recordDeliveryMethodID).FirstOrDefault();
+                LkRecorddeliverymethod recordDeliveryMethod = context.LkRecorddeliverymethods.Where(x => x.Id == recordDeliveryMethodID).FirstOrDefault();
                 recordDeliveryMethodDetail = recordDeliveryMethod.Detail;
             }
 
             int? analystAssignedID = requestFile.Analystassignedid ?? null;
             if (analystAssignedID.HasValue)
             {
-                analysts = context.Analysts.ToList(); 
-                Analyst analystAssigned = analysts.Where(x => x.Id == analystAssignedID).FirstOrDefault();
+                Analyst analystAssigned = context.Analysts.Where(x => x.Id == analystAssignedID).FirstOrDefault();
                 analystAssignedName = analystAssigned.Displayname;
             }
 
             int? requestStateID = requestFile.Requeststate ?? null;
             if (requestStateID.HasValue)
             {
-                requestStates = context.LkRequeststates.ToList(); 
-                LkRequeststate requestState = requestStates.Where(x => x.Id == requestStateID).FirstOrDefault();
+                LkRequeststate requestState = context.LkRequeststates.Where(x => x.Id == requestStateID).FirstOrDefault();
                 requestStateDetail = requestState.Detail;
-                
             }
         }
     }
@@ -93,38 +102,46 @@
     {
         using (var context = DbFactory.CreateDbContext())
         {
-            requestTypes =  context.LkRequesttypes.ToList();
-            requestTypes = requestTypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+            requestTypes = context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+            processingDeficiencies = context.LkProcessingdeficiencies.Where(x => x.Status != "del").OrderBy(x => x.SortBy).ToList();
 
-            processingDeficiencies = context.LkProcessingdeficiencies.ToList();
-            processingDeficiencies = processingDeficiencies.Where(x => x.Status != "del").OrderBy(x => x.SortBy).ToList();
-
-            recordDeliveryMethods =  context.LkRecorddeliverymethods.ToList();
-            recordDeliveryMethods = recordDeliveryMethods.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
-
-            analysts = context.Analysts.ToList();
-            analysts = analysts.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
-
-            requestStates = context.LkRequeststates.ToList();
-            requestStates = requestStates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
-
-            holidays =  context.Holidays.ToList();
             POIPersonNames = personNameService.GetPOINames();
+            companynames = personNameService.GetCompanyNames();
+            personnames = personNameService.GetNames();
+            addresses = addressService.GetAddress();
+
+            recordDeliveryMethods = context.LkRecorddeliverymethods.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+            analysts = context.Analysts.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+            requestStates = context.LkRequeststates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+            holidays = context.Holidays.Where(x => x.Status != "del").ToList();
         }
     }
+    #endregion
 
-
+    #region TypeAhead function
     private async Task<IEnumerable<POIName>> SearchPOIPersonName(string searchText)
     {
-        //filter data for Blazor Type Ahead
         return await Task.FromResult(POIPersonNames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
     }
 
-    
+    private async Task<IEnumerable<CompanyName>> SearchCompanyName(string searchText)
+    {
+        return await Task.FromResult(companynames.Where(x => (x.companyname).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<PersonName>> SearchPersonName(string searchText)
+    {
+        return await Task.FromResult(personnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private async Task<IEnumerable<AddressInfo>> SearchAddress(string searchText)
+    {
+        return await Task.FromResult(addresses.Where(x => (x.Street + x.City + x.Country + x.Province + x.Postalcode).ToLower().Contains(searchText.ToLower())));
+    }
+    #endregion
 
     public async Task setDuedate()
     {
-        // var dt = e.Value;
         await Task.Delay(500);
 
         if (requestFile.Receivedate != null)
@@ -137,7 +154,7 @@
 
             dueDate = ((DateTime)requestFile.Receivedate).AddDays(30);
 
-            for (int i = 1; i < 11; i++)
+            for (int i = 0; i < 11; i++)
             {
                 setDate = dueDate.AddDays(i);
                 if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
@@ -288,6 +305,168 @@
             </div>
         </div>
 
+        @* Requester Company info *@
+        <hr />
+        <div class="row">
+            <div class="col-lg-6 col-md-3 col-sm-12">
+                <div class="input-group ">
+                    <label style="font-weight:bold;color:blue;">Search Company Name:</label>
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" @bind-Value="selectedcompanyname">
+                        <SelectedTemplate Context="companyname">@companyname.companyname. </SelectedTemplate>
+                        <ResultTemplate Context="companyname">@companyname.companyname.</ResultTemplate>
+                    </BlazoredTypeahead>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-3 col-sm-12">
+                <div class="input-group ">
+                    <label style="font-weight:bold;color:blue;">Search Request Name:</label>
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
+                        <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
+                        <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
+                    </BlazoredTypeahead>
+                </div>
+            </div>
+        </div>
+
+        @if (selectedcompanyname != null)
+        {
+            person.Companyname = selectedcompanyname.companyname;
+            selectedcompanyname = null;
+        }
+
+        @if (selectedpersonname != null)
+        {
+            person.Firstname = selectedpersonname.firstname;
+            person.Lastname = selectedpersonname.lastname;
+            person.Middlename = selectedpersonname.middlename;
+            selectedpersonname = null;
+
+        }
+
+        <div class="row">
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label>
+                    Company:
+                </label>
+                <InputText id="companyname" class="form-control" @bind-Value="person.Companyname" />
+            </div>
+        
+
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label>First Name:</label>
+                <InputText id="firstname" class="form-control" @bind-Value="person.Firstname" />
+                <ValidationMessage For="@(() => person.Firstname)" />
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label>Middle Name:</label>
+                <InputText id="middlename" class="form-control" @bind-Value="person.Middlename" />
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label>Last Name:</label>
+                <InputText id="lastname" class="form-control" @bind-Value="person.Lastname" />
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label>Birth Date:</label>
+                <InputDate id="birthdate" class="form-control" placeholder="BIRTH DATE" @bind-Value="person.Birthdate" />
+            </div>
+    
+        </div>
+
+        @* Requester Address *@
+        <hr />
+        <div class="row">
+            <div class="col-lg-6 col-md-3 col-sm-12">
+                <div class="input-group ">
+                    <label style="font-weight:bold;color:blue;">Search Address:</label>
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" @bind-Value="selectedaddress">
+                        <SelectedTemplate Context="address">@address.Street @address.City @address.Province @address.City @address.Postalcode</SelectedTemplate>
+                        <ResultTemplate Context="address">@address.Street @address.City @address.Province @address.City @address.Postalcode</ResultTemplate>
+                    </BlazoredTypeahead>
+                </div>
+            </div>
+        </div>
+
+        @if (selectedaddress != null)
+        {
+            person.Street = selectedaddress.Street;
+            person.City = selectedaddress.City;
+            person.Province = selectedaddress.Province;
+            person.Country = selectedaddress.Country;
+            person.Postalcode = selectedaddress.Postalcode;
+
+            selectedaddress = null;
+        }
+
+        <div class="row">
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label>
+                    Street:
+                </label>
+                <InputText id="street" class="form-control" @bind-Value="person.Street" />
+                <ValidationMessage For="@(() => person.Street)" />
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label>
+                    City:
+                </label>
+                <InputText id="city" class="form-control" @bind-Value="person.City" />
+                <ValidationMessage For="@(() => person.City)" />
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label>
+                    Province:
+                </label>
+                <InputText id="province" class="form-control" @bind-Value="person.Province" />
+                <ValidationMessage For="@(() => person.Province)" />
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label>
+                    Country:
+                </label>
+                <InputText id="country" class="form-control" @bind-Value="person.Country" />
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label>
+                    Postal Code:
+                </label>
+                <InputText id="postalcode" class="form-control" @bind-Value="person.Postalcode" />
+            </div>
+        </div>
+
+        @* Requester Contact *@
+        <hr />
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <span class="required">*</span>
+                <label>Daytime Phone:</label>
+                <InputText id="daytimephone" class="form-control" @bind-Value="person.Daytimephone" />
+                <ValidationMessage For="@(() => person.Daytimephone)" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label>Alternate Phone:</label>
+                <InputText id="alternatephone" class="form-control" @bind-Value="person.Alternatephone" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label style="font-weight:200">Fax Phone:</label>
+                <InputText id="faxphone" class="form-control" @bind-Value="person.Faxphone" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label style="font-weight:200">Email:</label>
+                <InputText id="email" class="form-control" @bind-Value="person.Email" />
+            </div>
+
+        </div>
+
         <hr />
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
@@ -335,7 +514,8 @@
                 </label>
                 
                 <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestFile.Requeststate">
-                    <option value="-1">Select...</option>
+                    @* make request state default to Active *@
+                    <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)
                     {
                         <option value="@lktype.Id">@lktype.Detail</option>

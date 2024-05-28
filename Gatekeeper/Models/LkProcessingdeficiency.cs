@@ -23,7 +23,7 @@ public DateTime? Moddate { get; set; }
 [Column(TypeName = "varchar(45)")]
 public string? Moduser { get; set; }
 [Column(TypeName = "varchar(45)")]
-public string? SortBy { get; set; }
+public int? SortBy { get; set; }
 
 
 

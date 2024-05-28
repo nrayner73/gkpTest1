@@ -8,7 +8,7 @@
 @using System.Reflection;
 @using System;
 
-@inject IViewProcessingDeficiencyService searchProcessingDeficiencyService
+@inject ILkProcessingdeficiencyService searchProcessingDeficiencyService
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -30,6 +30,7 @@
     private string savetype = string.Empty;
     private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
+    private int nextId;
 
     [Parameter]
     public int fileid { get; set; }
@@ -55,7 +56,7 @@
 
 
     //Data Grid -- Blazor QuickGrid
-    private IQueryable<ProcessingDeficiencyView> searchProcessingDeficiencies;
+    private IQueryable<LkProcessingdeficiency> searchProcessingDeficiencies;
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
     string nameFilter;
@@ -102,17 +103,11 @@
 
     #region "Methods"
 
-    IQueryable<ProcessingDeficiencyView> UnfilteredProcessingDeficiencies
+    IQueryable<LkProcessingdeficiency> UnfilteredProcessingDeficiencies
     {
         get
         {
             var result = searchProcessingDeficiencies;
-            // if (!string.IsNullOrEmpty(nameFilter))
-            // {
-            //     result = result.Where(c => c.HolidayYear.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
-            // }
-
-
             return result;
         }
     }
@@ -120,7 +115,17 @@
 
     private  async void LoadData()
     {
-        searchProcessingDeficiencies = searchProcessingDeficiencyService.GetProcessingDeficiencyList().AsQueryable<ProcessingDeficiencyView>();
+        // searchProcessingDeficiencies = searchProcessingDeficiencyService.GetProcessingDeficiencyList().AsQueryable<ProcessingDeficiencyView>();
+        searchProcessingDeficiencies = searchProcessingDeficiencyService.GetLkProcessingdeficiencyList().AsQueryable<LkProcessingdeficiency>();
+        if (searchProcessingDeficiencies.Any())
+        {
+            nextId = (searchProcessingDeficiencies.Max(x => x.Id) + 1);
+        }
+        else
+        {
+            nextId = 1;
+        }
+        processingDeficiency.SortBy = nextId;
     }
 
     protected void HandleInvalidSubmit()
@@ -138,6 +143,10 @@
 
         if (savetype == "update")
         {
+            if (processingDeficiency.SortBy == null)
+            {
+                processingDeficiency.SortBy = processingDeficiency.Id;
+            }
             await ProcessingDeficiencyService.UpdateLkProcessingdeficiency(processingDeficiency);
             await AuditData("Update Processing Deficiency", "update");
         }
@@ -145,6 +154,10 @@
         {
             processingDeficiency.Createdate = DateTime.Now;
             processingDeficiency.Createuser = userReg;
+            if (processingDeficiency.SortBy == null)
+            {
+                processingDeficiency.SortBy = nextId;
+            }
 
             await ProcessingDeficiencyService.CreateLkProcessingdeficiency(processingDeficiency);
             await AuditData("Create Processing Deficiency", "create");
@@ -252,7 +265,7 @@
         processingDeficiency.Createdate = DateTime.Now;
         processingDeficiency.Createuser = userReg;
         processingDeficiency.Status = "ok";
-        processingDeficiency.SortBy = "description";
+        processingDeficiency.SortBy = nextId;
     }
     #endregion
 }
@@ -275,6 +288,12 @@
                     Description:
                 </label>
                 <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="processingDeficiency.Detail" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbSortBy">
+                    Order:
+                </label>
+                <InputNumber id="sortby" class="form-control" @bind-Value="processingDeficiency.SortBy" />
             </div>
         </div>
     </div>
@@ -319,18 +338,10 @@
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
         }
-@*         <PropertyColumn Property="@(c => c.HolidayYear)" Title="Year" Sortable="true" Class="filter-name">
-            <ColumnOptions>
-                <div class="search-box">
-                    <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Holiday year..." />
-                </div>
-            </ColumnOptions>
-        </PropertyColumn> *@
-        
         <PropertyColumn Property="@(r => r.Detail)" Title="Description" Sortable="true" />
         <PropertyColumn Property="@(r => r.Moddate)" Title="Modified Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Moduser)" Title="Modified By" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Status)" Title="Status" Sortable="true" />
+        <PropertyColumn Property="@(r => r.SortBy)" Title="Order" Sortable="true" />
 
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>

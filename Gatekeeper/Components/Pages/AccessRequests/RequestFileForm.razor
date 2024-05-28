@@ -202,11 +202,11 @@
                 <ValidationMessage For="@(() => requestFile.Requestdate)" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbreceivedate">
+                <span class="required">*</span> <label for="lbreceivedate">
                     Received Date:
                 </label>
                 <InputDate id="receivedate" class="form-control" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="requestFile.Receivedate" @bind-Value:after="setDuedate" />
-                
+                <ValidationMessage For="@(() => requestFile.Requestdate)" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrequestduedate">

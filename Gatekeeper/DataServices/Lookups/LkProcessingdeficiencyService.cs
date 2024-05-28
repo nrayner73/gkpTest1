@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces.Lookups;
+using Gatekeeper.Models.Lookups;
 
 namespace Gatekeeper.DataServices.Lookups
 {
@@ -15,10 +16,14 @@ namespace Gatekeeper.DataServices.Lookups
             _context = context;
         }
 
-        public async Task<IEnumerable<LkProcessingdeficiency>> GetLkProcessingdeficiencyList()
+        public List<LkProcessingdeficiency> GetLkProcessingdeficiencyList()
         {
-            return await _context.LkProcessingdeficiencies
-                    .ToListAsync();
+            List<LkProcessingdeficiency> items = new List<LkProcessingdeficiency>();
+            items = _context?.LkProcessingdeficiencies.ToList();
+
+            items = items.Where(c => c.Status != "del").OrderBy(x => x.SortBy).ToList();
+
+            return items;
         }
 
         public async Task<LkProcessingdeficiency> GetLkProcessingdeficiencyById(int id)

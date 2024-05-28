@@ -48,8 +48,6 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<POIName> POINames { get; set; }
 
-        public virtual DbSet<ProcessingDeficiencyView> ProcessingDeficiencyInfos { get; set; }
-
         public virtual DbSet<SearchRequestfee> RequestfeeInfos { get; set; }
 
         public virtual DbSet<Searchrequestfile> RequestfileInfos { get; set; }

@@ -148,7 +148,6 @@ builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
-builder.Services.AddScoped<IViewProcessingDeficiencyService, ViewProcessingDeficiencyService>();
 
 builder.Services.AddScoped<AppState>();
 builder.Services.AddScoped<LoginState>();

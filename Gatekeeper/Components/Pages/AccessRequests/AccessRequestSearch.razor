@@ -3,7 +3,6 @@
 @using System.Text
 @using Microsoft.AspNetCore.Components.QuickGrid
 
-
 @inject ISearchrequestfileService searchfileService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager navigationManager
@@ -30,7 +29,7 @@
 
     private IQueryable<Searchrequestfile> searchrequestfiles;
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
-
+    
     QuickGrid<Searchrequestfile>? grid;
     bool showpanel = false;
     bool showyear = false;
@@ -295,7 +294,7 @@
 
                 <div class="col-lg-4 col-md-3 col-sm-12">
                     <label>
-                        Status Update:
+                        Intake Notes:
                     </label>
                     <InputText id="intakenotes" class="form-control" @bind-Value="fileInfo.Intakenotes" />
                 </div>
@@ -341,8 +340,8 @@
 
 </div>
 
-@* Display number of items at the top, instead of bottom *@
 <Paginator State="@pagination" />
+
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchrequestfiles" Virtualize="true" Pagination="@pagination">
         @if (showid)

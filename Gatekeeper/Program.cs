@@ -130,6 +130,7 @@ builder.Services.AddScoped<IAuditlogService, AuditlogService>();
 //View
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IDateService, DateService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
 builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
 builder.Services.AddScoped<ISearchLkCityService, SearchLkCityService>();

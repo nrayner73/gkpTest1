@@ -15,6 +15,7 @@
 
 @inject IAuditlogService auditlogService
 @inject IJSRuntime JSRuntime
+@inject IDateService dateService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject LoginState loginState;
 @inject AppState appState;
@@ -56,7 +57,7 @@
 
     private bool alertMessageShow = false;
     private string? SuccessMessage { get; set; }
-    
+
     public List<LkRequesttype>? requestTypes { get; set; } = new List<LkRequesttype>();
 
     private string thisMachine = string.Empty;
@@ -216,7 +217,8 @@
 
         requestfile.Requestdate = DateTime.Today.Date;
         requestfile.Receivedate = DateTime.Today.Date;
-        setDuedate();
+        //setDuedate();
+        requestfile.Requestduedate = ((DateTime)requestfile.Receivedate).AddDays(30);
         requestfile.Referencenumber = "RF";
         requestfile.Idviewed = 0;
         requestfile.Requesttypeid = 1;
@@ -393,6 +395,11 @@
                 AlertText1.Add("- Request Date");
             }
 
+            if (requestfile.Receivedate == null)
+            {
+                AlertText1.Add("- Receive Date");
+            }
+
             if (requestfile.Idviewed == null || requestfile.Idviewed < 0)
             {
                 AlertText1.Add("- ID Viewed");
@@ -480,47 +487,6 @@
         }
     }
 
-    public void setDuedate()
-    {
-        if (requestfile.Receivedate != null)
-        {
-            List<DateTime> dateRange1 = new List<DateTime>();
-            List<DateTime> dateRange2 = new List<DateTime>();
-
-            DateTime dueDate = (DateTime)requestfile.Receivedate;
-            DateTime setDate;
-
-            dueDate = ((DateTime)requestfile.Receivedate).AddDays(30);
-
-            for (int i = 1; i < 11; i++)
-            {
-                setDate = dueDate.AddDays(i);
-                if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
-                {
-                    dateRange1.Add(setDate);
-                    dateRange2.Add(setDate);
-                }
-            }
-
-            //Remove holidays
-            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == DateTime.Today.Year && x.Holidayname != null);
-
-            foreach (var item in thisYearHolidays)
-            {
-                foreach (var dt in dateRange1)
-                {
-                    int y = dateRange1.IndexOf(dt);
-                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
-                    {
-                        dateRange2.RemoveAt(y);
-                    }
-                }
-            }
-
-            requestfile.Requestduedate = dateRange2.FirstOrDefault();
-        }
-    }
-
     #region Tab menu
     private bool tab1 = true;
     private bool tab2 = true;
@@ -559,15 +525,6 @@
     #endregion
 }
 
-
-<h5>Access Request : @thisMachine</h5>
-
-<nav>
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <button class="@(tab1?"nav-link active":"nav-link")" @onclick="x=>DisplayTab(1)">File Detail</button>
-    </div>
-</nav>
-
 <EditForm Model="requestfile" OnValidSubmit="@ValidSubmit">
 
     @if (alertMessageShow)
@@ -602,27 +559,10 @@
     {
         <br />
         <div class="tabcontent">
-            
             <RequestFileForm requestfile="@requestfile" person="@person" />
         </div>
     }
-
-    @if (tab2)
-    {
-        <br />
-        <div class="tabcontent">
-            <PersonRequestForm person="@person" />..
-        </div>
-    }
-
-    @if (tab3)
-    {
-        <br />
-        <div class="tabcontent">
-            Three
-        </div>
-    }
-    <br />
+    
     @if (tester)
     {
         <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>

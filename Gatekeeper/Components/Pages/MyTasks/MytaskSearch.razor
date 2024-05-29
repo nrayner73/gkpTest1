@@ -29,7 +29,7 @@
     private Searchmytask fileInfo { get; set; } = new Searchmytask();
 
     private IQueryable<Searchmytask> searchmytaskfiles;
-    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
     // QuickGrid<Searchmytask>? grid1;
     bool showpanel = false;
@@ -316,7 +316,7 @@
 
                 <div class="col-lg-4 col-md-3 col-sm-12">
                     <label>
-                        Status Update:
+                        Intake Notes:
                     </label>
                     <InputText id="intakenotes" class="form-control" @bind-Value="fileInfo.Intakenotes" />
                 </div>

@@ -72,7 +72,7 @@
     [Inject]
     private IRequestfileService requestFileService { get; set; }
     private List<SearchRequestfee> searchrequestfees = new List<SearchRequestfee>();
-    private List<SearchPayment> searchpayments = new List<SearchPayment>();
+    // private List<SearchPayment> searchpayments = new List<SearchPayment>();
     private Searchrequestfile searchrequestfile { get; set; } = new Searchrequestfile();
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
@@ -153,7 +153,7 @@
             analysts = context.Analysts.ToList();
             paymentTypes = context.LkPaymenttypes.ToList();
             paymentTypes = paymentTypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
-            
+
 
             if (fileid > 0)
             {
@@ -237,27 +237,49 @@
                 }
             }
 
-
-            if (payment != null)
+            foreach (var payment in payments)
             {
-                if (payment.Id == 0)
-                {
-                    if (payment.Description != "" && payment.Description != null)
+                    if (payment.Id == 0)
                     {
-                        payment.Createdate = DateTime.Now;
-                        payment.Createuser = userReg;
-                        await PaymentService.CreatePayment(payment);
+                        if (payment.Description != "" && payment.Description != null)
+                        {
+                            payment.Createdate = DateTime.Now;
+                            payment.Createuser = userReg;
+                            await PaymentService.CreatePayment(payment);
+                        }
                     }
-                }
-                else
-                {
-                    if (payment.Description != "" && payment.Description != null)
+                    else
                     {
-                        payment.Moddate = DateTime.Now;
-                        payment.Moduser = userReg;
-                        await PaymentService.UpdatePayment(payment);
-                    }
-                }
+                        if (payment.Description != "" && payment.Description != null)
+                        {
+                            payment.Moddate = DateTime.Now;
+                            payment.Moduser = userReg;
+                            await PaymentService.UpdatePayment(payment);
+                        }
+
+            }
+
+
+            // if (payment != null)
+            // {
+            //     if (payment.Id == 0)
+            //     {
+            //         if (payment.Description != "" && payment.Description != null)
+            //         {
+            //             payment.Createdate = DateTime.Now;
+            //             payment.Createuser = userReg;
+            //             await PaymentService.CreatePayment(payment);
+            //         }
+            //     }
+            //     else
+            //     {
+            //         if (payment.Description != "" && payment.Description != null)
+            //         {
+            //             payment.Moddate = DateTime.Now;
+            //             payment.Moduser = userReg;
+            //             await PaymentService.UpdatePayment(payment);
+            //         }
+            //     }
             }
 
             StatusClass = "alert-success";
@@ -350,7 +372,7 @@
                    requestfee="@requestfee" />
 
 
-    <PaymentAdd savetype="@savetype" searchpayments="@searchpayments" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payment="@payment" payments="@payments"></PaymentAdd>
+    <PaymentAdd savetype="@savetype" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payment="@payment" payments="@payments"></PaymentAdd>
     <div class="col-lg-3 col-md-3 col-sm-12">
         <label for="lbnotes">
             Notes:

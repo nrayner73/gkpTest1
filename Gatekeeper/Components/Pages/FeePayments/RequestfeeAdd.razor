@@ -162,7 +162,7 @@
         Message = "There are some validation errors. Please try again.";
     }
 
-    private async Task AuditData(string act, string type)
+    private async Task AuditData(string act, string type, Requestfee changedRequestfee)
     {
         auditlog = new AuditLog();
         auditlog.AccessDate = DateTime.Now;
@@ -171,28 +171,26 @@
         auditlog.UserName = userReg;
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
-       // auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+        auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, changedRequestfee, act).ToString();
 
         if (type == "update" || type == "delete")
         {
-            //auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, changedRequestfee, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
     }
 
-    private void UpdateData(int id)
-    {
-        savetype = "";
-        if (id > 0)
-        {
-            savetype = "update";
-            //orequestfee = await RequestfeeService.GetRequestfeeById(id);
-            //requestfee = requestfees.Where(x => x.Id == id).FirstOrDefault();
-
-            StateHasChanged();
-        }
-    }
+    // private void UpdateData(int id)
+    // {
+    //     savetype = "";
+    //     if (id > 0)
+    //     {
+    //         savetype = "update";
+    //              //orequestfee = await RequestfeeService.GetRequestfeeById(id);
+    //         StateHasChanged();
+    //     }
+    // }
 
 
     private ConfirmDialog dialog = default!;
@@ -209,7 +207,7 @@
             {
                 var requestfee = await RequestfeeService.GetRequestfeeById(id);
                 await RequestfeeService.DeleteRequestfee(requestfee);
-                AuditData("Delete Requestfee", "delete");
+                AuditData("Delete Requestfee", "delete", requestfee);
             }
 
             StatusClass = "alert-success";
@@ -304,10 +302,10 @@
                     @if (item != null)
                     {
                         <tr>
-                            <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="@item.Description" /></td>
+                            <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="StateHasChanged"  @bind-Value="@item.Description" /></td>
                             <td> <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Estimatedcost" /></td>
                             <td>
-                                <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @bind-Value="@item.Requested">
+                                <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @onchange="StateHasChanged" @bind-Value="@item.Requested">
                                     <option value="-1">Select...</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
@@ -320,7 +318,7 @@
                                     <option value="No">No</option>
                                 </InputSelect>
                             </td>
-                            <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @bind-Value="@item.Finalcost" /></td>
+                            <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @onchange="StateHasChanged" @bind-Value="@item.Finalcost" /></td>
 
                             <td>
                                 <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>

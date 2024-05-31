@@ -52,8 +52,6 @@
 
     [Inject]
     private IPaymentService PaymentService { get; set; }
-    // private Payment payment { get; set; } = new Payment();
-    // private Payment opayment { get; set; } = new Payment();
     private List<Payment> payments { get; set; } = new List<Payment>();
 
     private Requestfile requestfile { get; set; } = new Requestfile();
@@ -65,14 +63,12 @@
     [Inject]
     private IRequestfeeService RequestfeeService { get; set; }
 
-    // private Requestfee requestfee { get; set; } = new Requestfee();
-    // private Requestfee orequestfee { get; set; } = new Requestfee();
     private List<Requestfee> requestfees { get; set; } = new List<Requestfee>();
+    
 
     [Inject]
     private IRequestfileService requestFileService { get; set; }
     private List<SearchRequestfee> searchrequestfees = new List<SearchRequestfee>();
-    // private List<SearchPayment> searchpayments = new List<SearchPayment>();
     private Searchrequestfile searchrequestfile { get; set; } = new Searchrequestfile();
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
@@ -128,14 +124,6 @@
                 LoadData();
 
             }
-
-            //assign request file id and payment date
-            // requestfee.Requestid = fileid;
-            // payment.Requestid = fileid;
-            // payment.Paymentdate = DateTime.Now;
-            // payment.Createdate = DateTime.Now;
-            // payment.Moddate = DateTime.Now;
-
 
             StateHasChanged();
             firstRender = false;
@@ -203,11 +191,8 @@
             }
             catch (Exception)
             {
-
                 throw;
             }
-
-
 
 
             foreach (var requestfee in requestfees)
@@ -223,7 +208,7 @@
                             requestfee.Createdate = DateTime.Now;
                             requestfee.Createuser = userReg;
                             await RequestfeeService.CreateRequestfee(requestfee);
-                            await AuditData("Create Payment", "create");
+                            await AuditData("Create Payment", "create", requestfee);
                         }
                     }
                     else
@@ -234,7 +219,7 @@
                             requestfee.Moddate = DateTime.Now;
                             requestfee.Moduser = userReg;
                             await RequestfeeService.UpdateRequestfee(requestfee);
-                            await AuditData("Update Payment", "create");
+                            await AuditData("Update Payment", "create", requestfee);
                         }
                     }
                 }
@@ -260,28 +245,6 @@
                         }
 
             }
-
-
-            // if (payment != null)
-            // {
-            //     if (payment.Id == 0)
-            //     {
-            //         if (payment.Description != "" && payment.Description != null)
-            //         {
-            //             payment.Createdate = DateTime.Now;
-            //             payment.Createuser = userReg;
-            //             await PaymentService.CreatePayment(payment);
-            //         }
-            //     }
-            //     else
-            //     {
-            //         if (payment.Description != "" && payment.Description != null)
-            //         {
-            //             payment.Moddate = DateTime.Now;
-            //             payment.Moduser = userReg;
-            //             await PaymentService.UpdatePayment(payment);
-            //         }
-            //     }
             }
 
             StatusClass = "alert-success";
@@ -300,7 +263,7 @@
         StateHasChanged();
     }
 
-    private async Task AuditData(string act, string type)
+    private async Task AuditData(string act, string type, Requestfee requestfee)
     {
         auditlog = new AuditLog();
         auditlog.AccessDate = DateTime.Now;
@@ -310,21 +273,15 @@
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
 
-        //To Do - fix audit log
-       // auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+       auditlog.ActivityXml = auditlogService.GetAuditxml(new Requestfee(), requestfee, act).ToString();
 
         if (type == "update" || type == "delete")
         {
-            //auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+            auditlog.ActivityXml = auditlogService.GetAuditxml(new Requestfee(), requestfee, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
     }
-
-    // private void ClearData()
-    // {
-    //     requestfee = new Requestfee();
-    // }
 
     #endregion
 }

@@ -217,7 +217,7 @@
 
     private void EditData()
     {
-        isEditing = true;
+        isEditing = !isEditing;
     }
 
     private void AddNew()
@@ -268,7 +268,7 @@
     <tbody>
         @if (payments != null)
         {
-            if (isEditing)
+            @if (isEditing)
             {
                 @foreach (var item in payments)
                 {

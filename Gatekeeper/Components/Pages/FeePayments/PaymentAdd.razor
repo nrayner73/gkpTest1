@@ -14,7 +14,7 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @inject ILkPaymenttypeService paymentTypeService
-@inject ISearchPaymentService searchpaymentService
+@* @inject ISearchPaymentService searchpaymentService *@
 @inject IAnalystService analystService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
@@ -61,8 +61,10 @@
     //Data Grid -- Blazor QuickGrid
     // private IQueryable<SearchPayment> searchpayments;
 
-    [Parameter]
-    public List<SearchPayment> searchpayments { get; set; } = new List<SearchPayment>();
+    // [Parameter]
+    // public List<SearchPayment> searchpayments { get; set; } = new List<SearchPayment>();
+
+
 
     #endregion
 
@@ -84,7 +86,7 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            LoadData();
+            // LoadData();
             payment.Requestid = fileid;
             payment.Paymentdate = DateTime.Now;
 
@@ -98,42 +100,42 @@
 
     #region "Methods"
 
-    private void LoadData()
-    {
+    // private void LoadData()
+    // {
 
-        if (searchpayments.Count == 0)
-        {
+    //     if (searchpayments.Count == 0)
+    //     {
 
-            SearchPayment viewpayment = new SearchPayment();
+    //         SearchPayment viewpayment = new SearchPayment();
 
-            foreach (var item in payments)
-            {
-                viewpayment = new SearchPayment();
+    //         foreach (var item in payments)
+    //         {
+    //             viewpayment = new SearchPayment();
 
-                viewpayment.Id = item.Id;
-                viewpayment.Description = item.Description;
-                viewpayment.Authorization = item.Authorization;
-                viewpayment.Paytypeid = item.Paytypeid;
-                viewpayment.Payamount = item.Payamount;
-                viewpayment.Paymentdate = item.Paymentdate;
-                viewpayment.Status = item.Status;
-                viewpayment.Createdate = item.Createdate;
-                viewpayment.Createuser = item.Createuser;
-                viewpayment.Moddate = item.Moddate;
-                viewpayment.Moduser = item.Moduser;
+    //             viewpayment.Id = item.Id;
+    //             viewpayment.Description = item.Description;
+    //             viewpayment.Authorization = item.Authorization;
+    //             viewpayment.Paytypeid = item.Paytypeid;
+    //             viewpayment.Payamount = item.Payamount;
+    //             viewpayment.Paymentdate = item.Paymentdate;
+    //             viewpayment.Status = item.Status;
+    //             viewpayment.Createdate = item.Createdate;
+    //             viewpayment.Createuser = item.Createuser;
+    //             viewpayment.Moddate = item.Moddate;
+    //             viewpayment.Moduser = item.Moduser;
 
-                using (var context = DbFactory.CreateDbContext())
-                {
-                    viewpayment.Paytype = context.LkPaymenttypes.Where(x => x.Id == viewpayment.Paytypeid).FirstOrDefault().Detail;
-                }
-                searchpayments.Add(viewpayment);
-            }
-        }
+    //             using (var context = DbFactory.CreateDbContext())
+    //             {
+    //                 viewpayment.Paytype = context.LkPaymenttypes.Where(x => x.Id == viewpayment.Paytypeid).FirstOrDefault().Detail;
+    //             }
+    //             searchpayments.Add(viewpayment);
+    //         }
+    //     }
 
-        //searchpayments = new List<SearchPayment>();
-        //searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
+    //     //searchpayments = new List<SearchPayment>();
+    //     //searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
 
-    }
+    // }
 
 
 
@@ -224,7 +226,7 @@
 
             navigationManager.NavigateTo($"/Feepayment/add/", true);
 
-            LoadData();
+            // LoadData();
             StateHasChanged();
         }
 
@@ -255,7 +257,7 @@
 
 }
 
-<EditForm Model="@payment">
+@* <EditForm Model="@payment">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="container-fluid">
@@ -299,7 +301,7 @@
             </div>
         </div>
     </div>
-</EditForm>
+</EditForm> *@
 
 <br />
 
@@ -317,11 +319,11 @@
         </tr>
     </thead>
     <tbody>
-        @if (searchpayments != null)
+        @if (payments != null)
         {
             if (isEditing)
             {
-                @foreach (var item in searchpayments)
+                @foreach (var item in payments)
                 {
                     @if (item != null)
                     {
@@ -357,14 +359,14 @@
             }
             else
             {
-                @foreach (var item in searchpayments)
+                @foreach (var item in payments)
                 {
                     @if (item != null)
                     {
                         <tr>
                             <td>@item.Description</td>
                             <td>@item.Paymentdate</td>
-                            <td>@item.Paytype</td>
+                            <td>@item.Paytypeid</td>
                             <td>@item.Authorization</td>
                             <td>@item.Payamount</td>
                             <td>

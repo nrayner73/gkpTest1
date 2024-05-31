@@ -33,6 +33,7 @@
     public string savetype { get; set; } = string.Empty;
     private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
+    private bool isEditing = false;
 
     [Parameter]
     public int fileid { get; set; }
@@ -180,7 +181,7 @@
                 await AuditData("Update Payment", "update");
                 StateHasChanged();
             }
-            
+
         }
     }
 
@@ -221,12 +222,12 @@
             alertMessageShow = false;
             Saved = true;
 
-              navigationManager.NavigateTo($"/Feepayment/add/", true);
+            navigationManager.NavigateTo($"/Feepayment/add/", true);
 
             LoadData();
             StateHasChanged();
         }
-       
+
     }
 
     private void FillData()
@@ -243,6 +244,11 @@
         payment.Createuser = userReg;
         payment.Moddate = DateTime.Now;
         payment.Moduser = userReg;
+    }
+
+    private void EditData()
+    {
+        isEditing = true;
     }
 
     #endregion
@@ -298,7 +304,7 @@
 <br />
 
 <ConfirmDialog @ref="dialog" />
-
+<button type="button" class="btn btn-primary" @onclick="EditData">Edit</button>
 <table class="table table-striped">
     <thead class="table-warning">
         <tr>
@@ -313,23 +319,62 @@
     <tbody>
         @if (searchpayments != null)
         {
-            @foreach (var item in searchpayments)
+            if (isEditing)
             {
-                @if (item != null)
+                @foreach (var item in searchpayments)
                 {
-                    <tr>
-                        <td>@item.Description</td>
-                        <td>@item.Paymentdate</td>
-                        <td>@item.Paytype</td>
-                        <td>@item.Authorization</td>
-                        <td>@item.Payamount</td>
-                        <td>
-                            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(item.Id))">Edit</button>
-                            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
-                        </td>
-                    </tr>
+                    @if (item != null)
+                    {
+                        <tr>
+                            <td>
+                                <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="@item.Description" />
+                            </td>
+                            <td>
+                                <InputDate id="paymentdate" class="form-control" placeholder="PAYMENT DATE" @bind-Value="@item.Paymentdate" />
+                            </td>
+                            <td>
+                                <InputSelect id="paytypeid" class="form-control" placeholder="PAY TYPE" @bind-Value="@item.Paytypeid">
+                                    <option value="-1">Select...</option>
+                                    @foreach (var lktype in paymenttype)
+                                    {
+                                        <option value="@lktype.Id">@lktype.Detail</option>
+                                    }
+                                </InputSelect>
+                            </td>
+                            <td>
+                                <InputText id="authorization" class="form-control" placeholder="AUTHORIZATION" @bind-Value="@item.Authorization" />
+                            </td>
+                            <td>
+                                <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @bind-Value="@item.Payamount" />
+                                </td>
+                            <td>
+                                @* <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(item.Id))">Edit</button> *@
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                            </td>
+                        </tr>
+                    }
                 }
             }
+            else
+            {
+                @foreach (var item in searchpayments)
+                {
+                    @if (item != null)
+                    {
+                        <tr>
+                            <td>@item.Description</td>
+                            <td>@item.Paymentdate</td>
+                            <td>@item.Paytype</td>
+                            <td>@item.Authorization</td>
+                            <td>@item.Payamount</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+
         }
         else
         {

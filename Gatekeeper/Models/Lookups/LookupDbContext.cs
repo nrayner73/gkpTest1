@@ -43,7 +43,6 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<Searchmytask> MytaskfileInfos { get; set; }
 
-        public virtual DbSet<SearchPayment> PaymentInfos { get; set; }
         public virtual DbSet<PersonName> PersonNames { get; set; }
 
         public virtual DbSet<POIName> POINames { get; set; }
@@ -69,7 +68,6 @@ namespace Gatekeeper.Models.Lookups
             modelBuilder.Entity<SearchVideoNotes>().HasNoKey();
             modelBuilder.Entity<DisclosedViewitem>().HasNoKey();
             modelBuilder.Entity<Summarydisclosure>().HasNoKey();
-            modelBuilder.Entity<SearchPayment>().HasNoKey();
             modelBuilder.Entity<DisclosedViewitem>().HasNoKey();
             modelBuilder.Entity<LocationViewitem>().HasNoKey();
             modelBuilder.Entity<SearchRequestfee>().HasNoKey();

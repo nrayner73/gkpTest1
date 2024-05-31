@@ -45,8 +45,7 @@
 
     [Inject]
     private IPaymentService PaymentService { get; set; }
-    [Parameter]
-    public Payment payment { get; set; } = new Payment();
+
     private Payment opayment { get; set; } = new Payment();
     [Parameter]
     public List<Payment> payments { get; set; } = new List<Payment>();
@@ -78,8 +77,8 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            payment.Requestid = fileid;
-            payment.Paymentdate = DateTime.Now;
+            // payment.Requestid = fileid;
+            // payment.Paymentdate = DateTime.Now;
 
 
 
@@ -106,7 +105,7 @@
     }
 
 
-    private async Task AuditData(string act, string type)
+    private async Task AuditData(string act, string type, Payment payment)
     {
         auditlog = new AuditLog();
         auditlog.AccessDate = DateTime.Now;
@@ -131,13 +130,12 @@
         Message = "There are some validation errors. Please try again.";
     }
 
-    private async void UpdateData(int id)
+    private async void UpdateData(Payment payment)
     {
         savetype = "";
-        if (id > 0)
+        if (payment.Id > 0)
         {
             savetype = "update";
-            payment = payments.Where(x => x.Id == id).FirstOrDefault();
             using (var context = DbFactory.CreateDbContext())
             {
                 opayment = (Payment)context.Entry(payment).GetDatabaseValues().ToObject();
@@ -146,8 +144,7 @@
 
             if(payment != null)
             {
-                await PaymentService.UpdatePayment(payment);
-                await AuditData("Update Payment", "update");
+                await AuditData("Update Payment", "update", payment);
                 StateHasChanged();
             }
 
@@ -156,13 +153,7 @@
 
     private async void GetData(int id)
     {
-        // if (id != null && id > 0)
-        // {
-        //     //opayment = await PaymentService.GetPaymentById(id);
-        //     payment = payments.Where(x => x.Id == id).FirstOrDefault();
-        //     //await PaymentService.GetPaymentById(id);
-        //     StateHasChanged();
-        // }
+
     }
 
     private ConfirmDialog dialog = default!;
@@ -177,9 +168,10 @@
         {
             if (id != null && id > 0)
             {
-                payment = await PaymentService.GetPaymentById(id);
+                var opayment = new Payment();
+                var payment = await PaymentService.GetPaymentById(id);
                 await PaymentService.DeletePayment(payment);
-                AuditData("Delete Payment", "delete");
+                AuditData("Delete Payment", "delete", payment);
             }
 
             StatusClass = "alert-success";
@@ -197,22 +189,6 @@
             StateHasChanged();
         }
 
-    }
-
-    private void FillData()
-    {
-
-        // payment.Id = 1;
-        payment.Requestid = fileid;
-        payment.Description = "description";
-        payment.Paymentdate = DateTime.Now;
-        payment.Paytypeid = 1;
-        payment.Authorization = "authorization";
-        payment.Payamount = 100;
-        payment.Createdate = DateTime.Now;
-        payment.Createuser = userReg;
-        payment.Moddate = DateTime.Now;
-        payment.Moduser = userReg;
     }
 
     private void EditData()
@@ -276,13 +252,13 @@
                     {
                         <tr>
                             <td>
-                                <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="@item.Description" />
+                                <InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="() => UpdateData(item)" @bind-Value="@item.Description" />
                             </td>
                             <td>
-                                <InputDate id="paymentdate" class="form-control" placeholder="PAYMENT DATE" @bind-Value="@item.Paymentdate" />
+                                <InputDate id="paymentdate" class="form-control" placeholder="PAYMENT DATE" @onchange="() => UpdateData(item)" @bind-Value="@item.Paymentdate" />
                             </td>
                             <td>
-                                <InputSelect id="paytypeid" class="form-control" placeholder="PAY TYPE" @bind-Value="@item.Paytypeid">
+                                <InputSelect id="paytypeid" class="form-control" placeholder="PAY TYPE" @onchange="() => UpdateData(item)" @bind-Value="@item.Paytypeid">
                                     <option value="-1">Select...</option>
                                     @foreach (var lktype in paymenttype)
                                     {
@@ -291,10 +267,10 @@
                                 </InputSelect>
                             </td>
                             <td>
-                                <InputText id="authorization" class="form-control" placeholder="AUTHORIZATION" @bind-Value="@item.Authorization" />
+                                <InputText id="authorization" class="form-control" placeholder="AUTHORIZATION" @onchange="() => UpdateData(item)" @bind-Value="@item.Authorization" />
                             </td>
                             <td>
-                                <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @bind-Value="@item.Payamount" />
+                                <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @onchange="() => UpdateData(item)" @bind-Value="@item.Payamount" />
                                 </td>
                             <td>
                                 <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>

@@ -206,6 +206,10 @@
         {
             requestfee.Finalcost = 0;
         }
+        else if(requestfee.Requested == "No")
+        {
+            requestfee.Finalcost = 0;
+        }
         else
         {
             requestfee.Finalcost = requestfee.Estimatedcost;
@@ -232,7 +236,7 @@
         requestFee.Estimatedcost = 100;
         requestFee.Requested = "Yes";
         requestFee.Feewaived = "Yes";
-        requestFee.Finalcost = 100;
+        requestFee.Finalcost = 0;
         requestFee.Createdate = DateTime.Now;
         requestFee.Createuser = userReg;
         requestFee.Moddate = DateTime.Now;
@@ -275,7 +279,7 @@
                             <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="StateHasChanged"  @bind-Value="@item.Description" /></td>
                             <td> <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Estimatedcost" /></td>
                             <td>
-                                <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @onchange="StateHasChanged" @bind-Value="@item.Requested">
+                                <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Requested">
                                     <option value="-1">Select...</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>

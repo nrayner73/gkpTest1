@@ -14,7 +14,6 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @inject ILkPaymenttypeService paymentTypeService
-@* @inject ISearchPaymentService searchpaymentService *@
 @inject IAnalystService analystService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
@@ -58,13 +57,6 @@
     [Parameter]
     public List<LkPaymenttype>? paymenttype { get; set; } = new List<LkPaymenttype>();
 
-    //Data Grid -- Blazor QuickGrid
-    // private IQueryable<SearchPayment> searchpayments;
-
-    // [Parameter]
-    // public List<SearchPayment> searchpayments { get; set; } = new List<SearchPayment>();
-
-
 
     #endregion
 
@@ -86,7 +78,6 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            // LoadData();
             payment.Requestid = fileid;
             payment.Paymentdate = DateTime.Now;
 
@@ -100,43 +91,19 @@
 
     #region "Methods"
 
-    // private void LoadData()
-    // {
-
-    //     if (searchpayments.Count == 0)
-    //     {
-
-    //         SearchPayment viewpayment = new SearchPayment();
-
-    //         foreach (var item in payments)
-    //         {
-    //             viewpayment = new SearchPayment();
-
-    //             viewpayment.Id = item.Id;
-    //             viewpayment.Description = item.Description;
-    //             viewpayment.Authorization = item.Authorization;
-    //             viewpayment.Paytypeid = item.Paytypeid;
-    //             viewpayment.Payamount = item.Payamount;
-    //             viewpayment.Paymentdate = item.Paymentdate;
-    //             viewpayment.Status = item.Status;
-    //             viewpayment.Createdate = item.Createdate;
-    //             viewpayment.Createuser = item.Createuser;
-    //             viewpayment.Moddate = item.Moddate;
-    //             viewpayment.Moduser = item.Moduser;
-
-    //             using (var context = DbFactory.CreateDbContext())
-    //             {
-    //                 viewpayment.Paytype = context.LkPaymenttypes.Where(x => x.Id == viewpayment.Paytypeid).FirstOrDefault().Detail;
-    //             }
-    //             searchpayments.Add(viewpayment);
-    //         }
-    //     }
-
-    //     //searchpayments = new List<SearchPayment>();
-    //     //searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
-
-    // }
-
+    private string GetPaymentType(Payment payment)
+    {
+        if(payment.Paytypeid.HasValue) {
+            using (var context = DbFactory.CreateDbContext())
+            {
+                return context.LkPaymenttypes.Where(x => x.Id == payment.Paytypeid).FirstOrDefault().Detail;
+            }
+        }
+        else
+        {
+            return "";
+        }
+    }
 
 
     private async Task AuditData(string act, string type)
@@ -253,60 +220,40 @@
         isEditing = true;
     }
 
+    private void AddNew()
+    {
+        payments.Add(new Payment());
+        isEditing = true;
+    }
+
+    private void AddNewWithData()
+    {
+        var payment = new Payment();
+        payment.Requestid = fileid;
+        payment.Description = "description";
+        payment.Paymentdate = DateTime.Now;
+        payment.Paytypeid = 1;
+        payment.Authorization = "authorization";
+        payment.Payamount = 100;
+        payment.Createdate = DateTime.Now;
+        payment.Createuser = userReg;
+        payment.Moddate = DateTime.Now;
+        payment.Moduser = userReg;
+        payments.Add(payment);
+
+        isEditing = true;
+    }
+
     #endregion
 
 }
-
-@* <EditForm Model="@payment">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="container-fluid">
-        <div class="row">
-
-            <div class="col-lg-2 col-md-2 col-sm-12">
-                <label for="lbdescription">
-                    Payment Description:
-                </label>
-                <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="payment.Description" />
-            </div>
-            <div class="col-lg-2 col-md-2 col-sm-12">
-                <label for="lbpaymentdate">
-                    Payment Date:
-                </label>
-                <InputDate id="paymentdate" class="form-control" placeholder="PAYMENT DATE" @bind-Value="payment.Paymentdate" />
-            </div>
-            <div class="col-lg-2 col-md-2 col-sm-12">
-                <label for="lbpaytypeid">
-                    Pay Type:
-                </label>
-                <InputSelect id="paytypeid" class="form-control" placeholder="PAY TYPE" @bind-Value="payment.Paytypeid">
-                    <option value="-1">Select...</option>
-                    @foreach (var lktype in paymenttype)
-                    {
-                        <option value="@lktype.Id">@lktype.Detail</option>
-                    }
-                </InputSelect>
-            </div>
-            <div class="col-lg-2 col-md-2 col-sm-12">
-                <label for="lbauthorization">
-                    Authorization:
-                </label>
-                <InputText id="authorization" class="form-control" placeholder="AUTHORIZATION" @bind-Value="payment.Authorization" />
-            </div>
-            <div class="col-lg-2 col-md-2 col-sm-12">
-                <label for="lbpayamount">
-                    Pay Amount:
-                </label>
-                <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @bind-Value="payment.Payamount" />
-            </div>
-        </div>
-    </div>
-</EditForm> *@
 
 <br />
 
 <ConfirmDialog @ref="dialog" />
 <button type="button" class="btn btn-primary" @onclick="EditData">Edit</button>
+<button type="button" class="btn btn-primary" @onclick="AddNew">Add New</button>
+<button type="button" class="btn btn-primary" @onclick="AddNewWithData">Add New With Filled Data</button>
 <table class="table table-striped">
     <thead class="table-warning">
         <tr>
@@ -350,7 +297,6 @@
                                 <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @bind-Value="@item.Payamount" />
                                 </td>
                             <td>
-                                @* <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(item.Id))">Edit</button> *@
                                 <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
                             </td>
                         </tr>
@@ -363,10 +309,11 @@
                 {
                     @if (item != null)
                     {
+                        var PayTypeName = GetPaymentType(item);
                         <tr>
                             <td>@item.Description</td>
                             <td>@item.Paymentdate</td>
-                            <td>@item.Paytypeid</td>
+                            <td>@PayTypeName</td>
                             <td>@item.Authorization</td>
                             <td>@item.Payamount</td>
                             <td>

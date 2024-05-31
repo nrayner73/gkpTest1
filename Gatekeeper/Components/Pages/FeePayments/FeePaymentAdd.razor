@@ -184,8 +184,6 @@
 
             try
             {
-                requestfile = await requestFileService.GetRequestfileById(fileid);
-
                 await requestFileService.UpdateRequestfile(requestfile);
             }
             catch (Exception)

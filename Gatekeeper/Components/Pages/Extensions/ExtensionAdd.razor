@@ -15,6 +15,7 @@
 @inject ISearchExtensionService searchextensionService
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
+@inject IDateService dateService
 @inject NavigationManager navigationManager
 
 @inject AppState appState
@@ -25,8 +26,6 @@
 
 @code {
     #region "Variables"
-
-
     private System.Security.Claims.ClaimsPrincipal user;
     private string? userReg;
     protected string Message = string.Empty;
@@ -35,7 +34,6 @@
     private string savetype = string.Empty;
     private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
-    private int? extDays = 0;
     private string? oDuedate = string.Empty;
 
     [Parameter]
@@ -54,7 +52,6 @@
     private List<Extension> extensions { get; set; } = new List<Extension>();
 
     private Requestfile requestfile { get; set; } = new Requestfile();
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<Holiday>? holidays { get; set; } = new List<Holiday>();
 
     //Lookup
@@ -63,7 +60,7 @@
 
     //Data Grid -- Blazor QuickGrid
     private IQueryable<SearchExtension> searchextensions;
-    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20};
     QuickGrid<Searchrequestfile>? grid;
 
     bool tester = false;
@@ -138,8 +135,6 @@
     {
         using (var context = DbFactory.CreateDbContext())
         {
-            //get analyst lookup data
-            analysts = context.Analysts.Where(x => x.Status != "del").ToList();
             lksectionlist = context.LkSections.Where(x => x.Sectiontype.ToLower() == "extension" && x.Status != "del").ToList();
             lkextensionlist = context.LkExtensions.Where(x => x.Status != "del").ToList();
             holidays = context.Holidays.Where(x => x.Status != "del").ToList();
@@ -187,7 +182,6 @@
             extension.Createuser = userReg;
             await ExtensionsService.CreateExtension(extension);
             await AuditData("Create Extensions", "create");
-
         }
 
         StatusClass = "alert-success";
@@ -229,8 +223,6 @@
             await Task.Delay(1000);
 
             await updateRequestFileDuedate();
-            //await requestFileService.UpdateRequestfile(requestfile);
-
             alertMessageShow = false;
             Saved = true;
 
@@ -265,53 +257,8 @@
     {
         if (requestfile.Receivedate != null)
         {
-            List<DateTime> dateRange1 = new List<DateTime>();
-            List<DateTime> dateRange2 = new List<DateTime>();
-
-            DateTime dueDate = (DateTime)requestfile.Receivedate;
-            DateTime setDate;
-
             extensions = (await ExtensionsService.GetExtensionList(fileid)).Where(x => x.Status != "del").ToList();
-
-            extDays = 0;
-            foreach (var item in extensions)
-            {
-                if (item.Dayamount != null && item.Dayamount != 0)
-                {
-                    extDays = extDays + item.Dayamount;
-                }
-            }
-
-            oDuedate = ((DateTime)requestfile.Receivedate).AddDays(30).ToString();
-            dueDate = ((DateTime)requestfile.Receivedate).AddDays(30 + (int)extDays);
-
-            // remove weekends
-            for (int i = 0; i < 11; i++)
-            {
-                setDate = dueDate.AddDays(i);
-                if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
-                {
-                    dateRange1.Add(setDate);
-                    dateRange2.Add(setDate);
-                }
-            }
-
-            // remove holidays
-            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == ((DateTime)requestfile.Receivedate).Year);
-
-            foreach (var item in thisYearHolidays)
-            {
-                foreach (var dt in dateRange1)
-                {
-                    int y = dateRange1.IndexOf(dt);
-                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
-                    {
-                        dateRange2.RemoveAt(y);
-                    }
-                }
-            }
-
-            requestfile.Requestduedate = dateRange2.FirstOrDefault();
+            await dateService.SetDuedate(requestfile, extensions, holidays);
             requestfile.Moddate = DateTime.Now;
             requestfile.Moduser = userReg;
             await requestFileService.UpdateRequestfile(requestfile);
@@ -355,7 +302,6 @@
         extension.Createuser = userReg;
         extension.Moddate = DateTime.Now;
         extension.Moduser = userReg;
-        //   extension.Status = "status";
     }
 
     #endregion

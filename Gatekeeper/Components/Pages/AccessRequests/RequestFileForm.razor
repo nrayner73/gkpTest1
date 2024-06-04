@@ -1,11 +1,13 @@
 ﻿@rendermode InteractiveServer
-
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
 @inject IAddressService addressService
-
+@inject IDateService dateService
 
 @code {
+    [Inject]
+    private IExtensionService ExtensionService { get; set; }
+
     [Parameter]
     public EventCallback OnCancel { get; set; }
     [Parameter]
@@ -23,7 +25,7 @@
     public List<LkRequeststate>? requestStates { get; set; } = new List<LkRequeststate>();
 
     public List<Holiday>? holidays { get; set; } = new List<Holiday>();
-    public List<Holiday>? thisYearHolidays { get; set; } = new List<Holiday>();
+    private List<Extension> extensions { get; set; } = new List<Extension>();
 
     string? requestTypeDetail { get; set; } = null;
     string? processingDeficiencyDetail { get; set; } = null;
@@ -146,39 +148,8 @@
 
         if (requestFile.Receivedate != null)
         {
-            List<DateTime> dateRange1 = new List<DateTime>();
-            List<DateTime> dateRange2 = new List<DateTime>();
-
-            DateTime dueDate = (DateTime)requestFile.Receivedate;
-            DateTime setDate;
-
-            dueDate = ((DateTime)requestFile.Receivedate).AddDays(30);
-
-            for (int i = 0; i < 11; i++)
-            {
-                setDate = dueDate.AddDays(i);
-                if ((int)setDate.DayOfWeek != 0 && (int)setDate.DayOfWeek != 6)
-                {
-                    dateRange1.Add(setDate);
-                    dateRange2.Add(setDate);
-                }
-            }
-
-            //Remove holidays
-            var thisYearHolidays = holidays.Where(x => ((DateTime)x.Holidaydate).Year == DateTime.Today.Year);
-
-            foreach (var item in thisYearHolidays)
-            {
-                foreach (var dt in dateRange1)
-                {
-                    int y = dateRange1.IndexOf(dt);
-                    if (dt.Date.ToString() == ((DateTime)item.Holidaydate).Date.ToString())
-                    {
-                        dateRange2.RemoveAt(y);
-                    }
-                }
-            }
-            requestFile.Requestduedate = dateRange2.FirstOrDefault();
+            extensions = (await ExtensionService.GetExtensionList(requestFile.Id)).Where(x => x.Status != "del").ToList();
+            await dateService.SetDuedate(requestFile, extensions, holidays);
         }
     }
 }
@@ -206,7 +177,7 @@
                     Received Date:
                 </label>
                 <InputDate id="receivedate" class="form-control" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="requestFile.Receivedate" @bind-Value:after="setDuedate" />
-                <ValidationMessage For="@(() => requestFile.Requestdate)" />
+                <ValidationMessage For="@(() => requestFile.Receivedate)" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrequestduedate">
@@ -541,9 +512,9 @@
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <label for="lbintakenotes">
-                    Status Update:
+                    Intake Notes:
                 </label>
-                <InputTextArea id="intakenotes" class="form-control" placeholder="STATUS UPDATE" @bind-Value="requestFile.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />
+                <InputTextArea id="intakenotes" class="form-control" placeholder="INTAKE NOTES" @bind-Value="requestFile.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />
             </div>
         </div>
     </div>

@@ -130,6 +130,7 @@ builder.Services.AddScoped<IAuditlogService, AuditlogService>();
 //View
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IDateService, DateService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();
 builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
 builder.Services.AddScoped<ISearchLkCityService, SearchLkCityService>();
@@ -144,6 +145,7 @@ builder.Services.AddScoped<ISearchLkRecordDeliveryMethodService, SearchLkRecordD
 builder.Services.AddScoped<ISearchLkRequestStateService, SearchLkRequestStateService>();
 builder.Services.AddScoped<ISearchLkSectionService, SearchLkSectionService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
+builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();

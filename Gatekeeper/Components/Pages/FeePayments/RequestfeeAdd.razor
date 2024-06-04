@@ -40,6 +40,7 @@
     protected string Message = string.Empty;
     protected string StatusClass = string.Empty;
     private bool Saved;
+    private bool isEditing = false;
 
     [Parameter]
     public string savetype { get; set; } = string.Empty;
@@ -56,34 +57,30 @@
     [Inject]
     private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
 
-
-    [Parameter]
-    public Requestfee requestfee { get; set; }
-
     [Parameter]
     public List<Requestfee> requestfees { get; set; } = new List<Requestfee>();
 
     [Inject]
     private IRequestfeeService RequestfeeService { get; set; }
-    // private Requestfee requestfee { get; set; } = new Requestfee();
-    // private Requestfee orequestfee { get; set; } = new Requestfee();
-    
 
     [Parameter]
     public Requestfile requestfile { get; set; } = new Requestfile();
     private Requestfee orequestfee { get; set; } = new Requestfee();
-    
+
     [Parameter]
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
-    
 
 
+<<<<<<< f414479a2efc1102ac31d51c16e18e42d5e60cab
     //Data Grid -- Blazor QuickGrid
     // private IQueryable<SearchRequestfee> searchrequestfees;
 
 
     // public List<SearchRequestfee> searchrequestfees { get; set; } = new List<SearchRequestfee>();
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+=======
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+>>>>>>> 71ddcb60971cfcfd84151d2e98b1b66a3fd352f9
 
 
 
@@ -135,13 +132,7 @@
                 }
                 requestfile = await context.Requestfiles.FirstOrDefaultAsync(x => x.Id == fileid);
                 FileNumber = requestfile.Filenumber.ToString();
-
-
-
             }
-
-            //LoadData();
-            requestfee.Requestid = fileid;
 
             StateHasChanged();
             firstRender = false;
@@ -153,55 +144,10 @@
 
     private void getDataContext()
     {
-        using (var context = DbFactory.CreateDbContext())
-        {
-            // requestfees = context.Requestfees.Where(x => x.Requestid == fileid).Tolist();
-
-            // paymenttype = context.LkPaymenttypes.ToList();
-
-
-
-        }
         StateHasChanged();
 
     }
 
-    // private async void LoadData()
-    // {
-    //     if (searchrequestfees.Count == 0)
-    //     {
-
-    //         SearchRequestfee searchrequestfee = new SearchRequestfee();
-
-    //         foreach (var item in requestfees)
-    //         {
-    //             Type viewfeetype = searchrequestfee.GetType();
-    //             Type mainfeetype = item.GetType();
-
-    //             PropertyInfo[] viewfeeprops = viewfeetype.GetProperties();
-    //             PropertyInfo[] mainfeeprops = mainfeetype.GetProperties();
-
-
-    //             foreach (PropertyInfo prop1 in mainfeeprops)
-    //             {
-    //                 foreach (PropertyInfo prop2 in viewfeeprops)
-    //                 {
-    //                     if (prop1.Name == prop2.Name)
-    //                     {
-    //                         prop2.SetValue(viewfeetype,prop1.GetValue(item));
-    //                     }
-    //                 }
-    //             }
-
-    //             // using (var context = DbFactory.CreateDbContext())
-    //             // {
-    //             //     searchrequestfee.Description = context.LkPaymenttypes.Where(x => x.Id == searchrequestfee.Paytypeid).FirstOrDefault().ToString();
-    //             // }
-    //             searchrequestfees.Add(searchrequestfee);
-    //         }
-
-    //     }
-    // }
 
     protected void HandleInvalidSubmit()
     {
@@ -209,42 +155,7 @@
         Message = "There are some validation errors. Please try again.";
     }
 
-    protected async Task HandleValidSubmit()
-    {
-        // Saved = false;
-
-        // requestfee.Moddate = DateTime.Now;
-        // requestfee.Moduser = userReg;
-
-        // if (savetype == "update")
-        // {
-        //     await RequestfeeService.UpdateRequestfee(requestfee);
-        //     await AuditData("Update Requestfee", "update");
-        // }
-        // else
-        // {
-        //     requestfee.Createdate = DateTime.Now;
-        //     requestfee.Createuser = userReg;
-        //     await RequestfeeService.CreateRequestfee(requestfee);
-        //     //await AuditData("Create Requestfee", "create");
-
-        // }
-
-        // StatusClass = "alert-success";
-        // Message = "Data updated successfully";
-        // alertMessageShow = true;
-        // await InvokeAsync(() => StateHasChanged());
-        // await Task.Delay(1000);
-
-        // alertMessageShow = false;
-        // Saved = true;
-        // navigationManager.NavigateTo($"/requestfee/add/{fileid}", true);
-        // LoadData();
-        // requestfee = new Requestfee();
-        // StateHasChanged();
-    }
-
-    private async Task AuditData(string act, string type)
+    private async Task AuditData(string act, string type, Requestfee changedRequestfee)
     {
         auditlog = new AuditLog();
         auditlog.AccessDate = DateTime.Now;
@@ -253,29 +164,15 @@
         auditlog.UserName = userReg;
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
-        auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+        auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, changedRequestfee, act).ToString();
 
         if (type == "update" || type == "delete")
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, changedRequestfee, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
     }
-
-    private void UpdateData(int id)
-    {
-        savetype = "";
-        if (id > 0)
-        {
-            savetype = "update";
-            //orequestfee = await RequestfeeService.GetRequestfeeById(id);
-            requestfee = requestfees.Where(x => x.Id == id).FirstOrDefault();
-
-            StateHasChanged();
-        }
-    }
-
 
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
@@ -289,9 +186,9 @@
         {
             if (id != null && id > 0)
             {
-                requestfee = await RequestfeeService.GetRequestfeeById(id);
+                var requestfee = await RequestfeeService.GetRequestfeeById(id);
                 await RequestfeeService.DeleteRequestfee(requestfee);
-                AuditData("Delete Requestfee", "delete");
+                AuditData("Delete Requestfee", "delete", requestfee);
             }
 
             StatusClass = "alert-success";
@@ -305,8 +202,6 @@
 
             navigationManager.NavigateTo($"/Feepayment/add/", true);
 
-            // LoadData();
-            // StateHasChanged();
         }
         else
         {
@@ -314,9 +209,13 @@
         }
     }
 
-    private void setfinalcost()
+    private void setfinalcost(Requestfee requestfee)
     {
         if (requestfee.Feewaived == "Yes")
+        {
+            requestfee.Finalcost = 0;
+        }
+        else if(requestfee.Requested == "No")
         {
             requestfee.Finalcost = 0;
         }
@@ -327,83 +226,42 @@
         StateHasChanged();
     }
 
-    private void FillData()
+    private void EditData()
     {
-        // requestfee.Id = 1;
-        requestfee.Requestid = fileid;
-        // requestfee.Paytypeid = 1;
-        requestfee.Description = "description";
-        requestfee.Estimatedcost = 100;
-        requestfee.Requested = "Yes";
-        requestfee.Feewaived = "Yes";
-        requestfee.Finalcost = 100;
-        requestfee.Createdate = DateTime.Now;
-        requestfee.Createuser = userReg;
-        requestfee.Moddate = DateTime.Now;
-        requestfee.Moduser = userReg;
-        // requestfee.Status = "status";
+        isEditing = !isEditing;
+    }
 
+    private void AddNew()
+    {
+        requestfees.Add(new Requestfee());
+        isEditing = true;
+    }
+
+    private void AddNewWithData()
+    {
+        var requestFee = new Requestfee();
+        requestFee.Requestid = fileid;
+        requestFee.Description = "description";
+        requestFee.Estimatedcost = 100;
+        requestFee.Requested = "Yes";
+        requestFee.Feewaived = "Yes";
+        requestFee.Finalcost = 0;
+        requestFee.Createdate = DateTime.Now;
+        requestFee.Createuser = userReg;
+        requestFee.Moddate = DateTime.Now;
+        requestFee.Moduser = userReg;
+
+        requestfees.Add(requestFee);
+
+        isEditing = true;
     }
     #endregion
 }
 
-<EditForm Model="@requestfee">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="container-fluid">
-        <div class="row">
-
-            <div class="col-lg-2 col-md-2 col-sm-12">
-                <label for="lbfileid">
-                    File Number:
-                </label>
-                <input type="text" readonly id="fileid" class="form-control" value="@FileNumber" style="background-color:lightgray" />
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-12">
-                <label for="lbdescription">
-                    Fee Description:
-                </label>
-                <InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="requestfee.Description" />
-            </div>
-            <div class="col-lg-2 col-md-3 col-sm-12">
-                <label for="lbestimatedcost">
-                    Estimated Cost:
-                </label>
-                <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="setfinalcost" @onblur="setfinalcost" @bind-Value="requestfee.Estimatedcost" />
-            </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-                <label for="lbrequested">
-                    Requested:
-                </label>
-                <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @bind-Value="requestfee.Requested">
-                    <option value="-1">Select...</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </InputSelect>
-            </div>
-            <div class="col-lg-1 col-md-2 col-sm-12">
-                <label for="lbfeewaived">
-                    Fee Waived:
-                </label>
-                <InputSelect id="feewaived" class="form-control" placeholder="FEE WAIVED" @onchange="setfinalcost" @onblur="setfinalcost" @bind-Value="requestfee.Feewaived">
-                    <option value="-1">Select...</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </InputSelect>
-            </div>
-            <div class="col-lg-2 col-md-3 col-sm-12">
-                <label for="lbfinalcost">
-                    Final Cost:
-                </label>
-                <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @bind-Value="requestfee.Finalcost" />
-            </div>
-        </div>
-    </div>
-</EditForm>
-
-<br />
-
 <ConfirmDialog @ref="dialog" />
+<button type="button" class="btn btn-primary" @onclick="EditData">Edit</button>
+<button type="button" class="btn btn-primary" @onclick="AddNew">Add New</button>
+<button type="button" class="btn btn-primary" @onclick="AddNewWithData">Add New With Filled Data</button>
 
 <table class="table table-striped">
     <thead class="table-info">
@@ -420,25 +278,61 @@
     <tbody>
         @if (requestfees != null)
         {
-            @foreach (var item in requestfees)
+            @if(isEditing)
             {
-                @if (item != null)
+                @foreach (var item in requestfees)
                 {
-                    <tr>
-                        <td>@item.Description</td>
-                        <td>@item.Estimatedcost</td>
-                        <td>@item.Requested</td>
-                        <td>@item.Feewaived</td>
-                        <td>@item.Finalcost</td>
+                    @if (item != null)
+                    {
+                        <tr>
+                            <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="StateHasChanged"  @bind-Value="@item.Description" /></td>
+                            <td> <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Estimatedcost" /></td>
+                            <td>
+                                <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Requested">
+                                    <option value="-1">Select...</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </InputSelect>
+                            </td>
+                            <td>
+                                <InputSelect id="feewaived" class="form-control" placeholder="FEE WAIVED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Feewaived">
+                                    <option value="-1">Select...</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </InputSelect>
+                            </td>
+                            <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @onchange="StateHasChanged" @bind-Value="@item.Finalcost" /></td>
 
-                        <td>
-                            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(item.Id))">Edit</button>
-                            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
-                        </td>
-                    </tr>
+                            <td>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                            </td>
+                        </tr>
+                    }
                 }
             }
-        }
+            
+            else
+            {
+                @foreach (var item in requestfees)
+                {
+                    @if (item != null)
+                    {
+                        <tr>
+                            <td>@item.Description</td>
+                            <td>@item.Estimatedcost</td>
+                            <td>@item.Requested</td>
+                            <td>@item.Feewaived</td>
+                            <td>@item.Finalcost</td>
+
+                            <td>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+            }
+
         else
         {
             <tr>

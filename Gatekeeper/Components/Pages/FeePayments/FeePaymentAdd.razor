@@ -25,7 +25,6 @@
 
 
 @inject ILkPaymenttypeService paymentTypeService
-@inject ISearchPaymentService searchpaymentService
 
 @page "/feepayment/add/{fileid:int?}"
 
@@ -52,8 +51,6 @@
 
     [Inject]
     private IPaymentService PaymentService { get; set; }
-    private Payment payment { get; set; } = new Payment();
-    private Payment opayment { get; set; } = new Payment();
     private List<Payment> payments { get; set; } = new List<Payment>();
 
     private Requestfile requestfile { get; set; } = new Requestfile();
@@ -65,14 +62,12 @@
     [Inject]
     private IRequestfeeService RequestfeeService { get; set; }
 
-    private Requestfee requestfee { get; set; } = new Requestfee();
-    private Requestfee orequestfee { get; set; } = new Requestfee();
     private List<Requestfee> requestfees { get; set; } = new List<Requestfee>();
+    
 
     [Inject]
     private IRequestfileService requestFileService { get; set; }
     private List<SearchRequestfee> searchrequestfees = new List<SearchRequestfee>();
-    private List<SearchPayment> searchpayments = new List<SearchPayment>();
     private Searchrequestfile searchrequestfile { get; set; } = new Searchrequestfile();
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
@@ -129,14 +124,6 @@
 
             }
 
-            //assign request file id and payment date
-            requestfee.Requestid = fileid;
-            payment.Requestid = fileid;
-            payment.Paymentdate = DateTime.Now;
-            payment.Createdate = DateTime.Now;
-            payment.Moddate = DateTime.Now;
-
-
             StateHasChanged();
             firstRender = false;
         }
@@ -153,7 +140,7 @@
             analysts = context.Analysts.ToList();
             paymentTypes = context.LkPaymenttypes.ToList();
             paymentTypes = paymentTypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
-            
+
 
             if (fileid > 0)
             {
@@ -197,67 +184,64 @@
 
             try
             {
-                requestfile = await requestFileService.GetRequestfileById(fileid);
-
                 await requestFileService.UpdateRequestfile(requestfile);
             }
             catch (Exception)
             {
-
                 throw;
             }
 
 
-            requestfee.Moddate = DateTime.Now;
-            requestfee.Moduser = userReg;
-
-
-            if (requestfee != null)
+            foreach (var requestfee in requestfees)
             {
-                if (requestfee.Id == 0)
+                requestfee.Moddate = DateTime.Now;
+                requestfee.Moduser = userReg;
+                if (requestfee != null)
                 {
-                    if (requestfee.Description != "" && requestfee.Description != null)
+                    if (requestfee.Id == 0)
                     {
-                        requestfee.Createdate = DateTime.Now;
-                        requestfee.Createuser = userReg;
-                        await RequestfeeService.CreateRequestfee(requestfee);
-                        await AuditData("Create Payment", "create");
+                        if (requestfee.Description != "" && requestfee.Description != null)
+                        {
+                            requestfee.Createdate = DateTime.Now;
+                            requestfee.Createuser = userReg;
+                            await RequestfeeService.CreateRequestfee(requestfee);
+                            await AuditData("Create Payment", "create", requestfee);
+                        }
                     }
-                }
-                else
-                {
-
-                    if (requestfee.Description != "" && requestfee.Description != null)
+                    else
                     {
-                        requestfee.Moddate = DateTime.Now;
-                        requestfee.Moduser = userReg;
-                        await RequestfeeService.UpdateRequestfee(requestfee);
-                        await AuditData("Update Payment", "create");
+
+                        if (requestfee.Description != "" && requestfee.Description != null)
+                        {
+                            requestfee.Moddate = DateTime.Now;
+                            requestfee.Moduser = userReg;
+                            await RequestfeeService.UpdateRequestfee(requestfee);
+                            await AuditData("Update Payment", "create", requestfee);
+                        }
                     }
                 }
             }
-
-
-            if (payment != null)
+            foreach (var payment in payments)
             {
-                if (payment.Id == 0)
-                {
-                    if (payment.Description != "" && payment.Description != null)
+                    if (payment.Id == 0)
                     {
-                        payment.Createdate = DateTime.Now;
-                        payment.Createuser = userReg;
-                        await PaymentService.CreatePayment(payment);
+                        if (payment.Description != "" && payment.Description != null)
+                        {
+                            payment.Createdate = DateTime.Now;
+                            payment.Createuser = userReg;
+                            await PaymentService.CreatePayment(payment);
+                        }
                     }
-                }
-                else
-                {
-                    if (payment.Description != "" && payment.Description != null)
+                    else
                     {
-                        payment.Moddate = DateTime.Now;
-                        payment.Moduser = userReg;
-                        await PaymentService.UpdatePayment(payment);
-                    }
-                }
+                        if (payment.Description != "" && payment.Description != null)
+                        {
+                            payment.Moddate = DateTime.Now;
+                            payment.Moduser = userReg;
+                            await PaymentService.UpdatePayment(payment);
+                        }
+
+            }
             }
 
             StatusClass = "alert-success";
@@ -273,12 +257,10 @@
 
         //LoadData();
         getDataContext();
-        requestfee = new Requestfee();
-        payment = new Payment();
         StateHasChanged();
     }
 
-    private async Task AuditData(string act, string type)
+    private async Task AuditData(string act, string type, Requestfee requestfee)
     {
         auditlog = new AuditLog();
         auditlog.AccessDate = DateTime.Now;
@@ -287,50 +269,17 @@
         auditlog.UserName = userReg;
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
-        auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+
+       auditlog.ActivityXml = auditlogService.GetAuditxml(new Requestfee(), requestfee, act).ToString();
 
         if (type == "update" || type == "delete")
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfee, requestfee, act).ToString();
+            auditlog.ActivityXml = auditlogService.GetAuditxml(new Requestfee(), requestfee, act).ToString();
         }
 
         await auditlogService.CreateAuditlog(auditlog);
     }
 
-    private void ClearData()
-    {
-        requestfee = new Requestfee();
-    }
-
-    private void FillData()
-    {
-
-        // requestfee.Id = 1;
-        requestfee.Requestid = fileid;
-        requestfee.Description = "description";
-        requestfee.Estimatedcost = 100;
-        requestfee.Requested = "Yes";
-        requestfee.Feewaived = "Yes";
-        requestfee.Finalcost = 100;
-        requestfee.Createdate = DateTime.Now;
-        requestfee.Createuser = userReg;
-        requestfee.Moddate = DateTime.Now;
-        requestfee.Moduser = userReg;
-        // requestfee.Status = "status";
-
-
-        payment.Requestid = fileid;
-        payment.Description = "description";
-        payment.Paymentdate = DateTime.Now;
-        payment.Paytypeid = 1;
-        payment.Authorization = "authorization";
-        payment.Payamount = 100;
-        payment.Createdate = DateTime.Now;
-        payment.Createuser = userReg;
-        payment.Moddate = DateTime.Now;
-        payment.Moduser = userReg;
-        savetype = "create";
-    }
     #endregion
 }
 
@@ -346,11 +295,10 @@
                    analysts="@analysts"
                    fileid="@fileid"
                    requestfile="@requestfile"
-                   requestfees="@requestfees"
-                   requestfee="@requestfee" />
+                   requestfees="@requestfees" />
 
 
-    <PaymentAdd savetype="@savetype" searchpayments="@searchpayments" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payment="@payment" payments="@payments"></PaymentAdd>
+    <PaymentAdd savetype="@savetype" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payments="@payments"></PaymentAdd>
     <div class="col-lg-3 col-md-3 col-sm-12">
         <label for="lbnotes">
             Notes:
@@ -358,7 +306,5 @@
         <InputTextArea id="notes" class="form-control" placeholder="NOTES" @bind-Value="requestfile.Feepayment" row="15" col="250" style="min-height: 130px; overflow:auto;" />
     </div>
     <br />
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
-    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm>

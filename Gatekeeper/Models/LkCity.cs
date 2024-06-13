@@ -10,8 +10,9 @@ namespace Gatekeeper.Models;
 [Table("lk_city", Schema = "gkp")]
 public partial class LkCity
 {
- [Key]
-public int Id{ get; set; }
+[Key]
+public int Id { get; set; }
+[Required]
 [Column(TypeName = "varchar(255)")]
 public string? Detail{ get; set; }
 public DateTime? Createdate{ get; set; }

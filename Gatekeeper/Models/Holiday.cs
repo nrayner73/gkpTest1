@@ -12,8 +12,10 @@ public partial class Holiday
 {
  [Key]
 public int Id{ get; set; }
+[Required]
 [Column(TypeName = "varchar(150)")]
 public string? Holidayname{ get; set; }
+[Required]
 public DateTime? Holidaydate{ get; set; }
 public DateTime? Moddate{ get; set; }
 [Column(TypeName = "varchar(45)")]

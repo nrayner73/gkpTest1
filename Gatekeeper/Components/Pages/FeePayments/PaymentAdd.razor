@@ -63,6 +63,8 @@
     #region "Component Lifecycle"
     protected async override Task OnInitializedAsync()
     {
+        // EditContext = new EditContext(person);
+        // EditContext.OnFieldChanged += EditContext_OnFieldChanged;
 
     }
 
@@ -136,6 +138,7 @@
         if (payment.Id > 0)
         {
             savetype = "update";
+            payment.edited = true;
             using (var context = DbFactory.CreateDbContext())
             {
                 opayment = (Payment)context.Entry(payment).GetDatabaseValues().ToObject();
@@ -198,7 +201,9 @@
 
     private void AddNew()
     {
-        payments.Add(new Payment());
+        var payment = new Payment();
+        payment.Requestid = fileid;
+        payments.Add(payment);
         isEditing = true;
     }
 
@@ -233,11 +238,12 @@
 <table class="table table-striped">
     <thead class="table-warning">
         <tr>
-            <th scope="col">Payment Description</th>
+            <th scope="col">Item #</th>
+            <th scope="col">Description</th>
             <th scope="col">Payment Date</th>
-            <th scope="col">Pay Type</th>
+            <th scope="col">Payment Type</th>
             <th scope="col">Authorization</th>
-            <th scope="col">Pay Amount</th>
+            <th scope="col">Payment Made</th>
             <th scope="col">Action</th>
         </tr>
     </thead>
@@ -251,6 +257,7 @@
                     @if (item != null)
                     {
                         <tr>
+                            <td>@item.Id</td>
                             <td>
                                 <InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="() => UpdateData(item)" @bind-Value="@item.Description" />
                             </td>
@@ -287,6 +294,7 @@
                     {
                         var PayTypeName = GetPaymentType(item);
                         <tr>
+                            <td>@item.Id</td>
                             <td>@item.Description</td>
                             <td>@item.Paymentdate</td>
                             <td>@PayTypeName</td>

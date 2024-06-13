@@ -71,16 +71,14 @@
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
 
 
-<<<<<<< f414479a2efc1102ac31d51c16e18e42d5e60cab
+
     //Data Grid -- Blazor QuickGrid
     // private IQueryable<SearchRequestfee> searchrequestfees;
 
 
     // public List<SearchRequestfee> searchrequestfees { get; set; } = new List<SearchRequestfee>();
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
-=======
-    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
->>>>>>> 71ddcb60971cfcfd84151d2e98b1b66a3fd352f9
+
 
 
 
@@ -223,6 +221,7 @@
         {
             requestfee.Finalcost = requestfee.Estimatedcost;
         }
+        requestfee.edited = true;
         StateHasChanged();
     }
 
@@ -233,10 +232,17 @@
 
     private void AddNew()
     {
-        requestfees.Add(new Requestfee());
+        var requestFee = new Requestfee();
+        requestFee.Requestid = fileid;
+        requestfees.Add(requestFee);
         isEditing = true;
     }
 
+    private async void UpdateData(Requestfee requestfee)
+    {
+        requestfee.edited = true;
+        StateHasChanged();
+    }
     private void AddNewWithData()
     {
         var requestFee = new Requestfee();
@@ -285,7 +291,7 @@
                     @if (item != null)
                     {
                         <tr>
-                            <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="StateHasChanged"  @bind-Value="@item.Description" /></td>
+                            <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="() => UpdateData(item)" @bind-Value="@item.Description" /></td>
                             <td> <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Estimatedcost" /></td>
                             <td>
                                 <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Requested">
@@ -301,7 +307,7 @@
                                     <option value="No">No</option>
                                 </InputSelect>
                             </td>
-                            <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @onchange="StateHasChanged" @bind-Value="@item.Finalcost" /></td>
+                            <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @onchange="() => UpdateData(item)" @bind-Value="@item.Finalcost" /></td>
 
                             <td>
                                 <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>

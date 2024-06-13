@@ -29,5 +29,7 @@ public DateTime? Moddate{ get; set; }
 public string? Moduser{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Status{ get; set; }
+[NotMapped]
+public bool edited { get; set; }
 
 }

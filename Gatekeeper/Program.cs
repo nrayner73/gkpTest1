@@ -111,6 +111,7 @@ builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
 builder.Services.AddScoped<ILkRecordDeliveryMethodService, LkRecordDeliveryMethodService>();
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
+builder.Services.AddScoped<ILkReviewtypeService, LkReviewtypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
 builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();

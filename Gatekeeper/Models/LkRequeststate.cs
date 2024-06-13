@@ -12,6 +12,7 @@ public partial class LkRequeststate
 {
  [Key]
 public int Id{ get; set; }
+[Required]
 [Column(TypeName = "varchar(255)")]
 public string? Detail{ get; set; }
 public DateTime? Createdate{ get; set; }

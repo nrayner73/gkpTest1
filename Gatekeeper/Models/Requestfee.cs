@@ -13,7 +13,7 @@ public partial class Requestfee
  [Key]
 public int Id{ get; set; }
 public int? Requestid{ get; set; }
-public int? Paytypeid{ get; set; }
+//public int? Paytypeid{ get; set; }
     [Column(TypeName = "varchar(250)")]
     public string? Description { get; set; }
     public decimal? Estimatedcost{ get; set; }
@@ -30,5 +30,7 @@ public DateTime? Createdate{ get; set; }
 public string? Createuser{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Status{ get; set; }
+[NotMapped]
+public bool edited { get; set; }
 
 }

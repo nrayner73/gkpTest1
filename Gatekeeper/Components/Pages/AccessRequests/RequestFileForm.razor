@@ -4,27 +4,91 @@
 @inject IAddressService addressService
 @inject IDateService dateService
 
+
+
+@using Gatekeeper.Models.MenuInfo
+@using Gatekeeper.CustomValidators
+@using System.Text
+@using System.Web
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Encodings.Web
+@using Gatekeeper.Classes;
+@using System.Text.RegularExpressions
+@using BlazorBootstrap
+
+@inject IConfiguration Configuration
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService session
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+@inject IAuditlogService auditlogService
+@inject IJSRuntime JSRuntime
+@inject IDateService dateService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject LoginState loginState;
+@inject AppState appState;
+@inject NavigationManager navigationManager
+
+@page "/accessrequests/add/{fileid:int?}"
+
 @code {
+
+    #region "Parameters"
+
+
+    //Audit
+    private AuditLog auditlog = new AuditLog();
+    bool otherreason = false;
+    bool setTestdata = false;
+
+    private bool tester = false;
+
+    [Parameter]
+    public int fileid { get; set; }
+
+
+    public bool DisplayAlert { get; set; }
+    public List<string> AlertText1 = new List<string>();
+    public List<string> AlertText2 = new List<string>();
+
+    [Inject]
+    private IRequestfileService requestFileService { get; set; }
+    private Requestfile requestfile { get; set; } = new Requestfile();
+    private Requestfile orequestfile = new Requestfile();
+    private Requestfile Sessionrequestfile { get; set; } = new Requestfile();
+    private List<Requestfile>? requestfiles { get; set; } = new List<Requestfile>();
+
+    [Inject]
+    private IPersonService personService { get; set; }
+    private List<Person> persons { get; set; } = new List<Person>();
+    public List<Holiday>? holidays { get; set; } = new List<Holiday>();
+    private Person person { get; set; } = new Person();
+    private Person operson { get; set; } = new Person();
+
+    private bool alertMessageShow = false;
+    private string? SuccessMessage { get; set; }
+
+    public List<LkRequesttype>? requestTypes { get; set; } = new List<LkRequesttype>();
+
+    private string thisMachine = string.Empty;
+
     [Inject]
     private IExtensionService ExtensionService { get; set; }
 
-    [Parameter]
     public EventCallback OnCancel { get; set; }
-    [Parameter]
+
     public EventCallback<bool> OnSubmit { get; set; }
-    [Parameter]
-    public Requestfile requestFile { get; set; }
-    [Parameter]
-    public Person person { get; set; }
+    private Dictionary<string,object> parameters = new Dictionary<string, object>();
+
 
     #region Lookup parameters
-    public List<LkRequesttype>? requestTypes { get; set; } = new List<LkRequesttype>();
+
     public List<LkProcessingdeficiency>? processingDeficiencies { get; set; } = new List<LkProcessingdeficiency>();
     public List<LkRecorddeliverymethod> recordDeliveryMethods { get; set; } = new List<LkRecorddeliverymethod>();
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkRequeststate>? requestStates { get; set; } = new List<LkRequeststate>();
 
-    public List<Holiday>? holidays { get; set; } = new List<Holiday>();
+
     private List<Extension> extensions { get; set; } = new List<Extension>();
 
     string? requestTypeDetail { get; set; } = null;
@@ -50,48 +114,412 @@
     public List<AddressInfo>? addresses { get; set; } = new List<AddressInfo>();
     private AddressInfo selectedaddress;
     private AddressInfo address { get; set; } = new AddressInfo();
+
+    #endregion
+
     #endregion
 
     #region "Component Lifecycle"
+
+    protected async override Task OnParametersSetAsync()
+    {
+        if (requestfile.Yearid == 0 || requestfile.Yearid is null)
+        {
+            requestfile.Filenumber = "TBD";
+        }
+
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+
+        var AccessPerson = Configuration["Testers"];
+
+        tester = false;
+        thisMachine = "";
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+            thisMachine = Environment.MachineName;
+        }
+
+        SuccessMessage = "";
+        StateHasChanged();
+    }
+
+    private string? userReg;
     protected async override Task OnInitializedAsync()
     {
-        GetData(); 
+        GetData();
         GetDataContext();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (fileid > 0)
+            {
+                await sessionStorage.SetItemAsync("RQID", fileid);
+                await sessionStorage.SetItemAsync("objFileRequest", requestfile);
+                GetDataContext();
+            }
+            else
+            {
+                var RQID = await sessionStorage.GetItemAsync<string>("RQID");
+
+                if (RQID != "0" && RQID != null)
+                {
+                    fileid = Int32.Parse(RQID);
+                }
+            }
+            GetDataContext();
+
+            #region "set tab and top menu "
+            if (fileid > 0)
+            {
+                JSRuntime.InvokeVoidAsync("activetab");
+            }
+            else
+            {
+                JSRuntime.InvokeVoidAsync("disabledtab");
+            }
+
+            setTestdata = false;
+            JSRuntime.InvokeVoidAsync("showTopmenu");
+            //JSRuntime.InvokeVoidAsync("changetab", "file-tab");
+
+            #endregion
+
+            StateHasChanged();
+            firstRender = false;
+        }
+    }
+
+    #endregion
+
+    #region "Methods"
+    // //Modal
+    // private Modal modal = default!;
+
+    // private async Task OnShowModalClick()
+    // {
+    //     await modal.ShowAsync();
+    // }
+
+    // private async Task OnHideModalClick()
+    // {
+    //     await modal.HideAsync();
+    // }
+
+
+    private void ClearData()
+    {
+        requestfile = new Requestfile();
+        person = new Person();
+        requestfile.Filenumber = "TBD";
+        session.ClearAsync();
+    }
+
+    private void ValidateData()
+    {
+        AlertText1 = new List<string>();
+
+        if (requestfile != null)
+        {
+            if (requestfile.Requestdate == null)
+            {
+                AlertText1.Add("- Request Date");
+
+
+            }
+
+            if (requestfile.Receivedate == null)
+            {
+                AlertText1.Add("- Receive Date");
+
+            }
+
+            if (requestfile.Idviewed == null || requestfile.Idviewed < 0)
+            {
+                AlertText1.Add("- ID Viewed");
+
+            }
+
+            if (requestfile.Requesttypeid == null || requestfile.Requesttypeid < 0)
+            {
+                AlertText1.Add("- Request Type");
+
+            }
+
+            if (requestfile.Analystassignedid == null || requestfile.Analystassignedid < 0)
+            {
+                AlertText1.Add("- Analyst");
+
+            }
+
+            if (requestfile.Requestdetails == null || requestfile.Requestdetails == "")
+            {
+                AlertText1.Add("- Request Details");
+
+            }
+
+
+            if (requestfile.Requeststate != null)
+            {
+                string reqStateStr = string.Empty;
+                using (var context = DbFactory.CreateDbContext())
+                {
+                    reqStateStr = context.LkRequeststates.Where(x => x.Id == requestfile.Requeststate).FirstOrDefault().Detail.ToString();
+                }
+
+                if (reqStateStr.ToLower() == "closed" || reqStateStr.ToLower() == "withdrawn" || reqStateStr.ToLower() == "abandoned")
+                {
+                    if (requestfile.Closedate == null)
+                    {
+                        AlertText1.Add("- Specify Closed Date for Closed, Abandoned, and Withdrawn state types.");
+
+                    }
+                }
+
+            }
+
+            if (AlertText1.Count > 0)
+            {
+                AlertText1.Insert(0, "The access file request Information below is required.");
+
+            }
+        }
+        else
+        {
+            AlertText1.Add("Access Request is required.");
+        }
+
+        AlertText2 = new List<string>();
+        if (person != null || person.Id == 0)
+        {
+            if (person.Firstname == null || person.Firstname == "")
+            {
+                AlertText2.Add("- First Name");
+
+            }
+
+            if (person.Street == null || person.Street == "")
+            {
+                AlertText2.Add("- Street");
+
+            }
+
+            if (person.City == null || person.City == "")
+            {
+                AlertText2.Add("- City");
+
+            }
+
+            if (person.Province == null || person.Province == "")
+            {
+                AlertText2.Add("- Province");
+
+            }
+
+            if (person.Daytimephone == null || person.Daytimephone == "")
+            {
+                AlertText2.Add("- Daytime Phone");
+
+            }
+            if (AlertText2.Count > 0)
+            {
+                AlertText2.Insert(0, "The person request Information below is required.");
+            }
+        }
+        else
+        {
+            AlertText2.Add("Person information is required.");
+        }
+    }
+
+
+   
+    private async Task ValidSubmit()
+    {
+        ValidateData();
+
+        if (AlertText1.Count > 0 || AlertText2.Count > 0)
+        {
+            // await JSRuntime.InvokeVoidAsync("alert", AlertText1, AlertText2);
+            // await modal.ShowAsync<string>(title: "Data Required", parameters: parameters);
+            DisplayAlert = true;
+            // await  OnShowModalClick();
+
+           //  editContext.Validate();
+           // // await editContext.ValidateAsync();
+           //  return;
+
+        }
+        else
+        {
+            DisplayAlert = false;
+            // await OnHideModalClick();
+            if (person.Id != 0 && requestfile.Id != 0)
+            {
+                person.Moduser = userReg;
+                person.Moddate = DateTime.Today;
+
+                requestfile.Moduser = userReg;
+                requestfile.Moddate = DateTime.Today;
+
+                await personService.UpdatePerson(person);
+                await AuditData("update Person", "update person");
+                await Task.Delay(1000);
+                await UpdateFileNumber(requestfile.Id);
+                UpdateFileNumber(requestfile.Id);
+                SuccessMessage = "Data updated successfully";
+            }
+            else
+            {
+                person.Moduser = userReg;
+                person.Createdby = userReg;
+
+                person.Moddate = DateTime.Today;
+                person.Createdate = DateTime.Today;
+                await personService.CreatePerson(person);
+                await AuditData("create Person", "create person");
+                if (person.Id != null)
+                {
+                    requestfile.Personid = person.Id;
+                    requestfile.Moduser = userReg;
+                    requestfile.Createuser = userReg;
+
+                    requestfile.Moddate = DateTime.Today;
+                    requestfile.Createdate = DateTime.Today;
+
+                    /*********************************************************/
+                    /**** Create Request File without Receive Date First  ****/
+                    /*********************************************************/
+
+                    await requestFileService.CreateRequestfile(requestfile);
+                    await AuditData("Create RequestFile", "create file");
+                    await Task.Delay(1000);
+                    await UpdateFileNumber(requestfile.Id);
+                    await sessionStorage.SetItemAsync("RQID", requestfile.Id);
+                    await sessionStorage.SetItemAsync("objFileRequest", requestfile);
+                    loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
+
+                    if (requestfile.Id > 0)
+                    {
+                        JSRuntime.InvokeVoidAsync("activetab");
+                    }
+                    else
+                    {
+                        JSRuntime.InvokeVoidAsync("disabledtab");
+                    }
+
+                    SuccessMessage = "Data saved successfully";
+                }
+
+            }
+            alertMessageShow = true;
+            await InvokeAsync(() => StateHasChanged());
+            await Task.Delay(1000);
+            alertMessageShow = false;
+            //  navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
+        }
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update person" || type == "delete person")
+        {
+
+            auditlog.ActivityXml = auditlogService.GetAuditxml(operson, person, act).ToString();
+        }
+
+        if (type == "update file" || type == "delete file")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestfile, requestfile, act).ToString();
+
+        }
+
+        await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    private async Task UpdateFileNumber(int fileid)
+    {
+        Requestfile updatefile = requestfile;
+
+        var rtype = requestTypes.Where(x => x.Id == requestfile.Requesttypeid).FirstOrDefault();
+
+        // If receive date is not null then update file number with new format
+        if (updatefile.Filenumber == "TBD" && requestfile.Receivedate != null)
+        {
+            updatefile = requestfile;
+
+            int year = ((DateTime)updatefile.Receivedate).Year;
+            updatefile.Yearid = requestfiles.Where(x => x.Receivedate.ToString().Contains(year.ToString())).Count() + 1;
+        }
+
+        if (updatefile.Yearid != null)
+        {
+            updatefile.Filenumber = ((DateTime)requestfile.Receivedate).Year + "-" + rtype.Refertype + "-" + ((int)requestfile.Yearid).ToString("D4");
+            // Start Test Data
+            if (setTestdata)
+            {
+                updatefile.Referencenumber = "RF " + requestfile.Filenumber;
+                updatefile.Requestdetails = "Request Details For " + requestfile.Filenumber;
+                updatefile.Previousrequests = "Test For " + requestfile.Filenumber;
+                updatefile.Intakenotes = "Intake Notes For " + requestfile.Filenumber;
+
+            }
+        }
+        await requestFileService.UpdateRequestfile(updatefile);
+
+        await Task.Delay(1000);
+        await AuditData("update RequestFile", "update file");
+
+        requestfile = updatefile;
+        StateHasChanged();
     }
 
     public void GetData()
     {
         using (var context = DbFactory.CreateDbContext())
         {
-            int? requestTypeID = requestFile.Requesttypeid ?? null;
+            int? requestTypeID = requestfile.Requesttypeid ?? null;
             if (requestTypeID.HasValue)
             {
                 LkRequesttype requestType = context.LkRequesttypes.Where(x => x.Id == requestTypeID).FirstOrDefault();
                 requestTypeDetail = requestType.Detail;
             }
 
-            int? processingDeficiencyID = requestFile.Processingdeficiency ?? null;
+            int? processingDeficiencyID = requestfile.Processingdeficiency ?? null;
             if (processingDeficiencyID.HasValue)
             {
                 LkProcessingdeficiency processingDeficiency = context.LkProcessingdeficiencies.Where(x => x.Id == processingDeficiencyID).FirstOrDefault();
                 processingDeficiencyDetail = processingDeficiency.Detail;
             }
 
-            int? recordDeliveryMethodID = requestFile.Recorddeliverymethodid ?? null;
+            int? recordDeliveryMethodID = requestfile.Recorddeliverymethodid ?? null;
             if (recordDeliveryMethodID.HasValue)
             {
                 LkRecorddeliverymethod recordDeliveryMethod = context.LkRecorddeliverymethods.Where(x => x.Id == recordDeliveryMethodID).FirstOrDefault();
                 recordDeliveryMethodDetail = recordDeliveryMethod.Detail;
             }
 
-            int? analystAssignedID = requestFile.Analystassignedid ?? null;
+            int? analystAssignedID = requestfile.Analystassignedid ?? null;
             if (analystAssignedID.HasValue)
             {
                 Analyst analystAssigned = context.Analysts.Where(x => x.Id == analystAssignedID).FirstOrDefault();
                 analystAssignedName = analystAssigned.Displayname;
             }
 
-            int? requestStateID = requestFile.Requeststate ?? null;
+            int? requestStateID = requestfile.Requeststate ?? null;
             if (requestStateID.HasValue)
             {
                 LkRequeststate requestState = context.LkRequeststates.Where(x => x.Id == requestStateID).FirstOrDefault();
@@ -116,6 +544,45 @@
             analysts = context.Analysts.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
             requestStates = context.LkRequeststates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
             holidays = context.Holidays.Where(x => x.Status != "del").ToList();
+
+            holidays = context.Holidays.Where(x => x.Status != "del").ToList();
+            requestTypes = context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+           // requestfiles = context.Requestfiles.ToList();
+            if (fileid > 0)
+            {
+                //assigned Access Request File object
+                if (loginState.gFileId == 0 || loginState.gFileId == null)
+                {
+                    loginState.SetLogin(context.Requestfiles.FirstOrDefault(x => x.Id == fileid));
+                }
+
+                requestfile = loginState.Requestfile;
+                orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
+
+                if (requestfile.Yearid == 0 || requestfile.Yearid is null)
+                {
+                    requestfile.Filenumber = "TBD";
+                }
+                string pattern = "&%23160;";
+                Regex defaultRegex = new Regex(pattern);
+                MatchCollection matches;
+
+                var _intakeNotes = requestfile.Intakenotes;
+                if (!string.IsNullOrEmpty(requestfile.Intakenotes))
+                {
+                    _intakeNotes = HtmlUtilities.ConvertToPlainText(requestfile.Intakenotes);
+                    requestfile.Intakenotes = _intakeNotes.ToString().Replace("&%23160;", "");
+                }
+
+                var _requestDetails = requestfile.Requestdetails;
+                if (!string.IsNullOrEmpty(requestfile.Requestdetails))
+                {
+                    _requestDetails = HtmlUtilities.ConvertToPlainText(requestfile.Requestdetails);
+                    requestfile.Requestdetails = _requestDetails.ToString().Replace("&%23160;", "");
+                }
+                person = context.People.Where(x => x.Id == requestfile.Personid).FirstOrDefault();
+                operson = (Person)context.Entry(person).GetDatabaseValues().ToObject();
+            }
         }
     }
     #endregion
@@ -146,44 +613,92 @@
     {
         await Task.Delay(500);
 
-        if (requestFile.Receivedate != null)
+        if (requestfile.Receivedate != null)
         {
-            extensions = (await ExtensionService.GetExtensionList(requestFile.Id)).Where(x => x.Status != "del").ToList();
-            await dateService.SetDuedate(requestFile, extensions, holidays);
+            extensions = (await ExtensionService.GetExtensionList(requestfile.Id)).Where(x => x.Status != "del").ToList();
+            await dateService.SetDuedate(requestfile, extensions, holidays);
         }
+    }
+
+    private void FillData()
+    {
+        setTestdata = true;
+        person.Firstname = "Donald";
+        person.Lastname = "Duck";
+        person.Middlename = "D";
+
+        person.Birthdate = DateTime.Today.Date.AddYears(-30);
+
+        person.Email = "dnald@gmail.com";
+        person.Daytimephone = "403-305-3197";
+        person.Alternatephone = "403-994-888";
+        person.Faxphone = "1800-555-784";
+
+        person.Street = "152 1 street";
+        person.City = "Calgary";
+        person.Province = "Alberta";
+        person.Country = "Canada";
+
+        person.Personofinterestfirstname = "Mickey";
+        person.Personofinterestlastname = "Mouse";
+        person.Personofinterestmiddlename = "MD";
+
+        person.Companyname = "Disney";
+
+        requestfile.Requestdate = DateTime.Today.Date;
+        requestfile.Receivedate = DateTime.Today.Date;
+        //setDuedate();
+        requestfile.Requestduedate = ((DateTime)requestfile.Receivedate).AddDays(30);
+        requestfile.Referencenumber = "RF";
+        requestfile.Idviewed = 0;
+        requestfile.Requesttypeid = 1;
+        requestfile.Recorddeliverymethodid = 1;
+        requestfile.Processingdeficiency = 1;
+        requestfile.Analystassignedid = 9;
+        requestfile.Requestdetails = "Request Details For";
+        requestfile.Previousrequests = "Test";
+        requestfile.Intakenotes = "Intake Notes For";
+        requestfile.Timeframe = "1 month";
+        requestfile.Moddate = DateTime.Today;
+        requestfile.Moduser = userReg;
+        requestfile.Createdate = DateTime.Today;
+        requestfile.Createuser = userReg;
     }
 }
 
-<EditForm  Model="@requestFile">
+
+
+<EditForm  Model="@requestfile" OnValidSubmit="@ValidSubmit" OnInvalidSubmit="@inv">
+
     <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="container-fluid">
+ 
+     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbfilenumber">
                     File Number:
                 </label>
-                <InputText id="filenumber" class="form-control" readonly="true" placeholder="FILE NUMBER" @bind-Value="requestFile.Filenumber" style="background-color:lightgray" />
+                <InputText id="filenumber" class="form-control" readonly="true" placeholder="FILE NUMBER" @bind-Value="requestfile.Filenumber" style="background-color:lightgray" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
-               <span class="required">*</span> <label for="lbrequestdate">
+                <span class="required">*</span> <label for="lbrequestdate">
                     Request Date:
                 </label>
-                <InputDate id="requestdate" class="form-control" placeholder="REQUEST DATE" @bind-Value="requestFile.Requestdate" />
-                <ValidationMessage For="@(() => requestFile.Requestdate)" />
+                <InputDate id="requestdate" class="form-control" placeholder="REQUEST DATE" @bind-Value="requestfile.Requestdate" />
+                <ValidationMessage For="@(() => requestfile.Requestdate)" class="alert-danger" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span> <label for="lbreceivedate">
                     Received Date:
                 </label>
-                <InputDate id="receivedate" class="form-control" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="requestFile.Receivedate" @bind-Value:after="setDuedate" />
-                <ValidationMessage For="@(() => requestFile.Receivedate)" />
+                <InputDate id="receivedate" class="form-control" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="requestfile.Receivedate" @bind-Value:after="setDuedate" />
+                <ValidationMessage For="@(() => requestfile.Receivedate)" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrequestduedate">
                     Request Due Date:
                 </label>
-                <InputDate id="requestduedate" class="form-control" readonly="true" placeholder="REQUEST DUEDATE" @bind-Value="requestFile.Requestduedate" style="background-color:lightgray" />
+                <InputDate id="requestduedate" class="form-control" readonly="true" placeholder="REQUEST DUEDATE" @bind-Value="requestfile.Requestduedate" style="background-color:lightgray" />
             </div>
         </div>
 
@@ -192,41 +707,41 @@
                 <label for="lbreferencenumber">
                     Reference Number:
                 </label>
-                <InputText id="referencenumber" class="form-control" placeholder="REFERENCE NUMBER" @bind-Value="requestFile.Referencenumber" />
+                <InputText id="referencenumber" class="form-control" placeholder="REFERENCE NUMBER" @bind-Value="requestfile.Referencenumber" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label for="lbidviewed">
                     ID Viewed:
                 </label>
-                <InputSelect id="idviewed" class="form-control" placeholder="ID VIEWED" @bind-Value="requestFile.Idviewed">
-                    <option value="-1">Select...</option>
+                <InputSelect id="idviewed" class="form-control" placeholder="ID VIEWED" @bind-Value="requestfile.Idviewed">
+                    <option value="">Select...</option>
                     <option value="0">Yes</option>
                     <option value="1">No</option>
                     <option value="2">NA</option>
                 </InputSelect>
-                <ValidationMessage For="@(() => requestFile.Idviewed)" />
+                <ValidationMessage For="@(() => requestfile.Idviewed)" class="alert-danger" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label for="lbrequesttypeid">
                     Request Type:  <b>@requestTypeDetail</b>
                 </label>
-                <InputSelect id="requesttypeid" class="form-control" placeholder="REQUEST TYPE" @bind-Value="requestFile.Requesttypeid">
-                    <option value="-1">Select...</option>
+                <InputSelect id="requesttypeid" class="form-control" placeholder="REQUEST TYPE" @bind-Value="requestfile.Requesttypeid">
+                    <option value="">Select...</option>
                     @foreach (var lktype in requestTypes)
                     {
                         <option value="@lktype.Id">@lktype.Detail</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="@(() => requestFile.Requesttypeid)" />
+                <ValidationMessage For="@(() => requestfile.Requesttypeid)" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbprocessingdeficiency">
                     Processing Deficiency:  <b>@processingDeficiencyDetail</b>
                 </label>
-                <InputSelect id="processingdeficiency" class="form-control" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestFile.Processingdeficiency">
-                    <option value="-1">Select...</option>
+                <InputSelect id="processingdeficiency" class="form-control" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
+                    <option value="">Select...</option>
                     @foreach (var lktype in processingDeficiencies)
                     {
                         <option value="@lktype.Id">@lktype.Detail</option>
@@ -252,7 +767,7 @@
 
         @* Subject of Request Info *@
         <br />
-       
+
         @if (POISelectedPersonName != null)
         {
             person.Personofinterestfirstname = POISelectedPersonName.firstname;
@@ -322,7 +837,7 @@
                 </label>
                 <InputText id="companyname" class="form-control" @bind-Value="person.Companyname" />
             </div>
-        
+
 
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <span class="required">*</span>
@@ -345,7 +860,7 @@
                 <label>Birth Date:</label>
                 <InputDate id="birthdate" class="form-control" placeholder="BIRTH DATE" @bind-Value="person.Birthdate" />
             </div>
-    
+
         </div>
 
         @* Requester Address *@
@@ -355,8 +870,8 @@
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Address:</label>
                     <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" @bind-Value="selectedaddress">
-                        <SelectedTemplate Context="address">@address.Street @address.City @address.Province @address.City @address.Postalcode</SelectedTemplate>
-                        <ResultTemplate Context="address">@address.Street @address.City @address.Province @address.City @address.Postalcode</ResultTemplate>
+                        <SelectedTemplate Context="address">@address.Street @address.City @address.Province  @address.Postalcode</SelectedTemplate>
+                        <ResultTemplate Context="address">@address.Street @address.City @address.Province  @address.Postalcode</ResultTemplate>
                     </BlazoredTypeahead>
                 </div>
             </div>
@@ -444,7 +959,7 @@
                 <label for="lbrecorddeliverymethodid">
                     Record Delivery Method:  <b>@recordDeliveryMethodDetail</b>
                 </label>
-                <InputSelect id="recorddeliverymethodid" class="form-control" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestFile.Recorddeliverymethodid">
+                <InputSelect id="recorddeliverymethodid" class="form-control" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in recordDeliveryMethods)
                     {
@@ -457,34 +972,34 @@
                 <label for="lbanalystassignedid">
                     Analyst Assigned:  <b>@analystAssignedName</b>
                 </label>
-                <InputSelect id="analystassignedid" class="form-control" placeholder="ANALYST ASSIGNED" @bind-Value="requestFile.Analystassignedid">
+                <InputSelect id="analystassignedid" class="form-control" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in analysts)
                     {
                         <option value="@lktype.Id">@lktype.Displayname</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="@(() => requestFile.Analystassignedid)" />
+                <ValidationMessage For="@(() => requestfile.Analystassignedid)" />
             </div>
             <div class="col-lg-5 col-md-3 col-sm-12">
                 <label for="lbpreviousrequests">
                     Previous Requests:
                 </label>
-                <InputText id="previousrequests" class="form-control" placeholder="PREVIOUS REQUESTS" @bind-Value="requestFile.Previousrequests" />
+                <InputText id="previousrequests" class="form-control" placeholder="PREVIOUS REQUESTS" @bind-Value="requestfile.Previousrequests" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbtimeframe">
                     Time Frame:
                 </label>
-                <InputText id="timeframe" class="form-control" placeholder="TIME FRAME" @bind-Value="requestFile.Timeframe" />
+                <InputText id="timeframe" class="form-control" placeholder="TIME FRAME" @bind-Value="requestfile.Timeframe" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrequeststate">
                     Request State:  <b>@requestStateDetail</b>
                 </label>
-                
-                <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestFile.Requeststate">
+
+                <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate">
                     @* make request state default to Active *@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)
@@ -497,25 +1012,45 @@
                 <label for="lbclosedate">
                     Close Date:
                 </label>
-                <InputDate id="closedate" class="form-control" placeholder="CLOSE DATE" @bind-Value="requestFile.Closedate" />
+                <InputDate id="closedate" class="form-control" placeholder="CLOSE DATE" @bind-Value="requestfile.Closedate" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label for="lbrequestdetails">
                     Request Details:
                 </label>
-                
-                <InputTextArea id="requestdetails" class="form-control" placeholder="REQUEST DETAILS" @bind-Value="requestFile.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;">
-                    @((MarkupString)requestFile.Requestdetails)
-                    </InputTextArea>
-                <ValidationMessage For="@(() => requestFile.Requestdetails)" />
+
+                <InputTextArea id="requestdetails" class="form-control" placeholder="REQUEST DETAILS" @bind-Value="requestfile.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;">
+                    @((MarkupString)requestfile.Requestdetails)
+                </InputTextArea>
+                <ValidationMessage For="@(() => requestfile.Requestdetails)" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <label for="lbintakenotes">
                     Intake Notes:
                 </label>
-                <InputTextArea id="intakenotes" class="form-control" placeholder="INTAKE NOTES" @bind-Value="requestFile.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />
+                <InputTextArea id="intakenotes" class="form-control" placeholder="INTAKE NOTES" @bind-Value="requestfile.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />
             </div>
         </div>
     </div>
+
+
+    <hr />
+    <div style="color:red">
+     @*     @if (DisplayAlert)
+        {
+            <div> The access file request Information below is required. </div>
+        } *@
+        <ValidationSummary />
+    </div>
+  
+
+
+    @if (tester)
+    {
+        <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    }
+    &nbsp;
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="submit" class="btn btn-primary">Save</button>
 </EditForm>

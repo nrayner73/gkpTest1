@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Gatekeeper")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee9873a4cef57e13112e8236d588f5719b4705e5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f240e9d00c515da24fc943bca1645d92934fe7fe")]
 [assembly: System.Reflection.AssemblyProductAttribute("Gatekeeper")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Gatekeeper")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

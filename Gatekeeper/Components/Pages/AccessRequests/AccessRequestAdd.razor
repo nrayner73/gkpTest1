@@ -436,6 +436,13 @@
                         AlertText1.Add("- Specify Closed Date for Closed, Abandoned, and Withdrawn state types.");
                     }
                 }
+                if (reqStateStr.ToLower() == "active" || reqStateStr.ToLower() == "on hold" || reqStateStr.ToLower() == "under review")
+                {
+                    if (requestfile.Closedate != null)
+                    {
+                        AlertText1.Add("- Do not specify a Closed Date for Active, On Hold, or Under Review states.");
+                    }
+                }
 
             }
 

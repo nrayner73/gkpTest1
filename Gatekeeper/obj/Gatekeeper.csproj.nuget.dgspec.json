@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj": {}
+    "C:\\GateKeeper2024\\Gatekeeper\\Gatekeeper.csproj": {}
   },
   "projects": {
-    "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj": {
+    "C:\\GateKeeper2024\\Gatekeeper\\Gatekeeper.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
+        "projectUniqueName": "C:\\GateKeeper2024\\Gatekeeper\\Gatekeeper.csproj",
         "projectName": "Gatekeeper",
-        "projectPath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\Gatekeeper.csproj",
+        "projectPath": "C:\\GateKeeper2024\\Gatekeeper\\Gatekeeper.csproj",
         "packagesPath": "C:\\Users\\pol11067\\.nuget\\packages\\",
-        "outputPath": "C:\\Projects\\gatekeeper-2024\\Gatekeeper\\obj\\",
+        "outputPath": "C:\\GateKeeper2024\\Gatekeeper\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -120,7 +120,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

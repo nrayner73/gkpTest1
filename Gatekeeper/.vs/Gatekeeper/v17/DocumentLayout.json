@@ -5,14 +5,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\gatekeeper2024\\gatekeeper\\components\\pages\\accessrequests\\requestfileform.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\accessrequests\\requestfileform.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|C:\\GateKeeper2024\\Gatekeeper\\components\\pages\\accessrequests\\accessrequestadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:components\\pages\\accessrequests\\accessrequestadd.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|c:\\gatekeeper2024\\gatekeeper\\gatekeeper.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
-      "RelativeMoniker": "D:0:0:{9336D1C9-B972-46D6-B49B-524CC6BC67FB}|Gatekeeper.csproj|solutionrelative:gatekeeper.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 17,
+          "SelectedChildIndex": 14,
           "Children": [
             {
               "$type": "Bookmark",
@@ -73,22 +65,6 @@
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Gatekeeper",
-              "DocumentMoniker": "C:\\GateKeeper2024\\Gatekeeper\\Gatekeeper.csproj",
-              "RelativeDocumentMoniker": "Gatekeeper.csproj",
-              "ToolTip": "C:\\GateKeeper2024\\Gatekeeper\\Gatekeeper.csproj",
-              "RelativeToolTip": "Gatekeeper.csproj",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-06-13T17:54:08.828Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
-            {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
@@ -98,28 +74,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AccessRequestAdd.razor",
-              "DocumentMoniker": "C:\\GateKeeper2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
-              "ToolTip": "C:\\GateKeeper2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
-              "RelativeToolTip": "Components\\Pages\\AccessRequests\\AccessRequestAdd.razor",
-              "ViewState": "AQIAAAkCAAAAAAAAAAAmwA0CAAABAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-06-12T20:56:31.323Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "RequestFileForm.razor",
               "DocumentMoniker": "C:\\GateKeeper2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\RequestFileForm.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AccessRequests\\RequestFileForm.razor",
               "ToolTip": "C:\\GateKeeper2024\\Gatekeeper\\Components\\Pages\\AccessRequests\\RequestFileForm.razor",
               "RelativeToolTip": "Components\\Pages\\AccessRequests\\RequestFileForm.razor",
-              "ViewState": "AQIAAKoBAAAAAAAAAAAswJ4CAABTAAAA",
+              "ViewState": "AQIAAPoBAAAAAAAAAAAswBQCAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-06-12T13:58:06.686Z",
+              "WhenOpened": "2024-06-14T20:18:18.008Z",
               "EditorCaption": ""
             }
           ]

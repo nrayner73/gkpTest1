@@ -713,13 +713,13 @@
 
     public async Task setClosedDateIfStatusIsClosed()
     {
-        if (requestFile.Requeststate == 1 || requestFile.Requeststate == 3 || requestFile.Requeststate == 5)
+        if (requestfile.Requeststate == 1 || requestfile.Requeststate == 3 || requestfile.Requeststate == 5)
         {
-            requestFile.Closedate = DateTime.Today.Date;
+            requestfile.Closedate = DateTime.Today.Date;
         }
         else
         {
-            requestFile.Closedate = null;
+            requestfile.Closedate = null;
         }
     }
 }
@@ -1101,20 +1101,15 @@
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
-<<<<<<< 54938bd970a2d2a93cb7435f6cbd8ffef9d86d6a
-                <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestFile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+                <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
                     <option value="-1">Select...</option>
-=======
-                <InputSelect id="requeststate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate">
-                    @* make request state default to Active *@
-                    <option value="2" selected>Active</option>
->>>>>>> 7652d692d468b7597938a0cf0866116e705dfe0b
                     @foreach (var lktype in requestStates)
                     {
                         <option value="@lktype.Id">@lktype.Detail</option>
                     }
                 </InputSelect>
             </div>
+
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbclosedate">
                     Close Date:

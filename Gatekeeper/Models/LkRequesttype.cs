@@ -12,6 +12,7 @@ public partial class LkRequesttype
 {
  [Key]
 public int Id{ get; set; }
+[Required]
 [Column(TypeName = "varchar(255)")]
 public string? Detail{ get; set; }
 [Column(TypeName = "varchar(10)")]

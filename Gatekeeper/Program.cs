@@ -111,6 +111,7 @@ builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
 builder.Services.AddScoped<ILkRecordDeliveryMethodService, LkRecordDeliveryMethodService>();
 builder.Services.AddScoped<ILkRequesttypeService, LkRequesttypeService>();
+builder.Services.AddScoped<ILkReviewtypeService, LkReviewtypeService>();
 builder.Services.AddScoped<ILkRequestStateService, LkRequestStateService>();
 builder.Services.AddScoped<ILkProcessingdeficiencyService, LkProcessingdeficiencyService>();
 builder.Services.AddScoped<ILkPaymenttypeService, LkPaymenttypeService>();
@@ -145,7 +146,7 @@ builder.Services.AddScoped<ISearchLkRecordDeliveryMethodService, SearchLkRecordD
 builder.Services.AddScoped<ISearchLkRequestStateService, SearchLkRequestStateService>();
 builder.Services.AddScoped<ISearchLkSectionService, SearchLkSectionService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
-builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
+//builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();

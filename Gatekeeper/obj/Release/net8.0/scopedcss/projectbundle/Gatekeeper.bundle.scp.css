@@ -326,6 +326,24 @@ page-size-chooser select[b-c731o5n56r] {
 border-bottom[b-c731o5n56r] {
 border-bottom:double;
 }
+/* _content/Gatekeeper/Components/Pages/Cities/CityAdd.razor.rz.scp.css */
+[b-ksxcbb4iv8] table {
+    min-width: 100%;
+}
+
+[b-ksxcbb4iv8] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-ksxcbb4iv8] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-ksxcbb4iv8] tbody tr {
+    height: 1.8rem;
+}
 /* _content/Gatekeeper/Components/Pages/Extensions/ExtensionAdd.razor.rz.scp.css */
 [b-m2q7303c84] tr:nth-child(even) {
     background: #d8d8d8;
@@ -375,6 +393,24 @@ border-bottom:double;
 
 /* Don't collapse rows even if they are empty */
 [b-obm1x2umhb] tbody tr {
+    height: 1.8rem;
+}
+/* _content/Gatekeeper/Components/Pages/Locations/LocationAdd.razor.rz.scp.css */
+[b-i0h7kauxs1] table {
+    min-width: 100%;
+}
+
+[b-i0h7kauxs1] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-i0h7kauxs1] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-i0h7kauxs1] tbody tr {
     height: 1.8rem;
 }
 /* _content/Gatekeeper/Components/Pages/MyTasks/MytaskSearch.razor.rz.scp.css */
@@ -441,6 +477,114 @@ border-bottom:double;
 
 /* Don't collapse rows even if they are empty */
 [b-yu3dijjj8z] tbody tr {
+    height: 1.8rem;
+}
+/* _content/Gatekeeper/Components/Pages/ProcessingDeficiency/ProcessingDeficiencyAdd.razor.rz.scp.css */
+[b-3xa9h0dhyt] table {
+    min-width: 100%;
+}
+
+[b-3xa9h0dhyt] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-3xa9h0dhyt] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-3xa9h0dhyt] tbody tr {
+    height: 1.8rem;
+}
+/* _content/Gatekeeper/Components/Pages/RecordDeliveryMethods/RecordDeliveryMethodAdd.razor.rz.scp.css */
+[b-j6oysbzzyn] table {
+    min-width: 100%;
+}
+
+[b-j6oysbzzyn] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-j6oysbzzyn] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-j6oysbzzyn] tbody tr {
+    height: 1.8rem;
+}
+/* _content/Gatekeeper/Components/Pages/RequestStates/RequestStateAdd.razor.rz.scp.css */
+[b-s46g1asrbt] table {
+    min-width: 100%;
+}
+
+[b-s46g1asrbt] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-s46g1asrbt] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-s46g1asrbt] tbody tr {
+    height: 1.8rem;
+}
+/* _content/Gatekeeper/Components/Pages/RequestType/RequestTypeAdd.razor.rz.scp.css */
+[b-j081wibi3v] table {
+    min-width: 100%;
+}
+
+[b-j081wibi3v] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-j081wibi3v] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-j081wibi3v] tbody tr {
+    height: 1.8rem;
+}
+/* _content/Gatekeeper/Components/Pages/ReviewType/ReviewTypeAdd.razor.rz.scp.css */
+[b-gd2b59p6gg] table {
+    min-width: 100%;
+}
+
+[b-gd2b59p6gg] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-gd2b59p6gg] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-gd2b59p6gg] tbody tr {
+    height: 1.8rem;
+}
+/* _content/Gatekeeper/Components/Pages/Sections/SectionAdd.razor.rz.scp.css */
+[b-y9tx3dc9dc] table {
+    min-width: 100%;
+}
+
+[b-y9tx3dc9dc] th.filter-name {
+    width: 14rem;
+}
+
+/* Subtle stripe effect */
+[b-y9tx3dc9dc] tr:nth-child(even) {
+    background: #d8d8d8;
+}
+
+/* Don't collapse rows even if they are empty */
+[b-y9tx3dc9dc] tbody tr {
     height: 1.8rem;
 }
 /* _content/Gatekeeper/Components/Pages/VideoNotes/VideoNoteAdd.razor.rz.scp.css */

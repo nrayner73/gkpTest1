@@ -12,8 +12,10 @@ public partial class LkSection
 {
  [Key]
 public int Id{ get; set; }
+[Required]
 [Column(TypeName = "varchar(255)")]
 public string? Sectiontype{ get; set; }
+[Required]
 [Column(TypeName = "varchar(255)")]
 public string? Section{ get; set; }
 public DateTime? Createdate{ get; set; }

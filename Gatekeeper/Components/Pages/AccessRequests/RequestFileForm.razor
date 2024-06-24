@@ -149,6 +149,7 @@
     private string? userReg;
     protected async override Task OnInitializedAsync()
     {
+        requestfile.Requeststate = 2; 
         GetData();
         GetDataContext();
     }
@@ -530,8 +531,8 @@
             await dateService.SetDuedate(requestfile, extensions, holidays);
         }
     }
-    
-    
+
+
     public void GetData()
     {
         using (var context = DbFactory.CreateDbContext())
@@ -705,6 +706,7 @@
         requestfile.Previousrequests = "Test";
         requestfile.Intakenotes = "Intake Notes For";
         requestfile.Timeframe = "1 month";
+        requestfile.Requeststate = 2;
         requestfile.Moddate = DateTime.Today;
         requestfile.Moduser = userReg;
         requestfile.Createdate = DateTime.Today;

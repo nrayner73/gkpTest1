@@ -4,8 +4,6 @@
 @inject IAddressService addressService
 @inject IDateService dateService
 
-
-
 @using Gatekeeper.Models.MenuInfo
 @using Gatekeeper.CustomValidators
 @using System.Text
@@ -149,7 +147,6 @@
     private string? userReg;
     protected async override Task OnInitializedAsync()
     {
-        requestfile.Requeststate = 2; 
         GetData();
         GetDataContext();
     }
@@ -205,6 +202,7 @@
         requestfile = new Requestfile();
         person = new Person();
         requestfile.Filenumber = "TBD";
+        requestfile.Requeststate = 2;
         session.ClearAsync();
     }
 
@@ -410,6 +408,11 @@
             }
             else
             {
+                if (requestfile.Requeststate == null)
+                {
+                    requestfile.Requeststate = 2;
+                }
+
                 person.Moduser = userReg;
                 person.Createdby = userReg;
 

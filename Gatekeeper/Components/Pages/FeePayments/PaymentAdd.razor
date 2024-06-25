@@ -138,7 +138,6 @@
         if (payment.Id > 0)
         {
             savetype = "update";
-            payment.edited = true;
             using (var context = DbFactory.CreateDbContext())
             {
                 opayment = (Payment)context.Entry(payment).GetDatabaseValues().ToObject();

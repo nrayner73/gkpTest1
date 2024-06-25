@@ -13,6 +13,7 @@ public partial class Payment
  [Key]
 public int Id{ get; set; }
 public int? Requestid{ get; set; }
+public int PaymentLineNumber {  get; set; }
 [Column(TypeName = "varchar(250)")]
 public string? Description{ get; set; }
 [Column(TypeName = "varchar(250)")]

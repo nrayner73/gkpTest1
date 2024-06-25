@@ -19,6 +19,22 @@ namespace Gatekeeper.Models.Lookups
     }
 
 
+    [Keyless]
+    public class PersonEmail
+    {
+        public string email { get; set; }
+       
+
+   
+    }
+
+    [Keyless]
+    public class PersonPhone
+    {
+        public string daytimephone { get; set; }
+       
+    }
+
 
     [Keyless]
     public class POIName

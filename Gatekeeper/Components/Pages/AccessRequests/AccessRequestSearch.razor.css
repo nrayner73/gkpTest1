@@ -1,14 +1,26 @@
-﻿::deep th.country-name {
-    width: 14rem;
+﻿/**, ::after, ::before {
+box-sizing :border-box;
 }
+
+nav {
+    display: block;
+    unicode-bidi: isolate;
+}*/
+::deep tr {
+    font-family: arial;
+    font-size: medium;
+}
+/*::deep th.country-name {
+    width: 14rem;
+}*/
 
 /* Subtle stripe effect */
-::deep tr:nth-child(even) {
+/*::deep tr:nth-child(even) {
     background: #d8d8d8;
-}
+}*/
 
 /* Don't collapse rows even if they are empty */
-::deep tbody tr {
+/*::deep tbody tr {
     height: 1.8rem;
 }
 
@@ -21,5 +33,5 @@
 .page-size-chooser select {
     margin: 0 1rem;
     padding: 0.25rem 0.5rem;
-}
+}*/
 

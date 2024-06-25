@@ -30,6 +30,21 @@ namespace Gatekeeper.DataServices.Lookups
             return personNames;
         }
 
+        public List<PersonPhone>? GetPersonPhones()
+        {
+            List<PersonPhone> personPhones = new List<PersonPhone>();
+            personPhones = _context?.PersonPhones?.FromSqlRaw("EXECUTE [gkp].[GetPersonPhones] ").ToList();
+
+            return personPhones;
+        }
+
+        public List<PersonEmail>? GetPersonEmails()
+        {
+            List<PersonEmail> personEmails = new List<PersonEmail>();
+            personEmails = _context?.PersonEmails?.FromSqlRaw("EXECUTE [gkp].[GetPersonEmails] ").ToList();
+
+            return personEmails;
+        }
         public List<POIName> GetPOINames()
         {
             List<POIName> poiNames = new List<POIName>();
@@ -37,5 +52,8 @@ namespace Gatekeeper.DataServices.Lookups
 
             return poiNames;
         }
+
+
+
     }
 }

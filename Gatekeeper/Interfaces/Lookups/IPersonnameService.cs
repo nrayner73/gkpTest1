@@ -8,7 +8,8 @@ namespace Gatekeeper.Interfaces.Lookups
         List<PersonName> GetNames();
         List<POIName> GetPOINames();
         List<CompanyName> GetCompanyNames();
-
+        List<PersonPhone> GetPersonPhones();
+        List<PersonEmail> GetPersonEmails();
 
     }
 }

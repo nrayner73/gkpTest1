@@ -146,7 +146,6 @@ builder.Services.AddScoped<ISearchLkRecordDeliveryMethodService, SearchLkRecordD
 builder.Services.AddScoped<ISearchLkRequestStateService, SearchLkRequestStateService>();
 builder.Services.AddScoped<ISearchLkSectionService, SearchLkSectionService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();
-//builder.Services.AddScoped<ISearchPaymentService, SearchPaymentService>();
 builder.Services.AddScoped<ISearchrequestfileService, SearchrequestfileService>();
 builder.Services.AddScoped<ISearchVideonoteService, SearchVideonoteService>();
 builder.Services.AddScoped<IViewHolidayService, ViewHolidayService>();

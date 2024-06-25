@@ -605,12 +605,6 @@ C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\refint\Gatekeeper.dll
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.pdb
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\Gatekeeper.genruntimeconfig.cache
 C:\Projects\gatekeeper-2024\Gatekeeper\obj\Debug\net8.0\ref\Gatekeeper.dll
-C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
-C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
-C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
-C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
-C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
-C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\appsettings.Development.json
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\appsettings.json
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Gatekeeper.staticwebassets.runtime.json
@@ -631,6 +625,7 @@ C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.AspNetCore.Authenticatio
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.AspNetCore.Components.QuickGrid.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
+C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.CodeAnalysis.Workspaces.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
@@ -707,9 +702,13 @@ C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSh
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.Workspaces.resources.dll
+C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll
+C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
+C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
@@ -724,6 +723,7 @@ C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\linux\lib\net8.0\System.DirectoryServices.Protocols.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\osx\lib\net8.0\System.DirectoryServices.Protocols.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.DirectoryServices.Protocols.dll
+C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 C:\GateKeeper2024\Gatekeeper\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll

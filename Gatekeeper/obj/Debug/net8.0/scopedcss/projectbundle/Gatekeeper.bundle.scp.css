@@ -235,30 +235,42 @@ a:active[b-bbh6r6pxsf] {
     float:right;
 }
 /* _content/Gatekeeper/Components/Pages/AccessRequests/AccessRequestSearch.razor.rz.scp.css */
-[b-vrjkvxbnqu] th.country-name {
-    width: 14rem;
+/**, ::after, ::before {
+box-sizing :border-box;
 }
+
+nav {
+    display: block;
+    unicode-bidi: isolate;
+}*/
+[b-vrjkvxbnqu] tr {
+    font-family: arial;
+    font-size: medium;
+}
+/*::deep th.country-name {
+    width: 14rem;
+}*/
 
 /* Subtle stripe effect */
-[b-vrjkvxbnqu] tr:nth-child(even) {
+/*::deep tr:nth-child(even) {
     background: #d8d8d8;
-}
+}*/
 
 /* Don't collapse rows even if they are empty */
-[b-vrjkvxbnqu] tbody tr {
+/*::deep tbody tr {
     height: 1.8rem;
 }
 
-.page-size-chooser[b-vrjkvxbnqu] {
+.page-size-chooser {
     display: flex;
     align-items: revert;
     margin-bottom: 1rem;
 }
 
-.page-size-chooser select[b-vrjkvxbnqu] {
+.page-size-chooser select {
     margin: 0 1rem;
     padding: 0.25rem 0.5rem;
-}
+}*/
 
 /* _content/Gatekeeper/Components/Pages/AnalystNotes/AnalystNoteAdd.razor.rz.scp.css */
 [b-l5pgvhum4i] tr:nth-child(even) {
@@ -404,48 +416,53 @@ a:active[b-bbh6r6pxsf] {
     overflow-y: auto;
 }
 */
-[b-cnhds8r9c9] th.full-name {
+/*::deep th.full-name {
     width: 14rem;
 }
 
-[b-cnhds8r9c9] .col-width {
+::deep .col-width {
     min-width: 30em;
     max-width: 30em;
-}
+}*/
 
 /* Subtle stripe effect */
 [b-cnhds8r9c9] tr:nth-child(even) {
-    background: #d8d8d8;
+    /*    background: #e9e8e8 ;
+    background: #d8d8d8;*/
 }
 
+[b-cnhds8r9c9] tr {
+    font-family: arial;
+    font-size: medium ;
+}
 /* Don't collapse rows even if they are empty */
-[b-cnhds8r9c9] tbody tr {
+/*::deep tbody tr {
     height: 1.8rem;
     width:100%;
-}
+}*/
 
-.page-size-chooser[b-cnhds8r9c9] {
+/*.page-size-chooser {
     display: flex;
     align-items: revert;
     margin-bottom: 1rem;
 }
 
-.page-size-chooser select[b-cnhds8r9c9] {
+.page-size-chooser select {
     margin: 0 1rem;
     padding: 0.25rem 0.5rem;
 }
 
-.flag[b-cnhds8r9c9] {
+.flag {
 
    color: red;
     font-weight: 200;
 
 }
 
-.flagblue[b-cnhds8r9c9] {
+.flagblue {
     font-weight: 200;
     color: blue;
-}
+}*/
 /* _content/Gatekeeper/Components/Pages/PaymentTypes/PaymentTypeAdd.razor.rz.scp.css */
 [b-yu3dijjj8z] table {
     min-width: 100%;

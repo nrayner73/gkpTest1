@@ -49,6 +49,8 @@
     private POIName POIpersonname { get; set; } = new POIName();
 
     public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
+
+
     #endregion
 
     #endregion
@@ -93,13 +95,18 @@
     #endregion
 
     #region "Methods"
-    private void LoadData()
+    private int totalrecordCount { get; set; } = 0;
+
+    private async void LoadData()
     {
 
         fileInfo.Regno = userReg;
         if (searchmytaskfiles == null || searchmytaskfiles.Count() == 0)
         {
             searchmytaskfiles = searchmytaskService.GetMytaskList(fileInfo).AsQueryable<Searchmytask>();
+            totalrecordCount = searchmytaskfiles.Count();
+
+            
         }
     }
 
@@ -143,13 +150,12 @@
     private void goToAddPage(int fileid)
     {
         setSession(fileid);
-        navigationManager.NavigateTo($"/accessrequests/add",true);
+        navigationManager.NavigateTo($"/accessrequests/add", true);
     }
-
-      private async Task setSession(int fileid)
+    private async Task setSession(int fileid)
     {
         //  Requestfile requestfile = new Requestfile();
-       
+
 
         if (fileid > 0)
         {
@@ -160,8 +166,49 @@
             loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
             requestfile = loginState.Requestfile;
         }
-        
+
     }
+
+    private string? PageButtonClass(int pageIndex)
+      => pagination.CurrentPageIndex == pageIndex ? "current" : null;
+
+    private string? AriaCurrentValue(int pageIndex)
+        => pagination.CurrentPageIndex == pageIndex ? "page" : null;
+
+    private int lastPageIndex { get; set; } = 4;
+    private int firstPageIndex { get; set; } = 0;
+    private async Task GoToPageAsync(int pageIndex)
+    {
+        var x = pagination;
+
+        lastPageIndex = (int)pagination.LastPageIndex;
+
+        if (pageIndex >= firstPageIndex && pageIndex <= lastPageIndex)
+        {
+            await pagination.SetCurrentPageIndexAsync(pageIndex);
+        }
+        else
+        {
+            if (pageIndex < lastPageIndex)
+            {
+                if (pageIndex < totalrecordCount - 5)
+                {
+                    if (pageIndex < pagination.LastPageIndex)
+                    {
+                        firstPageIndex = lastPageIndex + 1;
+                        lastPageIndex += 5;
+
+                    }
+
+                }
+
+            }
+        }
+
+
+
+    }
+
 
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
     {
@@ -210,7 +257,7 @@
                     <InputText id="referencenumber" class="form-control" @bind-Value="fileInfo.Referencenumber" />
                 </div>
 
-              
+
 
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label for="lbrequesttypeid">
@@ -332,7 +379,7 @@
 
 
 <div class="row" style="width:100%;">
-    <div class="col-lg-5" style="float:left">
+    <div class="col" style="float:left">
         Show:
         <label><input type="checkbox" @bind="showid" /> Record Id</label>
         &nbsp;&nbsp;&nbsp;
@@ -340,7 +387,7 @@
         &nbsp;&nbsp;&nbsp;
         <label><input type="checkbox" @bind="showpanel" /> Search Panel</label>
     </div>
-    <div class="col-lg-5" style="float:left">
+    <div class="col" style="float:left">
         <div class="page-size-chooser">
             Items per page:
             <select @bind="@pagination.ItemsPerPage">
@@ -353,19 +400,76 @@
         </div>
 
     </div>
-    <div class="col-lg-2" style="float:revert">
-        <div class="page-size-chooser">
-            <button type="button" class="btn btn-warning" @onclick="()=>goToAddPage(0)">Add New</button>
-        </div>
+    <div class="col" style="float:revert">
+        <button type="button" class="btn btn-warning" @onclick="()=>goToAddPage(0)">Add New</button>
     </div>
+    <div class="col" style="float:revert">
+        <div class="pagination">
+            <nav aria-label="Page navigation" b-3qssc0bm46>
+                <ul class="pagination">
+                    <li class="page-item @(pagination.CurrentPageIndex <= pagination.LastPageIndex  ? "disabled" : "")">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <i class="bi bi-chevron-double-left"></i>
 
+                        </a>
+                    </li>
+                    <li class="page-item @(pagination.CurrentPageIndex == firstPageIndex  ? "disabled" : "")">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <i class="bi bi-chevron-left"></i>
+
+                        </a>
+                    </li>
+
+
+                    @if (totalrecordCount > 0)
+                    {
+                        for (var pageIndex = firstPageIndex; pageIndex <= lastPageIndex; pageIndex++)
+                        {
+                            var capturedIndex = pageIndex;
+                            <li class="page-item">
+                                <a @onclick="@(() => GoToPageAsync(capturedIndex))"
+                                   class="page-link" href="@PageButtonClass(capturedIndex)"
+                                   aria-current="@AriaCurrentValue(capturedIndex)"
+                                   aria-label="Go to page @(pageIndex + 1)">
+                                    @(pageIndex + 1)
+
+                                </a>
+                            </li>
+                        }
+                    }
+
+                    <li class="page-item @(pagination.CurrentPageIndex >= pagination.LastPageIndex  ? "disabled" : "")">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item  @(pagination.CurrentPageIndex == pagination.LastPageIndex  ? "disabled" : "")">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+    </div>
+    
 </div>
 
-@* Display number of items at the top, instead of bottom *@
-<Paginator State="@pagination" />
+
+
+
+
+@* Display number of items at the top, instead of bottom
+        <Paginator State="@pagination"></Paginator>
+*@
+
+
+
+
 
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@searchmytaskfiles" Virtualize="true" Pagination="@pagination">
+    <QuickGrid Items="@searchmytaskfiles" Virtualize="true" Pagination="@pagination" Class="bb-table table table-hover table-bordered table-striped">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
@@ -378,24 +482,24 @@
 
         <PropertyColumn Property="@(r => r.Filenumber)" Title="File Number" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Intakenotes)" Title="Status Update" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Personname)" Title="Name" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Personname)" Title="Person Name" Sortable="true" />
         <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
         <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
-        
+
         @* <TemplateColumn Title="Status">
-            @if (@context.Taskstatus == "overdue")
-            {
-                <div class="flag">@context.Taskstatus </div>
-            }
-            else
-            {
-                <div class="flagblue">@context.Taskstatus </div>
-            }
+        @if (@context.Taskstatus == "overdue")
+        {
+        <div class="flag">@context.Taskstatus </div>
+        }
+        else
+        {
+        <div class="flagblue">@context.Taskstatus </div>
+        }
         </TemplateColumn> *@
         <TemplateColumn Title="Actions">
-            <a @onclick="()=>goToAddPage(context.Id)"  class="btn btn-outline-primary">
+            <a @onclick="()=>goToAddPage(context.Id)" class="link-primary">
                 <i class="fas fa-edit">Edit</i>
             </a>
         </TemplateColumn>

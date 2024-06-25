@@ -3,27 +3,32 @@
     overflow-y: auto;
 }
 */
-::deep th.full-name {
+/*::deep th.full-name {
     width: 14rem;
 }
 
 ::deep .col-width {
     min-width: 30em;
     max-width: 30em;
-}
+}*/
 
 /* Subtle stripe effect */
 ::deep tr:nth-child(even) {
-    background: #d8d8d8;
+    /*    background: #e9e8e8 ;
+    background: #d8d8d8;*/
 }
 
+::deep tr {
+    font-family: arial;
+    font-size: medium ;
+}
 /* Don't collapse rows even if they are empty */
-::deep tbody tr {
+/*::deep tbody tr {
     height: 1.8rem;
     width:100%;
-}
+}*/
 
-.page-size-chooser {
+/*.page-size-chooser {
     display: flex;
     align-items: revert;
     margin-bottom: 1rem;
@@ -44,4 +49,4 @@
 .flagblue {
     font-weight: 200;
     color: blue;
-}
+}*/

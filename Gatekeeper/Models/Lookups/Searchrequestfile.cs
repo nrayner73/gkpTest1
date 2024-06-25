@@ -27,6 +27,9 @@ namespace Gatekeeper.Models.Lookups
         public string? Firstname { get; set; } = string.Empty;
         public string? Lastname { get; set; } = string.Empty;
         public string? Middlename { get; set; } = string.Empty;
+        public string? Email { get; set; } = string.Empty;
+        public string? Daytimephone { get; set; } = string.Empty;
+
         public string? Personname { get; set; } = string.Empty;
         public string? PersonOfInterest { get; set; } = string.Empty;
         public string? POIfirstname { get; set; } = string.Empty;
@@ -34,37 +37,8 @@ namespace Gatekeeper.Models.Lookups
         public string? POImiddlename { get; set; } = string.Empty;
         public string? Requestdetails { get; set; } = string.Empty;
         public string? Intakenotes { get; set; } = string.Empty;
+       
 
-        public void getFileById()
-        {
-            AppState appState = new AppState();
 
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-            builder.ConnectionString = appState.gbConnectionString;
-
-            using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
-            {
-                Console.WriteLine("\nQuery data example:");
-                Console.WriteLine("=========================================\n");
-
-                connection.Open();
-
-                String sql = "SELECT * from gkp.requestfiles";
-
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            
-                        }
-                    }
-                }
-
-            }
-
-        }
-        
     }
 }

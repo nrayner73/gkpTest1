@@ -499,10 +499,10 @@
             // Start Test Data
             if (setTestdata)
             {
-                updatefile.Referencenumber = "RF " + requestfile.Filenumber;
-                updatefile.Requestdetails = "Request Details For " + requestfile.Filenumber;
-                updatefile.Previousrequests = "Test For " + requestfile.Filenumber;
-                updatefile.Intakenotes = "Intake Notes For " + requestfile.Filenumber;
+                // updatefile.Referencenumber = "RF " + requestfile.Filenumber;
+                // updatefile.Requestdetails = "Request Details For " + requestfile.Filenumber;
+                // updatefile.Previousrequests = "Test For " + requestfile.Filenumber;
+                // updatefile.Intakenotes = "Intake Notes For " + requestfile.Filenumber;
 
             }
         }
@@ -592,7 +592,7 @@
 
             holidays = context.Holidays.Where(x => x.Status != "del").ToList();
             requestTypes = context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
-            // requestfiles = context.Requestfiles.ToList();
+             requestfiles = context.Requestfiles.ToList();
             if (fileid > 0)
             {
                 //assigned Access Request File object

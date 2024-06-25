@@ -45,6 +45,10 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<PersonName> PersonNames { get; set; }
 
+        public virtual DbSet<PersonPhone> PersonPhones { get; set; }
+
+        public virtual DbSet<PersonEmail> PersonEmails { get; set; }
+
         public virtual DbSet<POIName> POINames { get; set; }
 
         public virtual DbSet<SearchRequestfee> RequestfeeInfos { get; set; }

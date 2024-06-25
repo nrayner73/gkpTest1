@@ -205,22 +205,18 @@
                             requestfee.Createuser = userReg;
                             requestfee.Moddate = DateTime.Now;
                             requestfee.Moduser = userReg;
-                            requestfee.edited = false;
                             await RequestfeeService.CreateRequestfee(requestfee);
                             await AuditData("Create Payment", "create", requestfee);
                         }
                     }
                     else
                     {
-
-                        // if (requestfee.edited && requestfee.Description != "" && requestfee.Description != null)
                         if (requestfee.Description != "" && requestfee.Description != null)
                         {
                             requestfee.Moddate = DateTime.Now;
                             requestfee.Moduser = userReg;
                             await RequestfeeService.UpdateRequestfee(requestfee);
                             await AuditData("Update Payment", "create", requestfee);
-                            requestfee.edited = false;
                         }
                     }
                 }
@@ -237,7 +233,6 @@
                         payment.Createuser = userReg;
                         payment.Moddate = DateTime.Now;
                         payment.Moduser = userReg;
-                        payment.edited = false;
                         payment.PaymentLineNumber = lineNumber;
                         await PaymentService.CreatePayment(payment);
                     } else
@@ -253,7 +248,6 @@
                         payment.Moddate = DateTime.Now;
                         payment.Moduser = userReg;
                         await PaymentService.UpdatePayment(payment);
-                        payment.edited = false;
                     } 
 
                 }

@@ -221,7 +221,6 @@
         {
             requestfee.Finalcost = requestfee.Estimatedcost;
         }
-        requestfee.edited = true;
         StateHasChanged();
     }
 
@@ -238,11 +237,6 @@
         isEditing = true;
     }
 
-    private async void UpdateData(Requestfee requestfee)
-    {
-        requestfee.edited = true;
-        StateHasChanged();
-    }
     private void AddNewWithData()
     {
         var requestFee = new Requestfee();
@@ -291,7 +285,7 @@
                     @if (item != null)
                     {
                         <tr>
-                            <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="() => UpdateData(item)" @bind-Value="@item.Description" /></td>
+                            <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="@item.Description" /></td>
                             <td> <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Estimatedcost" /></td>
                             <td>
                                 <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Requested">
@@ -307,7 +301,7 @@
                                     <option value="No">No</option>
                                 </InputSelect>
                             </td>
-                            <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @onchange="() => UpdateData(item)" @bind-Value="@item.Finalcost" /></td>
+                            <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @bind-Value="@item.Finalcost" /></td>
 
                             <td>
                                 <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>

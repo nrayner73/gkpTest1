@@ -203,20 +203,31 @@
     {
         var payment = new Payment();
         payment.Requestid = fileid;
+        if (!payments.Any()) {
+            payment.PaymentLineNumber = 1;
+        } else {
+            payment.PaymentLineNumber = payments.ToArray().Max(x => x.PaymentLineNumber) + 1;
+        }
         payments.Add(payment);
         isEditing = true;
     }
 
     private void AddNewWithData()
-    {
+    { 
         var payment = new Payment();
         payment.Requestid = fileid;
+        if (!payments.Any())
+        {
+            payment.PaymentLineNumber = 1;
+        } else {
+            payment.PaymentLineNumber = payments.ToArray().Max(x => x.PaymentLineNumber) + 1;
+        }
         payment.Description = "description";
         payment.Paymentdate = DateTime.Now;
         payment.Paytypeid = 1;
         payment.Authorization = "authorization";
         payment.Payamount = 100;
-        payment.Createdate = DateTime.Now;
+        payment.Createdate = DateTime.Now;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
         payment.Createuser = userReg;
         payment.Moddate = DateTime.Now;
         payment.Moduser = userReg;
@@ -257,7 +268,7 @@
                     @if (item != null)
                     {
                         <tr>
-                            <td>@item.Id</td>
+                            <td>@item.PaymentLineNumber</td>
                             <td>
                                 <InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="() => UpdateData(item)" @bind-Value="@item.Description" />
                             </td>
@@ -294,7 +305,7 @@
                     {
                         var PayTypeName = GetPaymentType(item);
                         <tr>
-                            <td>@item.Id</td>
+                            <td>@item.PaymentLineNumber</td>
                             <td>@item.Description</td>
                             <td>@item.Paymentdate</td>
                             <td>@PayTypeName</td>

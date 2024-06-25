@@ -225,32 +225,39 @@
                     }
                 }
             }
+            int lineNumber = 1;
             foreach (var payment in payments)
             {
-                    if (payment.Id == 0)
+                if (payment.Id == 0)
+                {
+                    if (payment.Description != "" && payment.Description != null)
                     {
-                        if (payment.Description != "" && payment.Description != null)
-                        {
-                            payment.Createdate = DateTime.Now;
-                            payment.Createuser = userReg;
-                            payment.Moddate = DateTime.Now;
-                            payment.Moduser = userReg;
-                            payment.edited = false;
-                            await PaymentService.CreatePayment(payment);
-                        }
-                    }
-                    else
-                    {
-                        // if (payment.edited && payment.Description != "" && payment.Description != null)
-                        if (payment.Description != "" && payment.Description != null)
-                        {
-                            payment.Moddate = DateTime.Now;
-                            payment.Moduser = userReg;
-                            await PaymentService.UpdatePayment(payment);
-                            payment.edited = false;
-                        }
 
-            }
+                        payment.Createdate = DateTime.Now;
+                        payment.Createuser = userReg;
+                        payment.Moddate = DateTime.Now;
+                        payment.Moduser = userReg;
+                        payment.edited = false;
+                        payment.PaymentLineNumber = lineNumber;
+                        await PaymentService.CreatePayment(payment);
+                    } else
+                    {
+                        //undo incrementing line number - this line will not be added
+                        lineNumber--;
+                    }
+                }
+                else
+                {
+                    if (payment.Description != "" && payment.Description != null)
+                    {
+                        payment.Moddate = DateTime.Now;
+                        payment.Moduser = userReg;
+                        await PaymentService.UpdatePayment(payment);
+                        payment.edited = false;
+                    } 
+
+                }
+                lineNumber++;
             }
 
             StatusClass = "alert-success";

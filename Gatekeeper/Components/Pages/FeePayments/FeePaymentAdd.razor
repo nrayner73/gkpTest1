@@ -191,7 +191,7 @@
                 throw;
             }
 
-
+            int feeLineNumber = 1;
             foreach (var requestfee in requestfees)
             {
 
@@ -205,8 +205,13 @@
                             requestfee.Createuser = userReg;
                             requestfee.Moddate = DateTime.Now;
                             requestfee.Moduser = userReg;
+                            requestfee.LineNumber = feeLineNumber;
                             await RequestfeeService.CreateRequestfee(requestfee);
                             await AuditData("Create Payment", "create", requestfee);
+                        }else
+                        {
+                            //undo incrementing line number - this line will not be added
+                            feeLineNumber--;
                         }
                     }
                     else
@@ -220,8 +225,9 @@
                         }
                     }
                 }
+                feeLineNumber++;
             }
-            int lineNumber = 1;
+            int paymentLineNumber = 1;
             foreach (var payment in payments)
             {
                 if (payment.Id == 0)
@@ -233,12 +239,12 @@
                         payment.Createuser = userReg;
                         payment.Moddate = DateTime.Now;
                         payment.Moduser = userReg;
-                        payment.PaymentLineNumber = lineNumber;
+                        payment.PaymentLineNumber = paymentLineNumber;
                         await PaymentService.CreatePayment(payment);
                     } else
                     {
                         //undo incrementing line number - this line will not be added
-                        lineNumber--;
+                        paymentLineNumber--;
                     }
                 }
                 else
@@ -251,7 +257,7 @@
                     } 
 
                 }
-                lineNumber++;
+                paymentLineNumber++;
             }
 
             StatusClass = "alert-success";

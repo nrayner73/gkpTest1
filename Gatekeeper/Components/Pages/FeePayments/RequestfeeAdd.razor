@@ -233,6 +233,13 @@
     {
         var requestFee = new Requestfee();
         requestFee.Requestid = fileid;
+        if(!requestfees.Any())
+        {
+            requestFee.LineNumber = 1;
+        } else
+        {
+            requestFee.LineNumber = requestfees.ToArray().Max(x => x.LineNumber) + 1;
+        }
         requestfees.Add(requestFee);
         isEditing = true;
     }
@@ -266,11 +273,11 @@
 <table class="table table-striped">
     <thead class="table-info">
         <tr>
-
-            <th scope="col">Fee Description</th>
+            <th scope="col">Item #</th>
+            <th scope="col">Description</th>
             <th scope="col">Estimated Cost</th>
             <th scope="col">Requested</th>
-            <th scope="col">Feewaived</th>
+            <th scope="col">Fee Weived</th>
             <th scope="col">Final Cost</th>
             <th scope="col">Action</th>
         </tr>
@@ -285,6 +292,7 @@
                     @if (item != null)
                     {
                         <tr>
+                            <td>@item.LineNumber</td>
                             <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="@item.Description" /></td>
                             <td> <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Estimatedcost" /></td>
                             <td>
@@ -318,6 +326,7 @@
                     @if (item != null)
                     {
                         <tr>
+                            <td>@item.LineNumber</td>
                             <td>@item.Description</td>
                             <td>@item.Estimatedcost</td>
                             <td>@item.Requested</td>

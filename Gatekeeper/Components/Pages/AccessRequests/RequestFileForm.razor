@@ -488,6 +488,11 @@
 
         var rtype = requestTypes.Where(x => x.Id == requestfile.Requesttypeid).FirstOrDefault();
 
+        using (var context = DbFactory.CreateDbContext())
+        {
+            requestfiles = context.Requestfiles.ToList();
+        }
+
         // If receive date is not null then update file number with new format
         if (updatefile.Filenumber == "TBD" && requestfile.Receivedate != null)
         {
@@ -596,7 +601,7 @@
 
             holidays = context.Holidays.Where(x => x.Status != "del").ToList();
             requestTypes = context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
-             requestfiles = context.Requestfiles.ToList();
+            //requestfiles = context.Requestfiles.ToList(); -- moved to UpdateFileNumber
             if (fileid > 0)
             {
                 //assigned Access Request File object
@@ -607,7 +612,7 @@
 
                 requestfile = loginState.Requestfile;
                 orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
-
+                
                 if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
                 {
                     IsDisabled = true;
@@ -616,7 +621,6 @@
                 {
                     IsDisabled = false;
                 }
-
 
                 if (requestfile.Yearid == 0 || requestfile.Yearid is null)
                 {

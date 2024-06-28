@@ -28,6 +28,8 @@ public partial class Requestfile
     
     [Column(TypeName = "varchar(2000)")]
     public string? Referencenumber { get; set; }
+    [Column(TypeName = "varchar(2000)")]
+    public string? Statusnote { get; set; }
 
     [Required]
     public int? Idviewed { get; set; }

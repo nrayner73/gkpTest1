@@ -40,6 +40,7 @@
     bool setTestdata = false;
 
     private bool tester = false;
+    bool fileIsClosed = false;
 
     [Parameter]
     public int fileid { get; set; }
@@ -515,11 +516,20 @@
 
             }
         }
-        if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
+
+        checkIfFileIsClosed();
+
+        if (fileIsClosed)
+        //if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
         {
             IsDisabled = true;
-
         }
+        else
+        {
+            IsDisabled = false;
+        }
+            
+
         await requestFileService.UpdateRequestfile(updatefile);
 
         await Task.Delay(1000);
@@ -613,7 +623,14 @@
                 requestfile = loginState.Requestfile;
                 orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
 
+<<<<<<< 83adb8ca1d339f3a1b55a0a81fb47fb422e69f01
+                checkIfFileIsClosed();
+
+                if (fileIsClosed)
+                // if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
+=======
                 if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
+>>>>>>> 336fe862cadaa88a8c62bfdaf1cc143439108810
                 {
                     IsDisabled = true;
                 }
@@ -719,6 +736,33 @@
         requestfile.Moduser = userReg;
         requestfile.Createdate = DateTime.Today;
         requestfile.Createuser = userReg;
+    }
+
+    public async Task setClosedDateIfStatusIsClosed()
+    {
+        checkIfFileIsClosed();
+
+        if (fileIsClosed)
+        {
+            requestfile.Closedate = DateTime.Today.Date;
+        }
+        else
+        {
+            requestfile.Closedate = null;
+        }
+    }
+
+    public bool checkIfFileIsClosed()
+    {
+        foreach (LkRequeststate item in requestStates)
+        {
+            if (requestfile.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
+            {
+                fileIsClosed = true;
+                break;
+            }
+        }
+        return fileIsClosed;    
     }
 }
 
@@ -1109,7 +1153,7 @@
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
-                <InputSelect id="requeststate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate">
+                <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
                     @* make request state default to Active *@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)

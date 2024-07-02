@@ -13,10 +13,10 @@ public partial class Requestfee
  [Key]
 public int Id{ get; set; }
 public int? Requestid{ get; set; }
-public int? Paytypeid{ get; set; }
-    [Column(TypeName = "varchar(250)")]
-    public string? Description { get; set; }
-    public decimal? Estimatedcost{ get; set; }
+public int LineNumber { get; set; }
+[Column(TypeName = "varchar(250)")]
+public string? Description { get; set; }
+public decimal? Estimatedcost{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Requested{ get; set; }
 [Column(TypeName = "varchar(5)")]

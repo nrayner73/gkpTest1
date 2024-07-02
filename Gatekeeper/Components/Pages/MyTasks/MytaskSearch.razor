@@ -257,7 +257,12 @@
                     <InputText id="referencenumber" class="form-control" @bind-Value="fileInfo.Referencenumber" />
                 </div>
 
-
+                <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        Status Note:
+                    </label>
+                    <InputText id="statusnote" class="form-control" @bind-Value="fileInfo.Statusnote" />
+                </div>
 
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label for="lbrequesttypeid">
@@ -487,6 +492,7 @@
         <PropertyColumn Property="@(r => r.Personname)" Title="Person Name" Sortable="true" />
         <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
         <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Statusnote)" Title="Status Note" Sortable="true" />
 
         @* <TemplateColumn Title="Status">
         @if (@context.Taskstatus == "overdue")

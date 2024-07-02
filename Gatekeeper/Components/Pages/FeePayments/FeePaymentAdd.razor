@@ -63,7 +63,7 @@
     private IRequestfeeService RequestfeeService { get; set; }
 
     private List<Requestfee> requestfees { get; set; } = new List<Requestfee>();
-    
+
 
     [Inject]
     private IRequestfileService requestFileService { get; set; }
@@ -191,11 +191,10 @@
                 throw;
             }
 
-
+            int feeLineNumber = 1;
             foreach (var requestfee in requestfees)
             {
-                requestfee.Moddate = DateTime.Now;
-                requestfee.Moduser = userReg;
+
                 if (requestfee != null)
                 {
                     if (requestfee.Id == 0)
@@ -204,13 +203,19 @@
                         {
                             requestfee.Createdate = DateTime.Now;
                             requestfee.Createuser = userReg;
+                            requestfee.Moddate = DateTime.Now;
+                            requestfee.Moduser = userReg;
+                            requestfee.LineNumber = feeLineNumber;
                             await RequestfeeService.CreateRequestfee(requestfee);
                             await AuditData("Create Payment", "create", requestfee);
+                        }else
+                        {
+                            //undo incrementing line number - this line will not be added
+                            feeLineNumber--;
                         }
                     }
                     else
                     {
-
                         if (requestfee.Description != "" && requestfee.Description != null)
                         {
                             requestfee.Moddate = DateTime.Now;
@@ -220,28 +225,39 @@
                         }
                     }
                 }
+                feeLineNumber++;
             }
+            int paymentLineNumber = 1;
             foreach (var payment in payments)
             {
-                    if (payment.Id == 0)
+                if (payment.Id == 0)
+                {
+                    if (payment.Description != "" && payment.Description != null)
                     {
-                        if (payment.Description != "" && payment.Description != null)
-                        {
-                            payment.Createdate = DateTime.Now;
-                            payment.Createuser = userReg;
-                            await PaymentService.CreatePayment(payment);
-                        }
-                    }
-                    else
-                    {
-                        if (payment.Description != "" && payment.Description != null)
-                        {
-                            payment.Moddate = DateTime.Now;
-                            payment.Moduser = userReg;
-                            await PaymentService.UpdatePayment(payment);
-                        }
 
-            }
+                        payment.Createdate = DateTime.Now;
+                        payment.Createuser = userReg;
+                        payment.Moddate = DateTime.Now;
+                        payment.Moduser = userReg;
+                        payment.PaymentLineNumber = paymentLineNumber;
+                        await PaymentService.CreatePayment(payment);
+                    } else
+                    {
+                        //undo incrementing line number - this line will not be added
+                        paymentLineNumber--;
+                    }
+                }
+                else
+                {
+                    if (payment.Description != "" && payment.Description != null)
+                    {
+                        payment.Moddate = DateTime.Now;
+                        payment.Moduser = userReg;
+                        await PaymentService.UpdatePayment(payment);
+                    } 
+
+                }
+                paymentLineNumber++;
             }
 
             StatusClass = "alert-success";

@@ -30,6 +30,7 @@ namespace Gatekeeper.DataServices.Lookups
                 new SqlParameter { ParameterName = "@receivetodate",Value = searchfilter.Receivedate == null ? (object)DBNull.Value : searchfilter.Receivedate } ,
                 new SqlParameter { ParameterName = "@requestduedate",Value = searchfilter.Requestduedate == null ? (object)DBNull.Value : searchfilter.Requestduedate } ,
                 new SqlParameter { ParameterName = "@referencenumber",Value = string.IsNullOrEmpty(searchfilter.Referencenumber) ? (object)DBNull.Value : searchfilter.Referencenumber } ,
+                new SqlParameter { ParameterName = "@statusnote",Value = string.IsNullOrEmpty(searchfilter.Statusnote) ? (object)DBNull.Value : searchfilter.Statusnote } ,
                 new SqlParameter { ParameterName = "@requesttypeid",Value = searchfilter.Requesttypeid == null ? (object)DBNull.Value : searchfilter.Requesttypeid } ,
                 new SqlParameter { ParameterName = "@requesttype",Value = string.IsNullOrEmpty(searchfilter.Requesttype) ? (object)DBNull.Value : searchfilter.Requesttype} ,
                 new SqlParameter { ParameterName = "@analystassignedid",Value = searchfilter.Analystassignedid == null ? (object)DBNull.Value : searchfilter.Analystassignedid } ,
@@ -57,6 +58,7 @@ namespace Gatekeeper.DataServices.Lookups
             " @receivefromdate, " +
             " @receivetodate, " +
             " @referencenumber, " +
+            " @statusnote, " +
             " @requesttypeid, " +
             " @requesttype, " +
             " @analystassignedid, " +

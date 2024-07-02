@@ -623,10 +623,14 @@
                 requestfile = loginState.Requestfile;
                 orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
 
+<<<<<<< 83adb8ca1d339f3a1b55a0a81fb47fb422e69f01
                 checkIfFileIsClosed();
 
                 if (fileIsClosed)
                 // if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
+=======
+                if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
+>>>>>>> 336fe862cadaa88a8c62bfdaf1cc143439108810
                 {
                     IsDisabled = true;
                 }
@@ -717,6 +721,7 @@
         //setDuedate();
         requestfile.Requestduedate = ((DateTime)requestfile.Receivedate).AddDays(30);
         requestfile.Referencenumber = "RF";
+        requestfile.Statusnote = "Status Note For";
         requestfile.Idviewed = 0;
         requestfile.Requesttypeid = 1;
         requestfile.Recorddeliverymethodid = 1;
@@ -888,6 +893,16 @@
                         <option value="@lktype.Id">@lktype.Detail</option>
                     }
                 </InputSelect>
+            </div>
+        </div>
+
+         <div class="row">
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbstatusnote">
+                    Status Note:
+                </label>
+                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" @bind-Value="requestfile.Statusnote" />
             </div>
         </div>
 

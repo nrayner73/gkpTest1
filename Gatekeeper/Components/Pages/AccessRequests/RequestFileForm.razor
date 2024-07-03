@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
 @inject IAddressService addressService
@@ -623,14 +623,10 @@
                 requestfile = loginState.Requestfile;
                 orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
 
-<<<<<<< 83adb8ca1d339f3a1b55a0a81fb47fb422e69f01
                 checkIfFileIsClosed();
 
                 if (fileIsClosed)
                 // if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
-=======
-                if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
->>>>>>> 336fe862cadaa88a8c62bfdaf1cc143439108810
                 {
                     IsDisabled = true;
                 }

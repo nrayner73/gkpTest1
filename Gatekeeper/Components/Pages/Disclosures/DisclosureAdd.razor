@@ -81,6 +81,8 @@
 
     private bool tester = false;
 
+    protected bool IsDisabled { get; set; } = false;
+
     #endregion
 
     #region "Component Lifecycle"
@@ -177,6 +179,11 @@
                 {
                     discloseditemsData = context.Discloseditems.Where(x => x.Requestid == fileid).ToList();
                     odiscloseditemsData = context.Discloseditems.Where(x => x.Requestid == fileid).ToList();
+                }
+
+                if (context.LkRequeststates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").Any(x => x.Id == requestfile.Requeststate))
+                {
+                    IsDisabled = true;
                 }
 
                 LoadData();
@@ -410,67 +417,67 @@
                 <label for="lbfileclosedate">
                     Date file close:
                 </label>
-                <InputDate id="fileclosedate" class="form-control" placeholder="FILE CLOSE DATE" @bind-Value="summarydisclosure.Fileclosedate" />
+                <InputDate id="fileclosedate" class="form-control" placeholder="FILE CLOSE DATE" @bind-Value="summarydisclosure.Fileclosedate" disabled="@IsDisabled" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbpagesidentified">
                     Pages identified:
                 </label>
-                <InputText id="pagesidentified" class="form-control" placeholder="PAGES IDENTIFIED" @bind-Value="summarydisclosure.Pagesidentified" />
+                <InputText id="pagesidentified" class="form-control" placeholder="PAGES IDENTIFIED" @bind-Value="summarydisclosure.Pagesidentified" disabled="@IsDisabled" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbpagesdisclosed">
                     Pages disclosed:
                 </label>
-                <InputText id="pagesdisclosed" class="form-control" placeholder="PAGES DISCLOSED" @bind-Value="summarydisclosure.Pagesdisclosed" />
+                <InputText id="pagesdisclosed" class="form-control" placeholder="PAGES DISCLOSED" @bind-Value="summarydisclosure.Pagesdisclosed" disabled="@IsDisabled" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbvideoidentified">
                     Video identified:
                 </label>
-                <InputText id="videoidentified" class="form-control" placeholder="VIDEO IDENTIFIED" @bind-Value="summarydisclosure.Videoidentified" />
+                <InputText id="videoidentified" class="form-control" placeholder="VIDEO IDENTIFIED" @bind-Value="summarydisclosure.Videoidentified" disabled="@IsDisabled" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbvideodisclosed">
                     Video disclosed:
                 </label>
-                <InputText id="videodisclosed" class="form-control" placeholder="VIDEO DISCLOSED" @bind-Value="summarydisclosure.Videodisclosed" />
+                <InputText id="videodisclosed" class="form-control" placeholder="VIDEO DISCLOSED" @bind-Value="summarydisclosure.Videodisclosed" disabled="@IsDisabled" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbaudioidentified">
                     Audio identified:
                 </label>
-                <InputText id="audioidentified" class="form-control" placeholder="AUDIO IDENTIFIED" @bind-Value="summarydisclosure.Audioidentified" />
+                <InputText id="audioidentified" class="form-control" placeholder="AUDIO IDENTIFIED" @bind-Value="summarydisclosure.Audioidentified" disabled="@IsDisabled" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbaudiodisclosed">
                     Audio disclosed:
                 </label>
-                <InputText id="audiodisclosed" class="form-control" placeholder="AUDIO DISCLOSED" @bind-Value="summarydisclosure.Audiodisclosed" />
+                <InputText id="audiodisclosed" class="form-control" placeholder="AUDIO DISCLOSED" @bind-Value="summarydisclosure.Audiodisclosed" disabled="@IsDisabled" />
             </div>
 
             <div class="col-lg-8 col-md-8 col-sm-12">
                 <label for="lbremarks">
                     Remarks:
                 </label>
-                <InputTextArea id="remarks" class="form-control" placeholder="REMARKS" @bind-Value="summarydisclosure.Remarks" row="15" col="150" style="min-height: 130px; overflow:auto;" />
+                <InputTextArea id="remarks" class="form-control" placeholder="REMARKS" @bind-Value="summarydisclosure.Remarks" disabled="@IsDisabled" row="15" col="150" style="min-height: 130px; overflow:auto;" />
             </div>
         </div>
     </div>
     <br />
-    <DiscloseditemAdd userReg="@userReg" requestfile="requestfile" locationlist="locationlist" sectionlist="sectionlist" File_locationitems="locationitemData" File_discloseditems="discloseditemsData" View_locationitems="locationViewData" View_discloseditems="disclosedViewData"></DiscloseditemAdd>
+    <DiscloseditemAdd userReg="@userReg" requestfile="requestfile" locationlist="locationlist" sectionlist="sectionlist" File_locationitems="locationitemData" File_discloseditems="discloseditemsData" View_locationitems="locationViewData" View_discloseditems="disclosedViewData" IsDisabled="IsDisabled"></DiscloseditemAdd>
     <br />
 
     
     @if (tester)
     {
-        <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+        <button type="button" class="btn btn-primary" @onclick="FillData" disabled="@IsDisabled">Fill Data</button>
     }
     &nbsp;
-    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-primary" @onclick="ClearData" disabled="@IsDisabled">Add New</button>
+    <button type="submit" class="btn btn-primary" disabled="@IsDisabled">Save</button>
 </EditForm>
 
 

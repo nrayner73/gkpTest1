@@ -212,11 +212,7 @@
 
     private void setfinalcost(Requestfee requestfee)
     {
-        if (requestfee.Feewaived == "Yes")
-        {
-            requestfee.Finalcost = 0;
-        }
-        else if(requestfee.Requested == "No")
+        if (requestfee.Requested == "Yes" && requestfee.Feewaived == "Approved" || requestfee.Requested == "No" && requestfee.Feewaived == "NotRequested")
         {
             requestfee.Finalcost = 0;
         }
@@ -262,7 +258,7 @@
         requestFee.Description = "description";
         requestFee.Estimatedcost = 100;
         requestFee.Requested = "Yes";
-        requestFee.Feewaived = "Yes";
+        requestFee.Feewaived = "Approved";
         requestFee.Finalcost = 0;
         requestFee.Createdate = DateTime.Now;
         requestFee.Createuser = userReg;
@@ -316,8 +312,10 @@
                             <td>
                                 <InputSelect id="feewaived" class="form-control" placeholder="FEE WAIVED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Feewaived">
                                     <option value="-1">Select...</option>
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
+                                    <option value="NotRequested">Not Requested</option>
+                                    <option value="Requested">Requested</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Denied">Denied</option>
                                 </InputSelect>
                             </td>
                             <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @bind-Value="@item.Finalcost" /></td>

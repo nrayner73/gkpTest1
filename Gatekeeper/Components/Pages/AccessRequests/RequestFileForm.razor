@@ -45,7 +45,6 @@
     [Parameter]
     public int fileid { get; set; }
 
-
     public bool DisplayAlert { get; set; }
     public List<string> AlertText1 = new List<string>();
     public List<string> AlertText2 = new List<string>();
@@ -79,14 +78,12 @@
     public EventCallback<bool> OnSubmit { get; set; }
     private Dictionary<string, object> parameters = new Dictionary<string, object>();
 
-
     #region Lookup parameters
 
     public List<LkProcessingdeficiency>? processingDeficiencies { get; set; } = new List<LkProcessingdeficiency>();
     public List<LkRecorddeliverymethod> recordDeliveryMethods { get; set; } = new List<LkRecorddeliverymethod>();
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkRequeststate>? requestStates { get; set; } = new List<LkRequeststate>();
-
 
     private List<Extension> extensions { get; set; } = new List<Extension>();
 
@@ -113,9 +110,7 @@
     public List<AddressInfo>? addresses { get; set; } = new List<AddressInfo>();
     private AddressInfo selectedaddress;
     private AddressInfo address { get; set; } = new AddressInfo();
-
     #endregion
-
     #endregion
 
     #region "Component Lifecycle"
@@ -186,8 +181,6 @@
             setTestdata = false;
             JSRuntime.InvokeVoidAsync("showTopmenu");
             JSRuntime.InvokeVoidAsync("changetab", "file-tab");
-
-
             #endregion
 
             StateHasChanged();
@@ -216,38 +209,31 @@
             if (requestfile.Requestdate == null)
             {
                 AlertText1.Add("- Request Date");
-
-
             }
 
             if (requestfile.Receivedate == null)
             {
                 AlertText1.Add("- Receive Date");
-
             }
 
             if (requestfile.Idviewed == null || requestfile.Idviewed < 0)
             {
                 AlertText1.Add("- ID Viewed");
-
             }
 
             if (requestfile.Requesttypeid == null || requestfile.Requesttypeid < 0)
             {
                 AlertText1.Add("- Request Type");
-
             }
 
             if (requestfile.Analystassignedid == null || requestfile.Analystassignedid < 0)
             {
                 AlertText1.Add("- Analyst");
-
             }
 
             if (requestfile.Requestdetails == null || requestfile.Requestdetails == "")
             {
                 AlertText1.Add("- Request Details");
-
             }
 
 
@@ -264,16 +250,13 @@
                     if (requestfile.Closedate == null)
                     {
                         AlertText1.Add("- Specify Closed Date for Closed, Abandoned, and Withdrawn state types.");
-
                     }
                 }
-
             }
 
             if (AlertText1.Count > 0)
             {
                 AlertText1.Insert(0, "The access file request Information below is required.");
-
             }
         }
         else
@@ -287,31 +270,26 @@
             if (person.Firstname == null || person.Firstname == "")
             {
                 AlertText2.Add("- First Name");
-
             }
 
             if (person.Street == null || person.Street == "")
             {
                 AlertText2.Add("- Street");
-
             }
 
             if (person.City == null || person.City == "")
             {
                 AlertText2.Add("- City");
-
             }
 
             if (person.Province == null || person.Province == "")
             {
                 AlertText2.Add("- Province");
-
             }
 
             if (person.Daytimephone == null || person.Daytimephone == "")
             {
                 AlertText2.Add("- Daytime Phone");
-
             }
             if (AlertText2.Count > 0)
             {
@@ -346,7 +324,6 @@
             await OnShowModalClick();
             IsDisabled = true;
             //return;
-
         }
         else
         {
@@ -363,13 +340,11 @@
 
                 await UpdateFileNumber(requestfile.Id);
                 UpdateFileNumber(requestfile.Id);
-
             }
 
             StateHasChanged();
             SuccessMessage = "The data has been activated successfully";
             await OnShowModalClick();
-
             //  navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
         }
 
@@ -445,15 +420,20 @@
                 }
 
             }
+
+            checkIfFileIsClosed();
+
+            if (fileIsClosed)
+            {
+                IsDisabled = true;
+            }
+            else
+            {
+                IsDisabled = false;
+            }
+
             StateHasChanged();
-
             await OnShowModalClick();
-
-            // alertMessageShow = true;
-            // await InvokeAsync(() => StateHasChanged());
-            // await Task.Delay(1000);
-            // alertMessageShow = false;
-            //  navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
         }
     }
 
@@ -516,22 +496,7 @@
 
             }
         }
-
-        checkIfFileIsClosed();
-
-        if (fileIsClosed)
-        //if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
-        {
-            IsDisabled = true;
-        }
-        else
-        {
-            IsDisabled = false;
-        }
-            
-
         await requestFileService.UpdateRequestfile(updatefile);
-
         await Task.Delay(1000);
         await AuditData("update RequestFile", "update file");
 
@@ -622,21 +587,15 @@
 
                 requestfile = loginState.Requestfile;
                 orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
-
-<<<<<<< 83adb8ca1d339f3a1b55a0a81fb47fb422e69f01
                 checkIfFileIsClosed();
 
                 if (fileIsClosed)
-                // if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
-=======
-                if (requestfile.Requeststate == requestStates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").FirstOrDefault().Id)
->>>>>>> 336fe862cadaa88a8c62bfdaf1cc143439108810
                 {
                     IsDisabled = true;
                 }
                 else
                 {
-                    IsDisabled = false;
+                     IsDisabled = false;
                 }
 
                 if (requestfile.Yearid == 0 || requestfile.Yearid is null)

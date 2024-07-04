@@ -31,6 +31,9 @@
     [Parameter]
     public List<LocationViewitem> View_locationitems { get; set; } = new List<LocationViewitem>();
 
+    [Parameter]
+    public bool IsDisabled { get; set; } = false;
+
 
     private LkLocationsearch lklocationsearch { get; set; } = new LkLocationsearch();
     private LkSection lksection { get; set; } = new LkSection();
@@ -342,34 +345,34 @@
             <EditForm Model="@locationitem">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-                <InputSelect id="locationitem" class="form-select d-inline" style="width:250px;" @bind-Value="locationitem.Locationid">
+                <InputSelect id="locationitem" class="form-select d-inline" style="width:250px;" @bind-Value="locationitem.Locationid" disabled="@IsDisabled">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in Lklocationsearch)
                     {
                         <option value="@lktype.Id">@lktype.Detail</option>
                     }
                 </InputSelect>
-                <Button id="addLocationitem" Color="ButtonColor.Primary" @onclick="locationSearchAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
+                <Button id="addLocationitem" Color="ButtonColor.Primary" @onclick="locationSearchAdd" disabled="@IsDisabled"><Icon Name="IconName.PlusCircle" /> Add</Button>
             </EditForm>
         </div>
         <div class="col-lg-4 col-md-5 col-sm-12">
             <EditForm Model="@discloseditem">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-                <InputSelect id="disclosureitem" class="form-select d-inline" style="width:250px;" @bind-Value="discloseditem.Sectionid">
+                <InputSelect id="disclosureitem" class="form-select d-inline" style="width:250px;" @bind-Value="discloseditem.Sectionid" disabled="@IsDisabled">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in Lkdisclosured)
                     {
                         <option value="@lktype.Id">@lktype.Section</option>
                     }
                 </InputSelect>
-                <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="disclosuredAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
+                <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="disclosuredAuthAdd" disabled="@IsDisabled"><Icon Name="IconName.PlusCircle" /> Add</Button>
 
             </EditForm>
         </div>
         <div class="col-lg-4 col-md-5 col-sm-12">
             <EditForm Model="@sectionuseditem">
-                <InputSelect id="sectionuseditem" class="form-select d-inline" style="width:250px;" onchange="@OtherText()" @bind-Value="sectionuseditem.Sectionid">
+                <InputSelect id="sectionuseditem" class="form-select d-inline" style="width:250px;" onchange="@OtherText()" @bind-Value="sectionuseditem.Sectionid" disabled="@IsDisabled">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in Lksectionused)
                     {
@@ -377,7 +380,7 @@
                     }
                 </InputSelect>
 
-                <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="sectionusedAuthAdd"><Icon Name="IconName.PlusCircle" /> Add</Button>
+                <Button id="addDisclosureitem" Color="ButtonColor.Primary" @onclick="sectionusedAuthAdd" disabled="@IsDisabled"><Icon Name="IconName.PlusCircle" /> Add</Button>
                 &nbsp;
                 @if (showOthertext)
                 {
@@ -409,7 +412,7 @@
                             {
                                 <tr>
                                     <td>@item.Locationname</td>
-                                    <td> <Button @onclick="()=>locationSearchDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
+                                    <td> <Button @onclick="()=>locationSearchDelete(item.Id)" class="btn btn-outline-primary" disabled="@IsDisabled">Delete</Button> </td>
                                 </tr>
                             }
                         }
@@ -444,7 +447,7 @@
                             {
                                 <tr>
                                     <td>@item.Section</td>
-                                    <td> <Button @onclick="()=>disclosuredAuthDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
+                                    <td> <Button @onclick="()=>disclosuredAuthDelete(item.Id)" class="btn btn-outline-primary" disabled="@IsDisabled">Delete</Button> </td>
                                 </tr>
                             }
                         }
@@ -480,7 +483,7 @@
                                 <tr>
                                     <td>@item.Section</td>
                                     <td>@item.Othertext</td>
-                                    <td> <Button @onclick="()=>sectionusedDelete(item.Id)" class="btn btn-outline-primary">Delete</Button> </td>
+                                    <td> <Button @onclick="()=>sectionusedDelete(item.Id)" class="btn btn-outline-primary" disabled="@IsDisabled">Delete</Button> </td>
                                 </tr>
                             }
                         }

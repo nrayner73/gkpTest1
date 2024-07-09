@@ -305,14 +305,14 @@
                             <td><InputText id="description" class="form-control" placeholder="DESCRIPTION" @bind-Value="@item.Description" /></td>
                             <td> <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Estimatedcost" /></td>
                             <td>
-                                <InputSelect id="requested" class="form-control" placeholder="REQUESTED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Requested">
+                                <InputSelect id="requested" class="form-select d-inline" placeholder="REQUESTED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Requested">
                                     <option value="-1">Select...</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                 </InputSelect>
                             </td>
                             <td>
-                                <InputSelect id="feewaived" class="form-control" placeholder="FEE WAIVED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Feewaived">
+                                <InputSelect id="feewaived" class="form-select d-inline" placeholder="FEE WAIVED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Feewaived">
                                     <option value="-1">Select...</option>
                                     <option value="NotRequested">Not Requested</option>
                                     <option value="Requested">Requested</option>

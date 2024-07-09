@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
 @inject IAddressService addressService
@@ -1069,7 +1069,7 @@
         <hr />
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbrecorddeliverymethodid">
+                <label for="recorddeliverymethodid">
                     Record Delivery Method:  <b>@recordDeliveryMethodDetail</b>
                 </label>
                 <InputSelect id="recorddeliverymethodid" class="form-control" disabled="@IsDisabled" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
@@ -1082,7 +1082,7 @@
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
-                <label for="lbanalystassignedid">
+                <label for="analystassignedid">
                     Analyst Assigned:  <b>@analystAssignedName</b>
                 </label>
                 <InputSelect id="analystassignedid" class="form-control" disabled="@IsDisabled" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
@@ -1095,20 +1095,20 @@
                 <ValidationMessage For="@(() => requestfile.Analystassignedid)" />
             </div>
             <div class="col-lg-5 col-md-3 col-sm-12">
-                <label for="lbpreviousrequests">
+                <label for="previousrequests">
                     Previous Requests:
                 </label>
                 <InputText id="previousrequests" class="form-control" disabled="@IsDisabled" placeholder="PREVIOUS REQUESTS" @bind-Value="requestfile.Previousrequests" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbtimeframe">
+                <label for="timeframe">
                     Time Frame:
                 </label>
                 <InputText id="timeframe" class="form-control" disabled="@IsDisabled" placeholder="TIME FRAME" @bind-Value="requestfile.Timeframe" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbrequeststate">
+                <label for="requeststate">
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
@@ -1122,14 +1122,14 @@
                 </InputSelect>
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbclosedate">
+                <label for="closedate">
                     Close Date:
                 </label>
                 <InputDate id="closedate" class="form-control" disabled="@IsDisabled" placeholder="CLOSE DATE" @bind-Value="requestfile.Closedate" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <span class="required">*</span>
-                <label for="lbrequestdetails">
+                <label for="requestdetails">
                     Request Details:
                 </label>
 
@@ -1139,7 +1139,7 @@
                 <ValidationMessage For="@(() => requestfile.Requestdetails)" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
-                <label for="lbintakenotes">
+                <label for="intakenotes">
                     Intake Notes:
                 </label>
                 <InputTextArea id="intakenotes" class="form-control" disabled="@IsDisabled" placeholder="INTAKE NOTES" @bind-Value="requestfile.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />

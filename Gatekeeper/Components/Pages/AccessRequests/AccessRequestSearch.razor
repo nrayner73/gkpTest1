@@ -206,7 +206,6 @@
             {
                 item.SetValue(fileInfo, null);
             }
-            fileInfo.Fileyear = 2023;
             fileInfo.Requeststate = stateActive.ToString();
             searchrequestfiles = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
             totalrecordCount = searchrequestfiles.Count();

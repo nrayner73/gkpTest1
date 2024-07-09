@@ -12,8 +12,6 @@
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject NavigationManager navigationManager
 
-
-
 <div class="text-center" style="max-height:200px; max-width:200px;">
     <img src="crest-cps.svg" class="rounded mx-auto d-block" />
 </div>
@@ -25,76 +23,77 @@
     {
         <nav class="flex-column">
             <div class="nav-item px-2">
-                <NavLink class="nav-link" @onclick="HideMenu" href="/mytasks/search" Match="NavLinkMatch.All">
+                <Button class="nav-link" @onclick="@(() => navigate("/mytasks/search"))" href="#" Match="NavLinkMatch.All">
                     <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> My Tasks
-                </NavLink>
+                </Button>
             </div>
             @if (adminrole)
             {
             <div class="nav-item px-2">
-                <NavLink class="nav-link" @onclick="HideMenu" href="/accessrequests/search">
+                <Button class="nav-link" @onclick="@(() => navigate("/accessrequests/search"))" href="#">
                     <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Request
-                </NavLink>
+                </Button>
             </div>
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/analyst/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/analyst/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Analysts
-                    </NavLink>
+                    </Button>
                 </div>
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/lkcity/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/lkcity/add"))" href="#">
+
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cities
-                    </NavLink>
+                    </Button>
                 </div>
 
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/holiday/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/holiday/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Holidays
-                    </NavLink>
+                    </Button>
                 </div>
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/lklocation/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/lklocation/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Locations Searched
-                    </NavLink>
+                    </Button>
                 </div>
 
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/lkpaymenttype/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/lkpaymenttype/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Payment Types
-                    </NavLink>
+                    </Button>
                 </div>
 
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/processingDeficiency/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/processingDeficiency/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Processing Deficiency
-                    </NavLink>
+                    </Button>
                 </div>
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/requesttype/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/requesttype/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Request Types
-                    </NavLink>
+                    </Button>
                 </div>
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/reviewtype/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/reviewtype/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Review Types
-                    </NavLink>
+                    </Button>
                 </div>
 
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/lkrecorddeliverymethod/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/lkrecorddeliverymethod/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Record Delivery Methods
-                    </NavLink>
+                    </Button>
                 </div>
 
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/lkrequeststate/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/lkrequeststate/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Request States
-                    </NavLink>
+                    </Button>
                 </div>
                 <div class="nav-item px-2">
-                    <NavLink class="nav-link" @onclick="HideMenu" href="/lksection/add">
+                    <Button class="nav-link" @onclick="@(() => navigate("/lksection/add"))" href="#">
                         <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Sections
-                    </NavLink>
+                    </Button>
                 </div>
             }
         </nav>
@@ -157,6 +156,17 @@
     {
         await sessionStorage.ClearAsync();
         await JSRuntime.InvokeVoidAsync("hideTopmenu");
+    }
+
+    private async void navigate(string url)
+    {
+        var currentUrl = navigationManager.Uri;
+        //any pages that have confirmation before navigation need to be added here
+        if (!currentUrl.Contains("/feepayment/add"))
+        {
+            HideMenu();
+        }
+        navigationManager.NavigateTo(url);
     }
 
     protected override async Task OnParametersSetAsync()

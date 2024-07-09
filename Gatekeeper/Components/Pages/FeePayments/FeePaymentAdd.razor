@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @using System.Text
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Text.Encodings.Web
@@ -25,6 +25,10 @@
 
 
 @inject ILkPaymenttypeService paymentTypeService
+
+@inject IJSRuntime JSRuntime
+
+<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" ConfirmExternalNavigation="confirmExternalNavigation" />
 
 @page "/feepayment/add/{fileid:int?}"
 
@@ -69,6 +73,8 @@
     private IRequestfileService requestFileService { get; set; }
     private List<SearchRequestfee> searchrequestfees = new List<SearchRequestfee>();
     private Searchrequestfile searchrequestfile { get; set; } = new Searchrequestfile();
+
+    private Boolean confirmExternalNavigation = true;
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
@@ -183,6 +189,7 @@
     protected async Task HandleValidSubmit()
     {
         Saved = false;
+        confirmExternalNavigation = false;
 
         if (fileid > 0)
         {
@@ -273,7 +280,7 @@
 
             alertMessageShow = false;
             Saved = true;
-             navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
+            navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
         }
 
         //LoadData();
@@ -291,7 +298,7 @@
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
 
-       auditlog.ActivityXml = auditlogService.GetAuditxml(new Requestfee(), requestfee, act).ToString();
+        auditlog.ActivityXml = auditlogService.GetAuditxml(new Requestfee(), requestfee, act).ToString();
 
         if (type == "update" || type == "delete")
         {
@@ -299,6 +306,22 @@
         }
 
         await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (context.TargetLocation.Contains("feepayment/add", StringComparison.OrdinalIgnoreCase))
+        {
+            confirmExternalNavigation = false;
+            return;
+        }
+
+        var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to continue? You will lose any unsaved changes.");
+        if (!isConfirmed)
+        {
+            context.PreventNavigation();
+
+        } 
     }
 
     #endregion
@@ -311,7 +334,7 @@
 }
 
 <EditForm Model="@requestfile" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
-
+    <h5>Fees</h5>
     <RequestfeeAdd savetype=""
                    analysts="@analysts"
                    fileid="@fileid"
@@ -319,7 +342,7 @@
                    requestfees="@requestfees" 
                    IsDisabled="@IsDisabled" />
 
-
+    <h5>Payments</h5>
     <PaymentAdd savetype="@savetype" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payments="@payments" IsDisabled="@IsDisabled"></PaymentAdd>
     <div class="col-lg-3 col-md-3 col-sm-12">
         <label for="lbnotes">

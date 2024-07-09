@@ -176,7 +176,7 @@
     }
 
     private ConfirmDialog dialog = default!;
-    private async Task ShowConfirmationAsync(int id)
+    private async Task ShowConfirmationAsync(Requestfee requestfee)
     {
         var confirmation = await dialog.ShowAsync(
             title: "Are you sure you want to delete this?",
@@ -185,13 +185,13 @@
 
         if (confirmation)
         {
-            if (id != null && id > 0)
+            if (requestfee.Id != null && requestfee.Id > 0)
             {
-                var requestfee = await RequestfeeService.GetRequestfeeById(id);
+                // var requestfee = await RequestfeeService.GetRequestfeeById(id);
                 await RequestfeeService.DeleteRequestfee(requestfee);
                 AuditData("Delete Requestfee", "delete", requestfee);
             }
-
+            requestfees.Remove(requestfee);
             StatusClass = "alert-success";
             Message = "Data deleted successfully";
             alertMessageShow = true;
@@ -201,7 +201,9 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/Feepayment/add/", true);
+
+
+            // navigationManager.NavigateTo($"/Feepayment/add/", true);
 
         }
         else
@@ -321,7 +323,7 @@
                             <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @bind-Value="@item.Finalcost" /></td>
 
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
                             </td>
                         </tr>
                     }
@@ -343,7 +345,7 @@
                             <td>@item.Finalcost</td>
 
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
                             </td>
                         </tr>
                     }

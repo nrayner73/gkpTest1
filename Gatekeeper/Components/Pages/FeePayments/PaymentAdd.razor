@@ -161,7 +161,7 @@
     }
 
     private ConfirmDialog dialog = default!;
-    private async Task ShowConfirmationAsync(int id)
+    private async Task ShowConfirmationAsync(Payment payment)
     {
         var confirmation = await dialog.ShowAsync(
             title: "Are you sure you want to delete this?",
@@ -170,14 +170,14 @@
 
         if (confirmation)
         {
-            if (id != null && id > 0)
+            if (payment.Id != null && payment.Id > 0)
             {
                 var opayment = new Payment();
-                var payment = await PaymentService.GetPaymentById(id);
+                // var payment = await PaymentService.GetPaymentById(id);
                 await PaymentService.DeletePayment(payment);
                 AuditData("Delete Payment", "delete", payment);
             }
-
+            payments.Remove(payment);
             StatusClass = "alert-success";
             Message = "Data deleted successfully";
             alertMessageShow = true;
@@ -187,7 +187,9 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/Feepayment/add/", true);
+            
+
+            // navigationManager.NavigateTo($"/Feepayment/add/", true);
 
             // LoadData();
             StateHasChanged();
@@ -292,7 +294,7 @@
                                 <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @onchange="() => UpdateData(item)" @bind-Value="@item.Payamount" />
                                 </td>
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
                             </td>
                         </tr>
                     }
@@ -313,7 +315,7 @@
                             <td>@item.Authorization</td>
                             <td>@item.Payamount</td>
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
                             </td>
                         </tr>
                     }

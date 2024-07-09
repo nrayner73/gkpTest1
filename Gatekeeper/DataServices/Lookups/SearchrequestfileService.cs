@@ -39,8 +39,8 @@ namespace Gatekeeper.DataServices.Lookups
                 new SqlParameter { ParameterName = "@statusnote",Value = string.IsNullOrEmpty(searchfilter.Statusnote) ? (object)DBNull.Value : searchfilter.Statusnote } ,
                 new SqlParameter { ParameterName = "@requesttypeid",Value = searchfilter.Requesttypeid == null ? (object)DBNull.Value : searchfilter.Requesttypeid } ,
                 new SqlParameter { ParameterName = "@requesttype",Value = string.IsNullOrEmpty(searchfilter.Requesttype) ? (object)DBNull.Value : searchfilter.Requesttype} ,
-                new SqlParameter { ParameterName = "@analystassignedid",Value = searchfilter.Analystassignedid == null ? (object)DBNull.Value : searchfilter.Analystassignedid } ,
                 new SqlParameter { ParameterName = "@analystassigned",Value = searchfilter.Analystassigned == null ? (object)DBNull.Value : searchfilter.Analystassigned } ,
+                new SqlParameter { ParameterName = "@analystassignedid",Value = searchfilter.Analystassignedid == null ? (object)DBNull.Value : searchfilter.Analystassignedid } ,
                 new SqlParameter { ParameterName = "@requeststateid",Value = searchfilter.Requeststateid == null ? (object)DBNull.Value : searchfilter.Requeststateid } ,
                 new SqlParameter { ParameterName = "@requeststate",Value = searchfilter.Requeststate == null ? (object)DBNull.Value : searchfilter.Requeststate } ,
                 new SqlParameter { ParameterName = "@personid",Value = searchfilter.PersonId== null ? (object)DBNull.Value : searchfilter.PersonId } ,
@@ -73,8 +73,8 @@ namespace Gatekeeper.DataServices.Lookups
             " @statusnote, " +
             " @requesttypeid, " +
             " @requesttype, " +
+            " @analystassigned, " +
             " @analystassignedid, " +
-             " @analystassigned, " +
             " @requeststateid, " +
             " @requeststate, " +
             " @personid, " +

@@ -861,7 +861,7 @@
                 <label for="lbstatusnote">
                     Status Note:
                 </label>
-                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" @bind-Value="requestfile.Statusnote" />
+                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" disabled="@IsDisabled" @bind-Value="requestfile.Statusnote" />
             </div>
         </div>
 
@@ -870,7 +870,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Subject of Request:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" @bind-Value="POISelectedPersonName">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" disabled="@IsDisabled" @bind-Value="POISelectedPersonName" >
                         <SelectedTemplate Context="POIPersonName">@POIPersonName.firstname @POIPersonName.lastname @POIPersonName.middlename</SelectedTemplate>
                         <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
                     </BlazoredTypeahead>
@@ -910,7 +910,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Company Name:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" @bind-Value="selectedcompanyname">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" disabled="@IsDisabled" @bind-Value="selectedcompanyname">
                         <SelectedTemplate Context="companyname">@companyname.companyname. </SelectedTemplate>
                         <ResultTemplate Context="companyname">@companyname.companyname.</ResultTemplate>
                     </BlazoredTypeahead>
@@ -920,7 +920,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Request Name:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" disabled="@IsDisabled" @bind-Value="selectedpersonname">
                         <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
                         <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
                     </BlazoredTypeahead>
@@ -982,7 +982,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Address:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" @bind-Value="selectedaddress">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" disabled="@IsDisabled" @bind-Value="selectedaddress">
                         <SelectedTemplate Context="address">@address.Street @address.City @address.Province  @address.Postalcode</SelectedTemplate>
                         <ResultTemplate Context="address">@address.Street @address.City @address.Province  @address.Postalcode</ResultTemplate>
                     </BlazoredTypeahead>

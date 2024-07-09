@@ -25,10 +25,12 @@ function showTopmenu() {
 
 function hideTopmenu() {
 
-    if (location.pathname == "/accessrequests/add") {
+    //if (location.pathname == "/accessrequests/add") {
+    if (location.pathname == "/accessrequests/add" || location.pathname == "/feepayment/add" || location.pathname == "/disclosure/add" || location.pathname == "/extension/add") {
         showTopmenu();
     }
     else {
+        //sessionStorage.Clear();
         var topmenu = document.getElementById("fileTabs");
         topmenu.style.display = "none";
     }

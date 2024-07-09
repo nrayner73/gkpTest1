@@ -8,10 +8,25 @@ a:active {
     color: white;
 }
 
+.navbar-nav .navbar-brand {
+
+}
+
+    .navbar-nav .navbar-brand:Hover {
+        font-weight: bold;
+        color: darkblue;
+    }
+
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
     color: white;
     background-color: steelblue;
     font-weight: bold;
-    border-radius:4px;
-    float:right;
+    border-radius: 4px;
+    float: right;
 }
+
+.navbar-nav .nav-link:hover {
+    font-weight: bold;
+    color: darkblue;
+}
+

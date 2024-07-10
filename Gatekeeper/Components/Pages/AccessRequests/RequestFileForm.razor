@@ -1112,7 +1112,7 @@
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
-                <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+                <InputSelect id="requeststate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
                     @* make request state default to Active *@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)

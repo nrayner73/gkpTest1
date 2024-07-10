@@ -3,6 +3,7 @@
 @using System.Text
 @* @using BlazorBootstrap *@
 @using Microsoft.AspNetCore.Components.QuickGrid
+@using Gatekeeper.Classes
 
 @inject ISearchrequestfileService searchfileService
 @inject IJSRuntime JSRuntime
@@ -238,12 +239,14 @@
     private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
     {
         //filter data for Blazor Type Ahead
-        return await Task.FromResult(POIpersonnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
+        string[] names = ProcessSearchTerms(searchText);
+        return await Task.FromResult(POIpersonnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
     }
 
     private async Task<IEnumerable<PersonName>> SearchPersonName(string searchText)
     {
-        return await Task.FromResult(personnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
+        string[] names = ProcessSearchTerms(searchText);
+        return await Task.FromResult(personnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
     }
 
     private async Task<IEnumerable<PersonEmail>> SearchPersonEmail(string searchText)
@@ -254,6 +257,14 @@
     private async Task<IEnumerable<PersonPhone>> SearchPersonPhone(string searchText)
     {
         return await Task.FromResult(personphones.Where(x => (x.daytimephone ).ToLower().Contains(searchText.ToLower())));
+    }
+
+    private string[] ProcessSearchTerms(string searchText)
+    {
+        searchText = searchText.ToLower();
+        char[] delimiterChars = { ' ', ',', '.', ':', '\t' };
+        string[] searchTextWords = searchText.Split(delimiterChars, System.StringSplitOptions.RemoveEmptyEntries);
+        return searchTextWords;
     }
 
     private IEnumerable<Searchrequestfile> requestfilelist = default!;
@@ -704,8 +715,8 @@
                     </label>
                     <div class="input-group ">
                         <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIpersonName" @bind-Value="POIselectedpersonname">
-                            <SelectedTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</SelectedTemplate>
-                            <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
+                            <SelectedTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.middlename @POIpersonname.lastname</SelectedTemplate>
+                            <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.middlename @POIpersonname.lastname</ResultTemplate>
                         </BlazoredTypeahead>
                     </div>
                 </div>

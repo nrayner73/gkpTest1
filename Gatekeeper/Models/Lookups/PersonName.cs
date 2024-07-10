@@ -40,7 +40,8 @@ namespace Gatekeeper.Models.Lookups
     public class POIName
     {
         public string firstname { get; set; }
-        public string lastname { get; set; }
         public string middlename { get; set; }
+        public string lastname { get; set; }
+
     }
 }

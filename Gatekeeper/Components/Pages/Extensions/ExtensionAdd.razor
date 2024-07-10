@@ -67,6 +67,8 @@
     bool showpanel = true;
     bool shownotes = true;
     bool showid = false;
+
+    protected bool IsDisabled { get; set; }
     #endregion
 
     #region "Component Lifecycle"
@@ -148,6 +150,11 @@
                 }
                 requestfile = loginState.Requestfile;
                 FileNumber = loginState.Requestfile.Filenumber;
+            }
+
+            if (context.LkRequeststates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").Any(x => x.Id == requestfile.Requeststate))
+            {
+                IsDisabled = true;
             }
         }
         StateHasChanged();
@@ -330,7 +337,7 @@
                 <label for="lbextensionid">
                     Extension:
                 </label>
-                <InputSelect id="extensionid" class="form-control" placeholder="EXTENSIONID" @bind-Value="extension.Extensionid">
+                <InputSelect id="extensionid" class="form-control" placeholder="EXTENSIONID" @bind-Value="extension.Extensionid" disabled="@IsDisabled">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in lkextensionlist)
                     {
@@ -342,7 +349,7 @@
                 <label for="lbsection">
                     Section:
                 </label>
-                <InputSelect id="section" class="form-control" placeholder="SECTION" @bind-Value="extension.Sectionid">
+                <InputSelect id="section" class="form-control" placeholder="SECTION" @bind-Value="extension.Sectionid" disabled="@IsDisabled">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in lksectionlist)
                     {
@@ -354,13 +361,13 @@
                 <label for="lbextensiondate">
                     Extension Date:
                 </label>
-                <InputDate id="extensiondate" class="form-control" placeholder="EXTENSIONDATE" @bind-Value="extension.Extensiondate" />
+                <InputDate id="extensiondate" class="form-control" placeholder="EXTENSIONDATE" @bind-Value="extension.Extensiondate" disabled="@IsDisabled" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbdayamount">
                     Number of Extension Days:
                 </label>
-                <InputNumber id="dayamount" class="form-control" placeholder="DAYAMOUNT" @bind-Value="extension.Dayamount" />
+                <InputNumber id="dayamount" class="form-control" placeholder="DAYAMOUNT" @bind-Value="extension.Dayamount" disabled="@IsDisabled" />
             </div>
 
 
@@ -368,9 +375,9 @@
     </div>
     <hr />
 
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
-    <button type="button" class="btn btn-primary">Add New</button>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-primary" @onclick="FillData" disabled="@IsDisabled">Fill Data</button>
+    <button type="button" class="btn btn-primary" disabled="@IsDisabled">Add New</button>
+    <button type="submit" class="btn btn-primary" disabled="@IsDisabled">Save</button>
 
 </EditForm>
 
@@ -413,8 +420,8 @@
         <PropertyColumn Property="@(r => r.Extensiondate)" Format="yyyy/MM/dd" Title="Extension Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Dayamount)" Title="Number of Extension Days" Sortable="true" />
         <TemplateColumn Title="Actions">
-            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
-            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+            <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))" disabled="@IsDisabled">Edit</button>
+            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))" disabled="@IsDisabled">Del</button>
         </TemplateColumn>
     </QuickGrid>
 </div>

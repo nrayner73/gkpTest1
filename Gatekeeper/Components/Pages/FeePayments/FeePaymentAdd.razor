@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @using System.Text
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Text.Encodings.Web
@@ -25,6 +25,10 @@
 
 
 @inject ILkPaymenttypeService paymentTypeService
+
+@inject IJSRuntime JSRuntime
+
+<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" ConfirmExternalNavigation="confirmExternalNavigation" />
 
 @page "/feepayment/add/{fileid:int?}"
 
@@ -70,7 +74,11 @@
     private List<SearchRequestfee> searchrequestfees = new List<SearchRequestfee>();
     private Searchrequestfile searchrequestfile { get; set; } = new Searchrequestfile();
 
+    private Boolean confirmExternalNavigation = true;
+
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    protected bool IsDisabled { get; set; } = false;
 
     #endregion
 
@@ -154,9 +162,12 @@
                 FileNumber = loginState.Requestfile.Filenumber;
                 requestfees =  context.Requestfees.Where(x => x.Requestid == fileid).ToList();
                 payments =  context.Payments.Where(x => x.Requestid == fileid).ToList();
-
-
+                if (context.LkRequeststates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").Any(x => x.Id == requestfile.Requeststate))
+                {
+                    IsDisabled = true;
+                }
             }
+
         }
         StateHasChanged();
     }
@@ -178,6 +189,7 @@
     protected async Task HandleValidSubmit()
     {
         Saved = false;
+        confirmExternalNavigation = false;
 
         if (fileid > 0)
         {
@@ -268,7 +280,7 @@
 
             alertMessageShow = false;
             Saved = true;
-             navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
+            navigationManager.NavigateTo($"/Feepayment/add/{fileid}", true);
         }
 
         //LoadData();
@@ -286,7 +298,7 @@
         auditlog.AccessSystem = "GateKeeper";
         auditlog.Activity = act;
 
-       auditlog.ActivityXml = auditlogService.GetAuditxml(new Requestfee(), requestfee, act).ToString();
+        auditlog.ActivityXml = auditlogService.GetAuditxml(new Requestfee(), requestfee, act).ToString();
 
         if (type == "update" || type == "delete")
         {
@@ -294,6 +306,22 @@
         }
 
         await auditlogService.CreateAuditlog(auditlog);
+    }
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (context.TargetLocation.Contains("feepayment/add", StringComparison.OrdinalIgnoreCase))
+        {
+            confirmExternalNavigation = false;
+            return;
+        }
+
+        var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to continue? You will lose any unsaved changes.");
+        if (!isConfirmed)
+        {
+            context.PreventNavigation();
+
+        } 
     }
 
     #endregion
@@ -306,20 +334,21 @@
 }
 
 <EditForm Model="@requestfile" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
-
+    <h5>Fees</h5>
     <RequestfeeAdd savetype=""
                    analysts="@analysts"
                    fileid="@fileid"
                    requestfile="@requestfile"
-                   requestfees="@requestfees" />
+                   requestfees="@requestfees" 
+                   IsDisabled="@IsDisabled" />
 
-
-    <PaymentAdd savetype="@savetype" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payments="@payments"></PaymentAdd>
+    <h5>Payments</h5>
+    <PaymentAdd savetype="@savetype" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payments="@payments" IsDisabled="@IsDisabled"></PaymentAdd>
     <div class="col-lg-3 col-md-3 col-sm-12">
         <label for="lbnotes">
             Notes:
         </label>
-        <InputTextArea id="notes" class="form-control" placeholder="NOTES" @bind-Value="requestfile.Feepayment" row="15" col="250" style="min-height: 130px; overflow:auto;" />
+        <InputTextArea id="notes" class="form-control" disabled="@IsDisabled" placeholder="NOTES" @bind-Value="requestfile.Feepayment" row="15" col="250" style="min-height: 130px; overflow:auto;" />
     </div>
     <br />
     <button type="submit" class="btn btn-primary">Save</button>

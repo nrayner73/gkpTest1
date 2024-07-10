@@ -70,6 +70,9 @@
     [Parameter]
     public List<Analyst>? analysts { get; set; } = new List<Analyst>();
 
+    [Parameter]
+    public bool IsDisabled { get; set; } = false;
+
 
 
     //Data Grid -- Blazor QuickGrid
@@ -96,7 +99,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-
+        var context = DbFactory.CreateDbContext();
 
         if (requestfile != null)
         {
@@ -173,7 +176,7 @@
     }
 
     private ConfirmDialog dialog = default!;
-    private async Task ShowConfirmationAsync(int id)
+    private async Task ShowConfirmationAsync(Requestfee requestfee)
     {
         var confirmation = await dialog.ShowAsync(
             title: "Are you sure you want to delete this?",
@@ -182,13 +185,13 @@
 
         if (confirmation)
         {
-            if (id != null && id > 0)
+            if (requestfee.Id != null && requestfee.Id > 0)
             {
-                var requestfee = await RequestfeeService.GetRequestfeeById(id);
+                // var requestfee = await RequestfeeService.GetRequestfeeById(id);
                 await RequestfeeService.DeleteRequestfee(requestfee);
                 AuditData("Delete Requestfee", "delete", requestfee);
             }
-
+            requestfees.Remove(requestfee);
             StatusClass = "alert-success";
             Message = "Data deleted successfully";
             alertMessageShow = true;
@@ -198,7 +201,9 @@
             alertMessageShow = false;
             Saved = true;
 
-            navigationManager.NavigateTo($"/Feepayment/add/", true);
+
+
+            // navigationManager.NavigateTo($"/Feepayment/add/", true);
 
         }
         else
@@ -209,11 +214,7 @@
 
     private void setfinalcost(Requestfee requestfee)
     {
-        if (requestfee.Feewaived == "Yes")
-        {
-            requestfee.Finalcost = 0;
-        }
-        else if(requestfee.Requested == "No")
+        if (requestfee.Requested == "Yes" && requestfee.Feewaived == "Approved" || requestfee.Requested == "No" && requestfee.Feewaived == "NotRequested")
         {
             requestfee.Finalcost = 0;
         }
@@ -259,7 +260,7 @@
         requestFee.Description = "description";
         requestFee.Estimatedcost = 100;
         requestFee.Requested = "Yes";
-        requestFee.Feewaived = "Yes";
+        requestFee.Feewaived = "Approved";
         requestFee.Finalcost = 0;
         requestFee.Createdate = DateTime.Now;
         requestFee.Createuser = userReg;
@@ -274,9 +275,9 @@
 }
 
 <ConfirmDialog @ref="dialog" />
-<button type="button" class="btn btn-primary" @onclick="EditData">Edit</button>
-<button type="button" class="btn btn-primary" @onclick="AddNew">Add New</button>
-<button type="button" class="btn btn-primary" @onclick="AddNewWithData">Add New With Filled Data</button>
+<button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="EditData">Edit</button>
+<button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="AddNew">Add New</button>
+<button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="AddNewWithData">Add New With Filled Data</button>
 
 <table class="table table-striped">
     <thead class="table-info">
@@ -313,14 +314,16 @@
                             <td>
                                 <InputSelect id="feewaived" class="form-control" placeholder="FEE WAIVED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Feewaived">
                                     <option value="-1">Select...</option>
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
+                                    <option value="NotRequested">Not Requested</option>
+                                    <option value="Requested">Requested</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Denied">Denied</option>
                                 </InputSelect>
                             </td>
                             <td> <InputNumber id="finalcost" class="form-control" placeholder="FINAL COST" @bind-Value="@item.Finalcost" /></td>
 
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
                             </td>
                         </tr>
                     }
@@ -342,7 +345,7 @@
                             <td>@item.Finalcost</td>
 
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item.Id))">Del</button>
+                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
                             </td>
                         </tr>
                     }

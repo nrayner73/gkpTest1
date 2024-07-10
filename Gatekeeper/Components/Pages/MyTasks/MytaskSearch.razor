@@ -1,125 +1,158 @@
 ﻿@rendermode InteractiveServer
-@using System.Text
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.AspNetCore.Components.Authorization
-@using System.Drawing;
-@inject AuthenticationStateProvider authenticationProvider
-@inject ISearchmytaskService searchmytaskService
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using System
+@using System.Text
 
+@inject AuthenticationStateProvider authenticationProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IDbContextFactory<AppDbContext> DbFactory
 @inject IJSRuntime JSRuntime
 @inject NavigationManager navigationManager
-@inject IDbContextFactory<AppDbContext> DbFactory
+
+@inject IAnalystService analystservice
 @inject IPersonnameService personNameService
-
 @inject IRequestfileService requestFileService
+@inject ISearchrequestfileService searchfileService
 
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject LoginState loginState;
 @inject AppState appState;
 
 @page "/mytasks/search"
 
-
 @code {
-    #region "Variable"
+    #region "Variables"
+    private List<string> AllOptions;
+    [Parameter]
+    public bool showfileid { get; set; }
     private IRequestfileService RequestfileService { get; set; }
     private Requestfile requestfile { get; set; } = new Requestfile();
 
-    public List<Searchmytask>? requestfileInfos { get; set; } = new List<Searchmytask>();
-    private Searchmytask fileInfo { get; set; } = new Searchmytask();
+    public List<Searchrequestfile>? requestfileInfos { get; set; } = new List<Searchrequestfile>();
+    private Searchrequestfile fileInfo { get; set; } = new Searchrequestfile();
 
-    private IQueryable<Searchmytask> searchmytaskfiles;
+    private IQueryable<Searchrequestfile> searchrequestfiles;
+    private IQueryable<Searchrequestfile> searchrequestfilesActive;
+    private IQueryable<Searchrequestfile> searchrequestfilesOnhold;
+
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+    private int pageSet = 9;
+    private int localItemPerPage = 20;
+    private DataTable pageTable = new DataTable();
 
-    // QuickGrid<Searchmytask>? grid1;
+    // QuickGrid<Searchrequestfile>? grid;
     bool showpanel = false;
     bool showyear = false;
     bool showid = false;
     string userReg = string.Empty;
+    private Analyst useranalyst { get; set; } = new Analyst();
+    #endregion
 
     #region Lookup Parameters
-
+    public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
+    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
     public List<LkRequesttype>? requesttypes { get; set; } = new List<LkRequesttype>();
     public List<LkRequeststate>? requeststates { get; set; } = new List<LkRequeststate>();
     public List<PersonName>? personnames { get; set; } = new List<PersonName>();
+    public List<PersonEmail>? personemails { get; set; } = new List<PersonEmail>();
+    public List<PersonPhone>? personphones { get; set; } = new List<PersonPhone>();
+
     private PersonName selectedpersonname;
     private PersonName personname { get; set; } = new PersonName();
+
+    private PersonPhone selectedpersonphone;
+    private PersonPhone personphone { get; set; } = new PersonPhone();
+
+    private PersonEmail selectedpersonemail;
+    private PersonEmail personemail { get; set; } = new PersonEmail();
+
     public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
     private POIName POIselectedpersonname;
     private POIName POIpersonname { get; set; } = new POIName();
-
-    public List<Requestfile> Requestfiles { get; set; } = new List<Requestfile>();
-
-
+    private double totalrecordCount { get; set; } = 0;
+    private int stateActive = 0;
+    private int stateOnhold= 0;
     #endregion
-
-    #endregion
-
 
     #region  "Component Lifecycle"
-    protected async override Task OnParametersSetAsync()
+    protected async override Task OnInitializedAsync()
     {
-        if (requesttypes.Count == 0)
+        var authState = await authenticationProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var nameUser = user.Identity?.Name;
+        userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+        useranalyst = analystservice.GetAnalystsList().Where(x => x.Regno == userReg).FirstOrDefault(); 
+        
+        showid = showfileid;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            var authState = await authenticationProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
-            var nameUser = user.Identity?.Name;
-            userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-            using var context = DbFactory.CreateDbContext();
-            fileInfo.Regno = userReg;
-            requesttypes = await context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
-            requeststates = await context.LkRequeststates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
-            // Requestfiles = await context.Requestfiles.ToListAsync();
-            LoadData();
+            await JSRuntime.InvokeVoidAsync("hideTopmenu");
         }
     }
 
-    protected async override void OnAfterRender(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        base.OnAfterRender(firstRender);
+        if (requesttypes.Count == 0)
+        {
+            using var context = DbFactory.CreateDbContext();
+            analysts = await context.Analysts.ToListAsync();
+            requesttypes = await context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
+            requeststates = await context.LkRequeststates.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToListAsync();
+
+            foreach (var item in requeststates)
+            {
+                if (item.Detail == "Active")
+                {
+                    stateActive= item.Id;
+                    break;
+                }
+            }
+
+            foreach (var item in requeststates)
+            {
+                if (item.Detail == "On Hold")
+                {
+                    stateOnhold = item.Id;
+                    break;
+                }
+            }
+        }
+        LoadData();
+        if (totalPages > 0)
+        {
+            setPageConfig();
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
         if (firstRender)
         {
-            // var authState = await authenticationProvider.GetAuthenticationStateAsync();
-            // var user = authState.User;
-            // var nameUser = user.Identity?.Name;
-            // userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
-            //  userReg = await session.GetItemAsStringAsync("SessionUser");
-            //  LoadData();
-
-
             POIpersonnames = personNameService.GetPOINames();
             personnames = personNameService.GetNames();
+            personemails = personNameService.GetPersonEmails();
+            personphones = personNameService.GetPersonPhones();
+            firstRender = false;
         }
     }
 
     #endregion
 
     #region "Methods"
-    private int totalrecordCount { get; set; } = 0;
 
-    private async void LoadData()
-    {
-
-        fileInfo.Regno = userReg;
-        if (searchmytaskfiles == null || searchmytaskfiles.Count() == 0)
-        {
-            searchmytaskfiles = searchmytaskService.GetMytaskList(fileInfo).AsQueryable<Searchmytask>();
-            totalrecordCount = searchmytaskfiles.Count();
-
-            
-        }
-    }
-
-
+    #region "Main Methods"
     private void ClearSearch()
     {
         POIselectedpersonname = null;
         selectedpersonname = null;
-        searchmytaskfiles = Enumerable.Empty<Searchmytask>().AsQueryable();
-        // fileInfo.Regno = userReg;
-        fileInfo = new Searchmytask();
-        LoadData();
+        searchrequestfiles = Enumerable.Empty<Searchrequestfile>().AsQueryable();
+        fileInfo = new Searchrequestfile();
 
+        LoadData();
     }
 
     private void FilterData()
@@ -141,72 +174,85 @@
             fileInfo.Requeststateid = null;
         }
 
-        // fileInfo.Regno = userReg;
+        string mtype = "";
+        int i = 0;
+        foreach (var item in SelectedTypes)
+        {
 
-        searchmytaskfiles = searchmytaskService.GetMytaskList(fileInfo).AsQueryable<Searchmytask>();
+            if (i < SelectedTypes.Count() -1 )
+            {
+                mtype += item  +",";
+            }
+            else
+            {
+                mtype += item ;
+            }
+
+            i++;
+            Console.WriteLine(item);
+        }
+
+        fileInfo.Requeststate = mtype;
+
+        searchrequestfiles = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
+
+        // filter records to only those assigned to current analyst
+        searchrequestfiles = searchrequestfiles.Where(x => x.Analystassignedid == useranalyst.Id).AsQueryable<Searchrequestfile>();
+
+        requestfileInfos = searchfileService.GetRequestfileList(fileInfo).ToList();
+
+        totalrecordCount = searchrequestfiles.Count();
+    }
+
+    private int totalPages;
+    private int totalPageSet;
+
+    private async void LoadData()
+    {
+        lastPageIndex = pageSet;
+        if (searchrequestfiles == null || searchrequestfiles.Count() == 0)
+        {
+
+
+            foreach (var item in fileInfo.GetType().GetProperties())
+            {
+                item.SetValue(fileInfo, null);
+            }
+            // fileInfo.Fileyear = 2023;
+            fileInfo.Requeststate = stateActive.ToString();
+            searchrequestfilesActive = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
+
+            fileInfo.Requeststate = stateOnhold.ToString();
+            searchrequestfilesOnhold = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
+
+            searchrequestfiles = searchrequestfilesActive.Concat(searchrequestfilesOnhold);
+            
+            // filter records to only those assigned to current analyst
+            searchrequestfiles = searchrequestfiles.Where(x => x.Analystassignedid == useranalyst.Id).AsQueryable<Searchrequestfile>();
+
+            totalrecordCount = searchrequestfiles.Count();
+        }
 
     }
 
     private void goToAddPage(int fileid)
     {
         setSession(fileid);
-        navigationManager.NavigateTo($"/accessrequests/add", true);
+        navigationManager.NavigateTo($"/accessrequests/add/{fileid}");
     }
+
     private async Task setSession(int fileid)
     {
-        //  Requestfile requestfile = new Requestfile();
-
-
         if (fileid > 0)
         {
             requestfile = await requestFileService.GetRequestfileById(fileid);
+
             await sessionStorage.SetItemAsync("RQID", requestfile.Id);
             await sessionStorage.SetItemAsync("objFileRequest", requestfile);
 
             loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
             requestfile = loginState.Requestfile;
         }
-
-    }
-
-    private string? PageButtonClass(int pageIndex)
-      => pagination.CurrentPageIndex == pageIndex ? "current" : null;
-
-    private string? AriaCurrentValue(int pageIndex)
-        => pagination.CurrentPageIndex == pageIndex ? "page" : null;
-
-    private int lastPageIndex { get; set; } = 4;
-    private int firstPageIndex { get; set; } = 0;
-    private async Task GoToPageAsync(int pageIndex)
-    {
-        var x = pagination;
-
-        lastPageIndex = (int)pagination.LastPageIndex;
-
-        if (pageIndex >= firstPageIndex && pageIndex <= lastPageIndex)
-        {
-            await pagination.SetCurrentPageIndexAsync(pageIndex);
-        }
-        else
-        {
-            if (pageIndex < lastPageIndex)
-            {
-                if (pageIndex < totalrecordCount - 5)
-                {
-                    if (pageIndex < pagination.LastPageIndex)
-                    {
-                        firstPageIndex = lastPageIndex + 1;
-                        lastPageIndex += 5;
-
-                    }
-
-                }
-
-            }
-        }
-
-
-
     }
 
 
@@ -221,23 +267,403 @@
         return await Task.FromResult(personnames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
     }
 
-    private Color pickColor(string status)
+        private async Task<IEnumerable<PersonEmail>> SearchPersonEmail(string searchText)
     {
-        Color _color = Color.Wheat;
+        return await Task.FromResult(personemails.Where(x => (x.email ).ToLower().Contains(searchText.ToLower())));
+    }
 
-        if (status == "overdue")
-        {
-            _color = Color.Red;
-        }
+    private async Task<IEnumerable<PersonPhone>> SearchPersonPhone(string searchText)
+    {
+        return await Task.FromResult(personphones.Where(x => (x.daytimephone ).ToLower().Contains(searchText.ToLower())));
+    }
 
-        return _color;
+    private IEnumerable<Searchrequestfile> requestfilelist = default!;
+
+    private IEnumerable<Searchrequestfile> GetFileData()
+    {
+        FilterData();
+
+        return requestfileInfos;
+
+    }
+
+
+    // Grid<Searchrequestfile> grid;
+
+    private async Task refreshGrid()
+    {
+        showid = !showid;
+
+
+        // await grid.RefreshDataAsync();
+        // await Task.Delay(3000);
+        navigationManager.NavigateTo($"/accessrequests/search/{showid}", true);
+
     }
     #endregion
 
+    #region Paging Setting
+
+    private async void setPageConfig()
+    {
+
+
+        if (totalrecordCount == 0)
+        {
+            LoadData();
+        }
+        else
+        {
+
+
+            pageTable = new DataTable();
+            pageTable.Columns.Add("recid", typeof(int));
+            pageTable.Columns.Add("pagenum", typeof(int));
+            pageTable.Columns.Add("pageset", typeof(int));
+
+
+            DataRow dr = null;
+            int pset = 0;
+            int setcount = 0;
+            int pages = 0;
+            for (int i = 0; i < totalrecordCount; i++)
+            {
+                dr = pageTable.NewRow();
+                dr["recid"] = i;
+                dr["pagenum"] = pages;
+                dr["pageset"] = pset;
+
+                pageTable.Rows.Add(dr);
+
+                var x = ((pages + 1) * pagination.ItemsPerPage);
+
+                if (i == x)
+                {
+                    pages = pages + 1;
+                }
+            }
+
+
+            string columnName = "pagenum";
+
+            // Use LINQ to query the DataTable and retrieve the maximum value from the specified column
+            totalPages = pageTable.AsEnumerable()
+                              .Max(row => row.Field<int>(columnName));
+
+            DataTable dt = new DataTable();
+
+            dt.Columns.Add("id", typeof(int));
+            dt.Columns.Add("pagecount", typeof(int));
+            dt.Columns.Add("pageset", typeof(int));
+
+            for (int i = 0; i <= totalPages; i++)
+            {
+                dr = dt.NewRow();
+                dr["id"] = i;
+                dr["pagecount"] = pset;
+                if (pset <= pageSet)
+                {
+                    dr["pageset"] = setcount;
+                }
+                dt.Rows.Add(dr);
+
+                if (pset == pageSet)
+                {
+                    pset = 0;
+                    setcount += 1;
+
+
+                }
+                else
+                {
+
+                    pset += 1;
+                }
+            }
+
+            string cName = "id";
+            foreach (DataRow rw in pageTable.Rows)
+            {
+                var x = dt.AsEnumerable().Where(x => x.Field<int>("id") == (int)rw["pagenum"]).Select(x => x.Field<int>("pageset")).FirstOrDefault();
+
+                rw["pageset"] = x;
+            }
+
+            columnName = "pageset";
+            totalPageSet = pageTable.AsEnumerable()
+         .Max(row => row.Field<int>(columnName));
+
+            // currentPageSet = 0;
+        }
+    }
+
+    private string? PageButtonClass(int pageIndex)
+      => pagination.CurrentPageIndex == pageIndex ? "current" : null;
+
+    private string? AriaCurrentValue(int pageIndex)
+        => pagination.CurrentPageIndex == pageIndex ? "page" : null;
+
+    private string? AriaPerPageValue(int perpage)
+    {
+        setPageConfig();
+        var x = pagination.ItemsPerPage == perpage ? "page" : null;
+
+        return x;
+
+    }
+
+
+
+    private int lastPageItems;
+    private int currentPageSet;
+
+    private bool firstPagebutton = false;
+    private bool previousPagebutton = false;
+    private bool previousSetbutton = false;
+
+    private bool lastPagebutton = true;
+    private bool nextPagebutton = true;
+    private bool nextSetbutton = true;
+
+
+
+    private int lastPageIndex { get; set; }
+    private int firstPageIndex { get; set; } = 0;
+
+
+    private async Task GoToNextPageSetAsync()
+    {
+
+        if (currentPageSet <= totalPageSet)
+        {
+            currentPageSet += 1;
+
+        }
+
+
+        if (currentPageSet == totalPageSet)
+        {
+            firstPageIndex = (currentPageSet * (pageSet + 1));
+            lastPageIndex = (int)totalPages;
+
+        }
+        else
+        {
+            firstPageIndex = (currentPageSet * (pageSet + 1));
+            lastPageIndex = firstPageIndex + pageSet;
+        }
+
+
+        setPagingbutton(firstPageIndex);
+        await pagination.SetCurrentPageIndexAsync(firstPageIndex);
+
+    }
+
+    private async Task GoToPreviousPageSetAsync()
+    {
+
+        if (currentPageSet > 0)
+        {
+            currentPageSet -= 1;
+        }
+
+
+        if (currentPageSet == totalPageSet)
+        {
+            firstPageIndex = (currentPageSet * (pageSet + 1)) - 1;
+            lastPageIndex = (int)totalPages;
+
+        }
+        else
+        {
+            firstPageIndex = (currentPageSet * (pageSet + 1));
+            lastPageIndex = firstPageIndex + pageSet;
+        }
+
+
+        setPagingbutton(firstPageIndex);
+        await pagination.SetCurrentPageIndexAsync(firstPageIndex);
+
+    }
+
+    private int findPageSet(int pageIndex)
+    {
+        int pset = pageTable.AsEnumerable().Where(x => x.Field<int>("pagenum") == pageIndex).Select(x => x.Field<int>("pageset")).FirstOrDefault();
+
+        return pset;
+    }
+
+    private async Task GoToFirstPageAsync()
+    {
+        currentPageSet = 0;
+
+
+        firstPageIndex = 0;
+        lastPageIndex = firstPageIndex + pageSet;
+
+
+        firstPagebutton = false;
+        previousSetbutton = false;
+        previousPagebutton = false;
+
+        nextSetbutton = true;
+        nextPagebutton = true;
+        lastPagebutton = true;
+
+
+        await pagination.SetCurrentPageIndexAsync(firstPageIndex);
+    }
+
+    private async Task GoToLastPageAsync()
+    {
+
+        totalPageSet = pageTable.AsEnumerable()
+                              .Max(row => row.Field<int>("pageset"));
+
+        currentPageSet = (int)totalPageSet;
+
+        // firstPageIndex = (currentPageSet * (pageSet + 1));
+        // lastPageIndex = (int)totalPages ;
+
+        firstPageIndex = pageTable.AsEnumerable()
+          .Where(x => x.Field<int>("pageset") == currentPageSet).Min(row => row.Field<int>("pagenum"));
+
+        lastPageIndex = pageTable.AsEnumerable()
+                    .Where(x => x.Field<int>("pageset") == currentPageSet).Max(row => row.Field<int>("pagenum"));
+
+        firstPagebutton = true;
+        previousSetbutton = true;
+        previousPagebutton = true;
+
+        nextSetbutton = false;
+        nextPagebutton = false;
+        lastPagebutton = false;
+
+
+        await pagination.SetCurrentPageIndexAsync(firstPageIndex);
+    }
+
+    private async Task GoToPreviousPageAsync(int pageIndex)
+    {
+        pageIndex -= 1;
+        // currentPageSet = findPageSet(pageIndex);
+        // if (pageIndex == 0)
+        // {
+        //     await GoToFirstPageAsync();
+        // }
+        // else if (pageIndex == totalrecordCount)
+        // {
+        //     await GoToLastPageAsync();
+        // }
+
+        setPagingbutton(pageIndex);
+        await pagination.SetCurrentPageIndexAsync(pageIndex);
+    }
+
+    private async Task GoToNextPageAsync(int pageIndex)
+    {
+        pageIndex += 1;
+        // currentPageSet = findPageSet(pageIndex);
+        // if (pageIndex == 0)
+        // {
+        //     await GoToFirstPageAsync();
+        // }
+        // else if (pageIndex == totalPages)
+        // {
+        //     await GoToLastPageAsync();
+
+        // }
+
+        setPagingbutton(pageIndex);
+        await pagination.SetCurrentPageIndexAsync(pageIndex);
+    }
+
+    //Paging
+    private async Task GoToPageAsync(int pageIndex)
+    {
+        currentPageSet = findPageSet(pageIndex);
+        setPagingbutton(pageIndex);
+        await pagination.SetCurrentPageIndexAsync(pageIndex);
+    }
+
+    private void setPagingbutton(int pageIndex)
+    {
+        currentPageSet = findPageSet(pageIndex);
+
+        // pageTable.AsEnumerable().Where(x => x.Field<int>("pag") == pageIndex).Select(x => x.Field<int>("pageset")).FirstOrDefault(); ;
+        firstPageIndex = pageTable.AsEnumerable()
+           .Where(x => x.Field<int>("pageset") == currentPageSet).Min(row => row.Field<int>("pagenum"));
+
+        lastPageIndex = pageTable.AsEnumerable()
+                    .Where(x => x.Field<int>("pageset") == currentPageSet).Max(row => row.Field<int>("pagenum"));
+
+
+
+        if (currentPageSet == totalPageSet)
+        {
+            // firstPageIndex = (currentPageSet * (pageSet + 1));
+            // lastPageIndex = (int)totalPages - 1;
+
+
+
+            firstPagebutton = true;
+            previousSetbutton = true;
+            previousPagebutton = true;
+
+            nextSetbutton = false;
+            if (pageIndex < lastPageIndex)
+            {
+                nextPagebutton = true;
+            }
+            else
+            {
+                nextPagebutton = false;
+            }
+            lastPagebutton = false;
+
+        }
+        else
+        {
+            // firstPageIndex = (currentPageSet * (pageSet + 1));
+            // lastPageIndex = firstPageIndex + pageSet;
+
+            if (currentPageSet == 0)
+            {
+                // firstPageIndex = 0;
+                // lastPageIndex = firstPageIndex + pageSet;
+
+                firstPagebutton = false;
+                previousSetbutton = false;
+                previousPagebutton = false;
+
+                nextSetbutton = true;
+                nextPagebutton = true;
+                lastPagebutton = true;
+            }
+            else if (currentPageSet > 0 && currentPageSet < totalPageSet)
+            {
+                firstPagebutton = true;
+                previousSetbutton = true;
+                previousPagebutton = true;
+
+                nextSetbutton = true;
+                nextPagebutton = true;
+                lastPagebutton = true;
+            }
+        }
+    }
+    #endregion
+
+    public string[] SelectedTypes { get; set; } = new String[] { };
+    private void OnSelectionChanged(ChangeEventArgs e)
+    {
+        SelectedTypes = (string[])e.Value;
+    }
+    #endregion
 }
 
+<h3>My Assignments</h3>
 
-<h3>My Assignment</h3>
 <EditForm Model="@fileInfo">
     @if (showpanel)
     {
@@ -257,12 +683,26 @@
                     <InputText id="referencenumber" class="form-control" @bind-Value="fileInfo.Referencenumber" />
                 </div>
 
+
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label>
                         Status Note:
                     </label>
                     <InputText id="statusnote" class="form-control" @bind-Value="fileInfo.Statusnote" />
                 </div>
+
+                @* <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label>
+                        Analyst:
+                    </label>
+                    <InputSelect id="analystassignedid" class="form-control" placeholder="ANALYST" @bind-Value="fileInfo.Analystassignedid">
+                        <option value="-1">All...</option>
+                        @foreach (var lktype in analysts)
+                        {
+                            <option value="@lktype.Id">@lktype.Displayname</option>
+                        }
+                    </InputSelect>
+                </div> *@
 
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label for="lbrequesttypeid">
@@ -281,13 +721,13 @@
                     <label>
                         Request State:
                     </label>
-                    <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="fileInfo.Requeststateid">
+                    <select id="requeststate" class="form-select" placeholder="REQUEST STATE" @onchange="OnSelectionChanged" multiple>
                         <option value="-1">All...</option>
                         @foreach (var lktype in requeststates)
                         {
                             <option value="@lktype.Id">@lktype.Detail</option>
                         }
-                    </InputSelect>
+                    </select>
                 </div>
 
                 <div class="col-lg-3 col-md-3 col-sm-12">
@@ -315,12 +755,43 @@
                     fileInfo.Firstname = selectedpersonname.firstname;
                     fileInfo.Lastname = selectedpersonname.lastname;
                     fileInfo.Middlename = selectedpersonname.middlename;
-
                 }
 
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <label>
-                        Subject Of Request:
+                        Person Phone:
+                    </label>
+                    <div class="input-group ">
+                        <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonPhone" @bind-Value="selectedpersonphone">
+                            <SelectedTemplate Context="personphone">@personphone.daytimephone</SelectedTemplate>
+                            <ResultTemplate Context="personphone">@personphone.daytimephone </ResultTemplate>
+                        </BlazoredTypeahead>
+                    </div>
+                </div>
+                @if (selectedpersonphone != null)
+                {
+                    fileInfo.Daytimephone = selectedpersonphone.daytimephone;
+                   
+                }
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label>
+                        Person Email:
+                    </label>
+                    <div class="input-group ">
+                        <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonEmail" @bind-Value="selectedpersonemail">
+                            <SelectedTemplate Context="personemail">@personemail.email</SelectedTemplate>
+                            <ResultTemplate Context="personemail">@personemail.email</ResultTemplate>
+                        </BlazoredTypeahead>
+                    </div>
+                </div>
+                @if (selectedpersonemail != null)
+                {
+                    fileInfo.Email = selectedpersonemail.email;
+
+                }
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label>
+                        Subject of Request:
                     </label>
                     <div class="input-group ">
                         <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIpersonName" @bind-Value="POIselectedpersonname">
@@ -379,102 +850,123 @@
             <button class="btn btn-primary" @onclick="FilterData">Search</button>
             <button type="button" class="btn btn-primary" @onclick="ClearSearch">Reset</button>
         </div>
+        <hr />
     }
+  
 </EditForm>
 
 
-<div class="row" style="width:100%;">
-    <div class="col" style="float:left">
-        Show:
-        <label><input type="checkbox" @bind="showid" /> Record Id</label>
-        &nbsp;&nbsp;&nbsp;
-        <label><input type="checkbox" @bind="showyear" /> Year</label>
-        &nbsp;&nbsp;&nbsp;
-        <label><input type="checkbox" @bind="showpanel" /> Search Panel</label>
+<div class="container-fluid w-100 ">
+    <div class="row  align-items-end" style="margin-bottom: 10px;">
+        <div class="col-4">
+            Show:
+            <label><input type="checkbox" @bind="showid" /> Record Id</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" @bind="showyear" /> Year</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" @bind="showpanel" /> Search Panel</label>
+        </div>
+
+
+        <div class="col-8  text-end">
+            <button type="button" class="btn btn-warning" @onclick="()=>goToAddPage(0)">Add New</button>
+        </div>
     </div>
-    <div class="col" style="float:left">
-        <div class="page-size-chooser">
+
+
+
+    <div class="row align-items-end" >
+        <div class="col" style="padding-bottom:10px">
             Items per page:
-            <select @bind="@pagination.ItemsPerPage">
+            <select aria-current="@AriaPerPageValue(pagination.ItemsPerPage)" @bind="pagination.ItemsPerPage">
                 <option>5</option>
                 <option>10</option>
                 <option>20</option>
                 <option>50</option>
             </select>
-
         </div>
-
-    </div>
-    <div class="col" style="float:revert">
-        <button type="button" class="btn btn-warning" @onclick="()=>goToAddPage(0)">Add New</button>
-    </div>
-    <div class="col" style="float:revert">
-        <div class="pagination">
-            <nav aria-label="Page navigation" b-3qssc0bm46>
-                <ul class="pagination">
-                    <li class="page-item @(pagination.CurrentPageIndex <= pagination.LastPageIndex  ? "disabled" : "")">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <i class="bi bi-chevron-double-left"></i>
-
-                        </a>
-                    </li>
-                    <li class="page-item @(pagination.CurrentPageIndex == firstPageIndex  ? "disabled" : "")">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <i class="bi bi-chevron-left"></i>
-
-                        </a>
-                    </li>
-
-
-                    @if (totalrecordCount > 0)
-                    {
-                        for (var pageIndex = firstPageIndex; pageIndex <= lastPageIndex; pageIndex++)
+        <div class="col " style="padding-bottom:10px">
+            Total  <span style="font-weight:bold">@totalrecordCount</span> items  &nbsp;
+        </div>
+        <div class="col" style="padding-bottom:10px">
+            Page  <span style="font-weight:bold">@(pagination.CurrentPageIndex + 1)</span> Of <span style="font-weight:bold"> @(totalPages + 1)</span> &nbsp;
+        </div>
+        <Paginator State="@pagination" />
+        @* <div class="col align-item-end " >
+            <div>
+                <nav aria-label="Page navigation" b-3qssc0bm46>
+                    <ul class="pagination">
+                        <li class="page-item @(firstPagebutton   ? "" : "disabled")">
+                            <a class="page-link"
+                               @onclick="@(() => GoToFirstPageAsync())"
+                               aria-label="Firstpage">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item @(previousPagebutton ?  "": "disabled")">
+                            <a class="page-link"
+                               @onclick="@(() => GoToPreviousPageAsync(pagination.CurrentPageIndex))"
+                               aria-label="Previous">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <div class="@(previousSetbutton  ? "d-block" : "d-none")">
+                        <li class="page-item  @(previousSetbutton ?  "": "disabled")">
+                            <a class="page-link"
+                               onclick="@(() => GoToPreviousPageSetAsync())"
+                               aria-label="Previoussection">
+                                <i class="bi bi-three-dots"></i>
+                            </a>
+                        </li>
+            </div>
+                        @if (totalrecordCount > 0)
                         {
-                            var capturedIndex = pageIndex;
-                            <li class="page-item">
-                                <a @onclick="@(() => GoToPageAsync(capturedIndex))"
-                                   class="page-link" href="@PageButtonClass(capturedIndex)"
-                                   aria-current="@AriaCurrentValue(capturedIndex)"
-                                   aria-label="Go to page @(pageIndex + 1)">
-                                    @(pageIndex + 1)
-
-                                </a>
-                            </li>
+                            for (var pageIndex = firstPageIndex; pageIndex <= lastPageIndex; pageIndex++)
+                            {
+                                var capturedIndex = pageIndex;
+                    <li class="page-item">
+                        <a @onclick="@(() => GoToPageAsync(capturedIndex))"
+                           class="page-link"
+                           aria-current="@AriaCurrentValue(capturedIndex)"
+                           aria-label="Go to page @(pageIndex + 1)">
+                                        @(pageIndex + 1)
+                        </a>
+                    </li>
+                            }
                         }
-                    }
-
-                    <li class="page-item @(pagination.CurrentPageIndex >= pagination.LastPageIndex  ? "disabled" : "")">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-                    <li class="page-item  @(pagination.CurrentPageIndex == pagination.LastPageIndex  ? "disabled" : "")">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <i class="bi bi-chevron-double-right"></i>
-                        </a>
-                    </li>
-                </ul>
+            <div class="@(nextSetbutton ? "d-block" : "d-none")">
+                <li class="page-item @(nextSetbutton ? "" : "disabled")">
+                    <a class="page-link"
+                       @onclick="@(() => GoToNextPageSetAsync())"
+                       aria-label="Nextsection">
+                        <i class="bi bi-three-dots"></i>
+                    </a>
+                </li>
+            </div>
+            <li class="page-item @(nextPagebutton ? "" : "disabled")">
+                <a class="page-link"
+                   @onclick="@(() => GoToNextPageAsync(pagination.CurrentPageIndex))"
+                   aria-label="Next">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="page-item  @(lastPagebutton   ? "" : "disabled")">
+                <a class="page-link"
+                   @onclick="@(() => GoToLastPageAsync())"
+                   aria-label="Lastpage">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+            </ul>
             </nav>
-        </div>
-        
-    </div>
-    
+        </div> 
+    </div>*@
+</div>
 </div>
 
 
-
-
-
-@* Display number of items at the top, instead of bottom
-        <Paginator State="@pagination"></Paginator>
-*@
-
-
-
-
-
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@searchmytaskfiles" Virtualize="true" Pagination="@pagination" Class="bb-table table table-hover table-bordered table-striped">
+    <QuickGrid Items="@searchrequestfiles" Virtualize="true" Pagination="@pagination" Class="bb-table table table-hover table-bordered table-striped">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
@@ -484,7 +976,6 @@
         {
             <PropertyColumn Property="@(r => r.Fileyear)" Title="Year" Sortable="true" />
         }
-
         <PropertyColumn Property="@(r => r.Filenumber)" Title="File Number" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
         <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" />
@@ -494,16 +985,6 @@
         <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
         <PropertyColumn Property="@(r => r.Statusnote)" Title="Status Note" Sortable="true" />
 
-        @* <TemplateColumn Title="Status">
-        @if (@context.Taskstatus == "overdue")
-        {
-        <div class="flag">@context.Taskstatus </div>
-        }
-        else
-        {
-        <div class="flagblue">@context.Taskstatus </div>
-        }
-        </TemplateColumn> *@
         <TemplateColumn Title="Actions">
             <a @onclick="()=>goToAddPage(context.Id)" class="link-primary">
                 <i class="fas fa-edit">Edit</i>
@@ -511,5 +992,5 @@
         </TemplateColumn>
     </QuickGrid>
 </div>
-
-
+<Paginator State="@pagination" />
+<br />

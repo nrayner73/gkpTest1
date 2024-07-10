@@ -279,7 +279,7 @@
                                 <InputDate id="paymentdate" class="form-control" placeholder="PAYMENT DATE" @onchange="() => UpdateData(item)" @bind-Value="@item.Paymentdate" />
                             </td>
                             <td>
-                                <InputSelect id="paytypeid" class="form-control" placeholder="PAY TYPE" @onchange="() => UpdateData(item)" @bind-Value="@item.Paytypeid">
+                                <InputSelect id="paytypeid" class="form-select d-inline" placeholder="PAY TYPE" @onchange="() => UpdateData(item)" @bind-Value="@item.Paytypeid">
                                     <option value="-1">Select...</option>
                                     @foreach (var lktype in paymenttype)
                                     {

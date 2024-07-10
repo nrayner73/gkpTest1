@@ -827,7 +827,7 @@
                 <label for="lbidviewed">
                     ID Viewed:
                 </label>
-                <InputSelect id="idviewed" class="form-control" disabled="@IsDisabled" placeholder="ID VIEWED" @bind-Value="requestfile.Idviewed">
+                <InputSelect id="idviewed" class="form-select d-inline" disabled="@IsDisabled" placeholder="ID VIEWED" @bind-Value="requestfile.Idviewed">
                     <option value="">Select...</option>
                     <option value="0">Yes</option>
                     <option value="1">No</option>
@@ -840,7 +840,7 @@
                 <label for="lbrequesttypeid">
                     Request Type:  <b>@requestTypeDetail</b>
                 </label>
-                <InputSelect id="requesttypeid" class="form-control" disabled="@IsDisabled" placeholder="REQUEST TYPE" @bind-Value="requestfile.Requesttypeid">
+                <InputSelect id="requesttypeid" class="form-select d-inline" disabled="@IsDisabled" placeholder="REQUEST TYPE" @bind-Value="requestfile.Requesttypeid">
                     <option value="">Select...</option>
                     @foreach (var lktype in requestTypes)
                     {
@@ -853,7 +853,7 @@
                 <label for="lbprocessingdeficiency">
                     Processing Deficiency:  <b>@processingDeficiencyDetail</b>
                 </label>
-                <InputSelect id="processingdeficiency" class="form-control" disabled="@IsDisabled" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
+                <InputSelect id="processingdeficiency" class="form-select d-inline" disabled="@IsDisabled" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
                     <option value="">Select...</option>
                     @foreach (var lktype in processingDeficiencies)
                     {
@@ -1080,7 +1080,7 @@
                 <label for="recorddeliverymethodid">
                     Record Delivery Method:  <b>@recordDeliveryMethodDetail</b>
                 </label>
-                <InputSelect id="recorddeliverymethodid" class="form-control" disabled="@IsDisabled" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
+                <InputSelect id="recorddeliverymethodid" class="form-select d-inline" disabled="@IsDisabled" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in recordDeliveryMethods)
                     {
@@ -1093,7 +1093,7 @@
                 <label for="analystassignedid">
                     Analyst Assigned:  <b>@analystAssignedName</b>
                 </label>
-                <InputSelect id="analystassignedid" class="form-control" disabled="@IsDisabled" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
+                <InputSelect id="analystassignedid" class="form-select d-inline" disabled="@IsDisabled" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in analysts)
                     {
@@ -1120,7 +1120,11 @@
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
+<<<<<<< 93eba927a050e219951e5cdf3f77a0cc93fd761f
+                <InputSelect id="requeststate" class="form-select d-inline" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+=======
                 <InputSelect id="requeststate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+>>>>>>> aab608772745b0c6f97c1fed73067dd72b93d29f
                     @* make request state default to Active *@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)

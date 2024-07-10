@@ -337,7 +337,7 @@
                 <label for="lbextensionid">
                     Extension:
                 </label>
-                <InputSelect id="extensionid" class="form-control" placeholder="EXTENSIONID" @bind-Value="extension.Extensionid" disabled="@IsDisabled">
+                <InputSelect id="extensionid" class="form-select d-inline" placeholder="EXTENSIONID" @bind-Value="extension.Extensionid" disabled="@IsDisabled">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in lkextensionlist)
                     {
@@ -349,7 +349,7 @@
                 <label for="lbsection">
                     Section:
                 </label>
-                <InputSelect id="section" class="form-control" placeholder="SECTION" @bind-Value="extension.Sectionid" disabled="@IsDisabled">
+                <InputSelect id="section" class="form-select d-inline" placeholder="SECTION" @bind-Value="extension.Sectionid" disabled="@IsDisabled">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in lksectionlist)
                     {

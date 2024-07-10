@@ -13,23 +13,21 @@ public partial class Person
     [Key]
     public int Id { get; set; }
     [Column(TypeName = "varchar(1000)")]
-    [Required]
+
     public string? Firstname { get; set; }
 
-    [Required]
     [Column(TypeName = "varchar(1000)")]
     public string? Lastname { get; set; }
 
     [Column(TypeName = "varchar(1000)")]
     public string? Middlename { get; set; }
-    
+   
     [Column(TypeName = "varchar(1000)")]
     public string? Previousname { get; set; }
     [Column(TypeName = "varchar(1000)")]
     public string? Companyname { get; set; }
     public DateTime? Birthdate { get; set; }
 
-    [Required]
     [Column(TypeName = "varchar(500)")]
     public string? Daytimephone { get; set; }
     [Column(TypeName = "varchar(500)")]
@@ -39,15 +37,12 @@ public partial class Person
     [Column(TypeName = "varchar(500)")]
     public string? Email { get; set; }
 
-    [Required]
     [Column(TypeName = "varchar(1000)")]
     public string? Street { get; set; }
 
-    [Required]
     [Column(TypeName = "varchar(1000)")]
     public string? City { get; set; }
 
-    [Required]
     [Column(TypeName = "varchar(1000)")]
     public string? Province { get; set; }
     [Column(TypeName = "varchar(45)")]

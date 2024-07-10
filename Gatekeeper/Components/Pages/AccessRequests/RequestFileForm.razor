@@ -816,14 +816,12 @@
                     Request Date:
                 </label>
                 <InputDate id="requestdate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DATE" @bind-Value="requestfile.Requestdate" />
-                <ValidationMessage For="@(() => requestfile.Requestdate)" class="alert-danger" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span> <label for="lbreceivedate">
                     Received Date:
                 </label>
                 <InputDate id="receivedate" class="form-control" disabled="@IsDisabled" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="requestfile.Receivedate" @bind-Value:after="setDuedate" />
-                <ValidationMessage For="@(() => requestfile.Receivedate)" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrequestduedate">
@@ -851,7 +849,6 @@
                     <option value="1">No</option>
                     <option value="2">NA</option>
                 </InputSelect>
-                <ValidationMessage For="@(() => requestfile.Idviewed)" class="alert-danger" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
@@ -865,7 +862,6 @@
                         <option value="@lktype.Id">@lktype.Detail</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="@(() => requestfile.Requesttypeid)" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbprocessingdeficiency">
@@ -982,7 +978,6 @@
                 <span class="required">*</span>
                 <label>First Name:</label>
                 <InputText id="firstname" class="form-control" disabled="@IsDisabled" @bind-Value="person.Firstname" />
-                <ValidationMessage For="@(() => person.Firstname)" />
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
@@ -1034,7 +1029,6 @@
                     Street:
                 </label>
                 <InputText id="street" class="form-control" disabled="@IsDisabled" @bind-Value="person.Street" />
-                <ValidationMessage For="@(() => person.Street)" />
             </div>
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <span class="required">*</span>
@@ -1042,7 +1036,6 @@
                     City:
                 </label>
                 <InputText id="city" class="form-control" disabled="@IsDisabled" @bind-Value="person.City" />
-                <ValidationMessage For="@(() => person.City)" />
             </div>
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <span class="required">*</span>
@@ -1050,7 +1043,6 @@
                     Province:
                 </label>
                 <InputText id="province" class="form-control" disabled="@IsDisabled" @bind-Value="person.Province" />
-                <ValidationMessage For="@(() => person.Province)" />
             </div>
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <label>
@@ -1073,7 +1065,6 @@
                 <span class="required">*</span>
                 <label>Daytime Phone:</label>
                 <InputText id="daytimephone" class="form-control" disabled="@IsDisabled" @bind-Value="person.Daytimephone" />
-                <ValidationMessage For="@(() => person.Daytimephone)" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
@@ -1112,13 +1103,12 @@
                     Analyst Assigned:  <b>@analystAssignedName</b>
                 </label>
                 <InputSelect id="analystassignedid" class="form-select d-inline" disabled="@IsDisabled" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
-                    <option value="-1">Select...</option>
+                    <option value="">Select...</option>
                     @foreach (var lktype in analysts)
                     {
                         <option value="@lktype.Id">@lktype.Displayname</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="@(() => requestfile.Analystassignedid)" />
             </div>
             <div class="col-lg-5 col-md-3 col-sm-12">
                 <label for="previousrequests">
@@ -1163,7 +1153,6 @@
                 <InputTextArea id="requestdetails" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DETAILS" @bind-Value="requestfile.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;">
                     @((MarkupString)requestfile.Requestdetails)
                 </InputTextArea>
-                <ValidationMessage For="@(() => requestfile.Requestdetails)" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <label for="intakenotes">
@@ -1176,31 +1165,22 @@
 
 
     <hr />
-    <div style="color:red">
-        @*     @if (DisplayAlert)
-        {
-        <div> The access file request Information below is required. </div>
-        } *@
-        <ValidationSummary />
-    </div>
 
+    @if (tester)
+    {
+        <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    }
+    &nbsp;
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="ValidSubmit">Save</button>
+    &nbsp;
+    @if (IsDisabled)
+    {
 
+        <button type="button" class="btn btn-primary" disabled="@(IsDisabled == true ? false : true)" @onclick="ActivateFile">Activate</button>
+    }
 
 </EditForm>
-
-@if (tester)
-{
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
-}
-    &nbsp;
-<button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-<button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="ValidSubmit">Save</button>
-  &nbsp;
-@if (IsDisabled)
-{
-
-    <button type="button" class="btn btn-primary" disabled="@(IsDisabled == true ? false : true)" @onclick="ActivateFile">Activate</button>
-}
 
 
 

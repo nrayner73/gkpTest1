@@ -18,7 +18,6 @@ public partial class Requestfile
     [Column(TypeName = "varchar(50)")]
     public string? Filenumber { get; set; }
 
-    [Required]
     public DateTime? Requestdate { get; set; }
 
  
@@ -31,10 +30,8 @@ public partial class Requestfile
     [Column(TypeName = "varchar(2000)")]
     public string? Statusnote { get; set; }
 
-    [Required]
     public int? Idviewed { get; set; }
     
-    [Required]
     public int? Requesttypeid { get; set; }
     
     public int? Recorddeliverymethodid { get; set; }
@@ -43,10 +40,8 @@ public partial class Requestfile
     
     public int? Personid { get; set; }
     
-    [Required]
     public int? Analystassignedid { get; set; }
 
-    [Required]
     [Column(TypeName = "varchar(max)")]
     public string? Requestdetails { get; set; }
 

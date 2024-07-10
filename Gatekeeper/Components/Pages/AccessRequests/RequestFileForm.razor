@@ -45,7 +45,15 @@
     [Parameter]
     public int fileid { get; set; }
 
-    public bool DisplayAlert { get; set; }
+    public enum PopUpType
+    {
+        Alert,
+        Info,
+        Success
+    }
+
+    public PopUpType popUpType;
+
     public List<string> AlertText1 = new List<string>();
     public List<string> AlertText2 = new List<string>();
 
@@ -328,7 +336,7 @@
         if (AlertText1.Count > 0 || AlertText2.Count > 0)
         {
             ModalTitle = "Data was not saved due to missing information. ";
-            DisplayAlert = true;
+            popUpType = PopUpType.Alert;
             await OnShowModalClick();
             IsDisabled = true;
             //return;
@@ -337,7 +345,7 @@
         {
             IsDisabled = false;
             ModalTitle = "Data Details";
-            DisplayAlert = false;
+            popUpType = PopUpType.Success;
             // await OnHideModalClick();
             if (person.Id != 0 && requestfile.Id != 0)
             {
@@ -365,7 +373,7 @@
         if (AlertText1.Count > 0 || AlertText2.Count > 0)
         {
             ModalTitle = "Data was not saved due to missing information. ";
-            DisplayAlert = true;
+            popUpType = PopUpType.Alert;
             await OnShowModalClick();
             //return;
 
@@ -373,7 +381,7 @@
         else
         {
             ModalTitle = "Data Details";
-            DisplayAlert = false;
+            popUpType = PopUpType.Success;
             // await OnHideModalClick();
             if (person.Id != 0 && requestfile.Id != 0)
             {
@@ -603,7 +611,7 @@
                 }
                 else
                 {
-                     IsDisabled = false;
+                    IsDisabled = false;
                 }
 
                 if (requestfile.Yearid == 0 || requestfile.Yearid is null)
@@ -711,6 +719,11 @@
 
         if (fileIsClosed)
         {
+            popUpType = PopUpType.Info;
+            ModalTitle = "Running Record Required";
+            SuccessMessage = "Before a file is set to Closed, Abandoned or Withdrawn, you are required to attach the running record. \n\n  If required, please attach the running record to this file before clicking on Save";
+            await OnShowModalClick();
+
             requestfile.Closedate = DateTime.Today.Date;
         }
         else
@@ -721,6 +734,7 @@
 
     public bool checkIfFileIsClosed()
     {
+        fileIsClosed = false;
         foreach (LkRequeststate item in requestStates)
         {
             if (requestfile.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
@@ -736,7 +750,7 @@
 
 <Modal @ref="modal" Size="ModalSize.Large">
     <HeaderTemplate>
-        @if (DisplayAlert)
+        @if (popUpType == PopUpType.Alert)
         {
             <h4 style="color:red">@ModalTitle</h4>
         }
@@ -747,7 +761,7 @@
         }
     </HeaderTemplate>
     <BodyTemplate>
-        @if (DisplayAlert)
+        @if (popUpType == PopUpType.Alert)
         {
             @if (AlertText1.Count > 0)
             {
@@ -768,6 +782,10 @@
             }
 
 
+        }
+        else if (popUpType == PopUpType.Info)
+        {
+            <div style="white-space:pre-line; text-align:center">&nbsp; @SuccessMessage</div>
         }
         else
         {
@@ -1120,11 +1138,8 @@
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
-<<<<<<< 93eba927a050e219951e5cdf3f77a0cc93fd761f
-                <InputSelect id="requeststate" class="form-select d-inline" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
-=======
-                <InputSelect id="requeststate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
->>>>>>> aab608772745b0c6f97c1fed73067dd72b93d29f
+                    <InputSelect id="requeststate" class="form-select d-inline" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+
                     @* make request state default to Active *@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)

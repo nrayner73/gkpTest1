@@ -252,6 +252,14 @@
                         AlertText1.Add("- Specify Closed Date for Closed, Abandoned, and Withdrawn state types.");
                     }
                 }
+
+                if (reqStateStr.ToLower() == "active" || reqStateStr.ToLower() == "on hold" || reqStateStr.ToLower() == "under review")
+                {
+                    if (requestfile.Closedate != null)
+                    {
+                        AlertText1.Add("- Do not specify a Closed Date for Active, On Hold, or Under Review states.");
+                    }
+                }
             }
 
             if (AlertText1.Count > 0)
@@ -861,7 +869,7 @@
                 <label for="lbstatusnote">
                     Status Note:
                 </label>
-                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" @bind-Value="requestfile.Statusnote" />
+                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" disabled="@IsDisabled" @bind-Value="requestfile.Statusnote" />
             </div>
         </div>
 
@@ -870,7 +878,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Subject of Request:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" @bind-Value="POISelectedPersonName">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" disabled="@IsDisabled" @bind-Value="POISelectedPersonName" >
                         <SelectedTemplate Context="POIPersonName">@POIPersonName.firstname @POIPersonName.lastname @POIPersonName.middlename</SelectedTemplate>
                         <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
                     </BlazoredTypeahead>
@@ -910,7 +918,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Company Name:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" @bind-Value="selectedcompanyname">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" disabled="@IsDisabled" @bind-Value="selectedcompanyname">
                         <SelectedTemplate Context="companyname">@companyname.companyname. </SelectedTemplate>
                         <ResultTemplate Context="companyname">@companyname.companyname.</ResultTemplate>
                     </BlazoredTypeahead>
@@ -920,7 +928,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Request Name:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" disabled="@IsDisabled" @bind-Value="selectedpersonname">
                         <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
                         <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
                     </BlazoredTypeahead>
@@ -982,7 +990,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Address:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" @bind-Value="selectedaddress">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" disabled="@IsDisabled" @bind-Value="selectedaddress">
                         <SelectedTemplate Context="address">@address.Street @address.City @address.Province  @address.Postalcode</SelectedTemplate>
                         <ResultTemplate Context="address">@address.Street @address.City @address.Province  @address.Postalcode</ResultTemplate>
                     </BlazoredTypeahead>
@@ -1112,7 +1120,11 @@
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
+<<<<<<< 93eba927a050e219951e5cdf3f77a0cc93fd761f
                 <InputSelect id="requeststate" class="form-select d-inline" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+=======
+                <InputSelect id="requeststate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+>>>>>>> aab608772745b0c6f97c1fed73067dd72b93d29f
                     @* make request state default to Active *@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)

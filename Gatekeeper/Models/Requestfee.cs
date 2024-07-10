@@ -19,7 +19,7 @@ public string? Description { get; set; }
 public decimal? Estimatedcost{ get; set; }
 [Column(TypeName = "varchar(5)")]
 public string? Requested{ get; set; }
-[Column(TypeName = "varchar(5)")]
+[Column(TypeName = "varchar(25)")]
 public string? Feewaived{ get; set; }
 public decimal? Finalcost{ get; set; }
 public DateTime? Moddate{ get; set; }

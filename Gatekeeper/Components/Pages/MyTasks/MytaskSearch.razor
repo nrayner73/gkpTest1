@@ -702,24 +702,11 @@
                     <InputText id="statusnote" class="form-control" @bind-Value="fileInfo.Statusnote" />
                 </div>
 
-                @* <div class="col-lg-2 col-md-3 col-sm-12">
-                    <label>
-                        Analyst:
-                    </label>
-                    <InputSelect id="analystassignedid" class="form-control" placeholder="ANALYST" @bind-Value="fileInfo.Analystassignedid">
-                        <option value="-1">All...</option>
-                        @foreach (var lktype in analysts)
-                        {
-                            <option value="@lktype.Id">@lktype.Displayname</option>
-                        }
-                    </InputSelect>
-                </div> *@
-
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label for="lbrequesttypeid">
                         Request Type:
                     </label>
-                    <InputSelect id="requesttypeid" class="form-control" placeholder="REQUEST TYPE" @bind-Value="fileInfo.Requesttypeid">
+                    <InputSelect id="requesttypeid" class="form-select d-inline" placeholder="REQUEST TYPE" @bind-Value="fileInfo.Requesttypeid">
                         <option value="-1">All...</option>
                         @foreach (var lktype in requesttypes)
                         {

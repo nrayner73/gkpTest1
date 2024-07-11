@@ -413,9 +413,9 @@
     <QuickGrid Items="@searchextensions" Virtualize="true" Pagination="@pagination">
         @if (showid)
         {
-            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
         }
-        <PropertyColumn Property="@(r => r.Extension)" Title="Extension" Sortable="true" class="col-width" />
+        <PropertyColumn Property="@(r => r.Extension)" Title="Extension" Sortable="true"/>
         <PropertyColumn Property="@(r => r.Section)" Title="Section" Sortable="true" />
         <PropertyColumn Property="@(r => r.Extensiondate)" Format="yyyy/MM/dd" Title="Extension Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Dayamount)" Title="Number of Extension Days" Sortable="true" />

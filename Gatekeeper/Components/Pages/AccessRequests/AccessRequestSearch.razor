@@ -171,10 +171,16 @@
         int i = 0;
         foreach (var item in SelectedTypes)
         {
+            if (item == "-1")
+            {
+                mtype = "";
+                break;
+            }
 
             if (i < SelectedTypes.Count() -1 )
             {
                 mtype += item  +",";
+
             }
             else
             {

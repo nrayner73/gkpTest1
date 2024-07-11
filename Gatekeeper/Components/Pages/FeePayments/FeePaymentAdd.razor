@@ -328,5 +328,10 @@
         <InputTextArea id="notes" class="form-control" disabled="@IsDisabled" placeholder="NOTES" @bind-Value="requestfile.Feepayment" row="15" col="250" style="min-height: 130px; overflow:auto;" />
     </div>
     <br />
-    <button type="submit" class="btn btn-primary">Save</button>
+
+    @if (!IsDisabled)
+    {
+        <button type="submit" disabled="@IsDisabled" class="btn btn-primary">Save</button>
+    }
+
 </EditForm>

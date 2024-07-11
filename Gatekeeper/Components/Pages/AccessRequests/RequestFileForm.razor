@@ -45,7 +45,15 @@
     [Parameter]
     public int fileid { get; set; }
 
-    public bool DisplayAlert { get; set; }
+    public enum PopUpType
+    {
+        Alert,
+        Info,
+        Success
+    }
+
+    public PopUpType popUpType;
+
     public List<string> AlertText1 = new List<string>();
     public List<string> AlertText2 = new List<string>();
 
@@ -252,6 +260,14 @@
                         AlertText1.Add("- Specify Closed Date for Closed, Abandoned, and Withdrawn state types.");
                     }
                 }
+
+                if (reqStateStr.ToLower() == "active" || reqStateStr.ToLower() == "on hold" || reqStateStr.ToLower() == "under review")
+                {
+                    if (requestfile.Closedate != null)
+                    {
+                        AlertText1.Add("- Do not specify a Closed Date for Active, On Hold, or Under Review states.");
+                    }
+                }
             }
 
             if (AlertText1.Count > 0)
@@ -320,7 +336,7 @@
         if (AlertText1.Count > 0 || AlertText2.Count > 0)
         {
             ModalTitle = "Data was not saved due to missing information. ";
-            DisplayAlert = true;
+            popUpType = PopUpType.Alert;
             await OnShowModalClick();
             IsDisabled = true;
             //return;
@@ -329,7 +345,7 @@
         {
             IsDisabled = false;
             ModalTitle = "Data Details";
-            DisplayAlert = false;
+            popUpType = PopUpType.Success;
             // await OnHideModalClick();
             if (person.Id != 0 && requestfile.Id != 0)
             {
@@ -357,7 +373,7 @@
         if (AlertText1.Count > 0 || AlertText2.Count > 0)
         {
             ModalTitle = "Data was not saved due to missing information. ";
-            DisplayAlert = true;
+            popUpType = PopUpType.Alert;
             await OnShowModalClick();
             //return;
 
@@ -365,7 +381,7 @@
         else
         {
             ModalTitle = "Data Details";
-            DisplayAlert = false;
+            popUpType = PopUpType.Success;
             // await OnHideModalClick();
             if (person.Id != 0 && requestfile.Id != 0)
             {
@@ -595,7 +611,7 @@
                 }
                 else
                 {
-                     IsDisabled = false;
+                    IsDisabled = false;
                 }
 
                 if (requestfile.Yearid == 0 || requestfile.Yearid is null)
@@ -703,6 +719,11 @@
 
         if (fileIsClosed)
         {
+            popUpType = PopUpType.Info;
+            ModalTitle = "Running Record Required";
+            SuccessMessage = "Before a file is set to Closed, Abandoned or Withdrawn, you are required to attach the running record. \n\n  If required, please attach the running record to this file before clicking on Save";
+            await OnShowModalClick();
+
             requestfile.Closedate = DateTime.Today.Date;
         }
         else
@@ -713,6 +734,7 @@
 
     public bool checkIfFileIsClosed()
     {
+        fileIsClosed = false;
         foreach (LkRequeststate item in requestStates)
         {
             if (requestfile.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
@@ -728,7 +750,7 @@
 
 <Modal @ref="modal" Size="ModalSize.Large">
     <HeaderTemplate>
-        @if (DisplayAlert)
+        @if (popUpType == PopUpType.Alert)
         {
             <h4 style="color:red">@ModalTitle</h4>
         }
@@ -739,7 +761,7 @@
         }
     </HeaderTemplate>
     <BodyTemplate>
-        @if (DisplayAlert)
+        @if (popUpType == PopUpType.Alert)
         {
             @if (AlertText1.Count > 0)
             {
@@ -760,6 +782,10 @@
             }
 
 
+        }
+        else if (popUpType == PopUpType.Info)
+        {
+            <div style="white-space:pre-line; text-align:center">&nbsp; @SuccessMessage</div>
         }
         else
         {
@@ -819,7 +845,7 @@
                 <label for="lbidviewed">
                     ID Viewed:
                 </label>
-                <InputSelect id="idviewed" class="form-control" disabled="@IsDisabled" placeholder="ID VIEWED" @bind-Value="requestfile.Idviewed">
+                <InputSelect id="idviewed" class="form-select d-inline" disabled="@IsDisabled" placeholder="ID VIEWED" @bind-Value="requestfile.Idviewed">
                     <option value="">Select...</option>
                     <option value="0">Yes</option>
                     <option value="1">No</option>
@@ -832,7 +858,7 @@
                 <label for="lbrequesttypeid">
                     Request Type:  <b>@requestTypeDetail</b>
                 </label>
-                <InputSelect id="requesttypeid" class="form-control" disabled="@IsDisabled" placeholder="REQUEST TYPE" @bind-Value="requestfile.Requesttypeid">
+                <InputSelect id="requesttypeid" class="form-select d-inline" disabled="@IsDisabled" placeholder="REQUEST TYPE" @bind-Value="requestfile.Requesttypeid">
                     <option value="">Select...</option>
                     @foreach (var lktype in requestTypes)
                     {
@@ -845,7 +871,7 @@
                 <label for="lbprocessingdeficiency">
                     Processing Deficiency:  <b>@processingDeficiencyDetail</b>
                 </label>
-                <InputSelect id="processingdeficiency" class="form-control" disabled="@IsDisabled" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
+                <InputSelect id="processingdeficiency" class="form-select d-inline" disabled="@IsDisabled" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
                     <option value="">Select...</option>
                     @foreach (var lktype in processingDeficiencies)
                     {
@@ -861,7 +887,7 @@
                 <label for="lbstatusnote">
                     Status Note:
                 </label>
-                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" @bind-Value="requestfile.Statusnote" />
+                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" disabled="@IsDisabled" @bind-Value="requestfile.Statusnote" />
             </div>
         </div>
 
@@ -870,7 +896,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Subject of Request:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" @bind-Value="POISelectedPersonName">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" disabled="@IsDisabled" @bind-Value="POISelectedPersonName" >
                         <SelectedTemplate Context="POIPersonName">@POIPersonName.firstname @POIPersonName.lastname @POIPersonName.middlename</SelectedTemplate>
                         <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
                     </BlazoredTypeahead>
@@ -910,7 +936,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Company Name:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" @bind-Value="selectedcompanyname">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" disabled="@IsDisabled" @bind-Value="selectedcompanyname">
                         <SelectedTemplate Context="companyname">@companyname.companyname. </SelectedTemplate>
                         <ResultTemplate Context="companyname">@companyname.companyname.</ResultTemplate>
                     </BlazoredTypeahead>
@@ -920,7 +946,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Request Name:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" disabled="@IsDisabled" @bind-Value="selectedpersonname">
                         <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
                         <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
                     </BlazoredTypeahead>
@@ -982,7 +1008,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Address:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" @bind-Value="selectedaddress">
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchAddress" disabled="@IsDisabled" @bind-Value="selectedaddress">
                         <SelectedTemplate Context="address">@address.Street @address.City @address.Province  @address.Postalcode</SelectedTemplate>
                         <ResultTemplate Context="address">@address.Street @address.City @address.Province  @address.Postalcode</ResultTemplate>
                     </BlazoredTypeahead>
@@ -1072,7 +1098,7 @@
                 <label for="recorddeliverymethodid">
                     Record Delivery Method:  <b>@recordDeliveryMethodDetail</b>
                 </label>
-                <InputSelect id="recorddeliverymethodid" class="form-control" disabled="@IsDisabled" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
+                <InputSelect id="recorddeliverymethodid" class="form-select d-inline" disabled="@IsDisabled" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in recordDeliveryMethods)
                     {
@@ -1085,7 +1111,7 @@
                 <label for="analystassignedid">
                     Analyst Assigned:  <b>@analystAssignedName</b>
                 </label>
-                <InputSelect id="analystassignedid" class="form-control" disabled="@IsDisabled" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
+                <InputSelect id="analystassignedid" class="form-select d-inline" disabled="@IsDisabled" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in analysts)
                     {
@@ -1112,7 +1138,8 @@
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
-                <InputSelect id="requeststate" class="form-control" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+                    <InputSelect id="requeststate" class="form-select d-inline" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
+
                     @* make request state default to Active *@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)

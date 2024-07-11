@@ -83,7 +83,7 @@
         var nameUser = user.Identity?.Name;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
         useranalyst = analystservice.GetAnalystsList().Where(x => x.Regno == userReg).FirstOrDefault(); 
-        
+
         showid = showfileid;
     }
 
@@ -150,6 +150,8 @@
     {
         POIselectedpersonname = null;
         selectedpersonname = null;
+        selectedpersonphone = null;
+        selectedpersonemail = null;
         searchrequestfiles = Enumerable.Empty<Searchrequestfile>().AsQueryable();
         fileInfo = new Searchrequestfile();
 

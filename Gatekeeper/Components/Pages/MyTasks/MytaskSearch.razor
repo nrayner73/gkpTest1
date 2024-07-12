@@ -83,7 +83,7 @@
         var nameUser = user.Identity?.Name;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
         useranalyst = analystservice.GetAnalystsList().Where(x => x.Regno == userReg).FirstOrDefault(); 
-        
+
         showid = showfileid;
     }
 
@@ -179,6 +179,11 @@
         int i = 0;
         foreach (var item in SelectedTypes)
         {
+            if(item == "-1")
+            {
+                mtype = "";
+                break;
+            }
 
             if (i < SelectedTypes.Count() -1 )
             {

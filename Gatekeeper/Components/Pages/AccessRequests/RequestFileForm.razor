@@ -71,6 +71,8 @@
     private Person person { get; set; } = new Person();
     private Person operson { get; set; } = new Person();
 
+    private AccessRequestForm accessRequestForm { get; set; } = new AccessRequestForm();
+
     private bool alertMessageShow = false;
     private string? SuccessMessage { get; set; }
 
@@ -145,6 +147,8 @@
         }
 
         SuccessMessage = "";
+
+        accessRequestForm = new AccessRequestForm(requestfile, person);
         StateHasChanged();
     }
 
@@ -153,6 +157,7 @@
     {
         GetData();
         GetDataContext();
+        accessRequestForm = new AccessRequestForm(requestfile, person);
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -205,6 +210,7 @@
         person = new Person();
         requestfile.Filenumber = "TBD";
         requestfile.Requeststate = 2;
+        accessRequestForm = new AccessRequestForm(requestfile, person);
         session.ClearAsync();
     }
 
@@ -212,50 +218,50 @@
     {
         AlertText1 = new List<string>();
 
-        if (requestfile != null)
+        if (accessRequestForm != null)
         {
-            if (requestfile.Requestdate == null)
+            if (accessRequestForm.Requestdate == null)
             {
                 AlertText1.Add("- Request Date");
             }
 
-            if (requestfile.Receivedate == null)
+            if (accessRequestForm.Receivedate == null)
             {
                 AlertText1.Add("- Receive Date");
             }
 
-            if (requestfile.Idviewed == null || requestfile.Idviewed < 0)
+            if (accessRequestForm.Idviewed == null || accessRequestForm.Idviewed < 0)
             {
                 AlertText1.Add("- ID Viewed");
             }
 
-            if (requestfile.Requesttypeid == null || requestfile.Requesttypeid < 0)
+            if (accessRequestForm.Requesttypeid == null || accessRequestForm.Requesttypeid < 0)
             {
                 AlertText1.Add("- Request Type");
             }
 
-            if (requestfile.Analystassignedid == null || requestfile.Analystassignedid < 0)
+            if (accessRequestForm.Analystassignedid == null || accessRequestForm.Analystassignedid < 0)
             {
                 AlertText1.Add("- Analyst");
             }
 
-            if (requestfile.Requestdetails == null || requestfile.Requestdetails == "")
+            if (accessRequestForm.Requestdetails == null || accessRequestForm.Requestdetails == "")
             {
                 AlertText1.Add("- Request Details");
             }
 
 
-            if (requestfile.Requeststate != null)
+            if (accessRequestForm.Requeststate != null)
             {
                 string reqStateStr = string.Empty;
                 using (var context = DbFactory.CreateDbContext())
                 {
-                    reqStateStr = context.LkRequeststates.Where(x => x.Id == requestfile.Requeststate).FirstOrDefault().Detail.ToString();
+                    reqStateStr = context.LkRequeststates.Where(x => x.Id == accessRequestForm.Requeststate).FirstOrDefault().Detail.ToString();
                 }
 
                 if (reqStateStr.ToLower() == "closed" || reqStateStr.ToLower() == "withdrawn" || reqStateStr.ToLower() == "abandoned")
                 {
-                    if (requestfile.Closedate == null)
+                    if (accessRequestForm.Closedate == null)
                     {
                         AlertText1.Add("- Specify Closed Date for Closed, Abandoned, and Withdrawn state types.");
                     }
@@ -263,7 +269,7 @@
 
                 if (reqStateStr.ToLower() == "active" || reqStateStr.ToLower() == "on hold" || reqStateStr.ToLower() == "under review")
                 {
-                    if (requestfile.Closedate != null)
+                    if (accessRequestForm.Closedate != null)
                     {
                         AlertText1.Add("- Do not specify a Closed Date for Active, On Hold, or Under Review states.");
                     }
@@ -281,29 +287,29 @@
         }
 
         AlertText2 = new List<string>();
-        if (person != null || person.Id == 0)
+        if (accessRequestForm != null || accessRequestForm.PersonId == 0)
         {
-            if (person.Firstname == null || person.Firstname == "")
+            if (accessRequestForm.Firstname == null || accessRequestForm.Firstname == "")
             {
                 AlertText2.Add("- First Name");
             }
 
-            if (person.Street == null || person.Street == "")
+            if (accessRequestForm.Street == null || accessRequestForm.Street == "")
             {
                 AlertText2.Add("- Street");
             }
 
-            if (person.City == null || person.City == "")
+            if (accessRequestForm.City == null || accessRequestForm.City == "")
             {
                 AlertText2.Add("- City");
             }
 
-            if (person.Province == null || person.Province == "")
+            if (accessRequestForm.Province == null || accessRequestForm.Province == "")
             {
                 AlertText2.Add("- Province");
             }
 
-            if (person.Daytimephone == null || person.Daytimephone == "")
+            if (accessRequestForm.Daytimephone == null || accessRequestForm.Daytimephone == "")
             {
                 AlertText2.Add("- Daytime Phone");
             }
@@ -347,15 +353,15 @@
             ModalTitle = "Data Details";
             popUpType = PopUpType.Success;
             // await OnHideModalClick();
-            if (person.Id != 0 && requestfile.Id != 0)
+            if (accessRequestForm.PersonId != 0 && accessRequestForm.Id != 0)
             {
-                requestfile.Requeststate = requestStates.Where(x => x.Detail == "Active").FirstOrDefault().Id;
-                requestfile.Closedate = null;
-                requestfile.Moduser = userReg;
-                requestfile.Moddate = DateTime.Today;
+                accessRequestForm.Requeststate = requestStates.Where(x => x.Detail == "Active").FirstOrDefault().Id;
+                accessRequestForm.Closedate = null;
+                accessRequestForm.Moduser = userReg;
+                accessRequestForm.Moddate = DateTime.Today;
 
-                await UpdateFileNumber(requestfile.Id);
-                UpdateFileNumber(requestfile.Id);
+                await UpdateFileNumber(accessRequestForm.Id);
+                UpdateFileNumber(accessRequestForm.Id);
             }
 
             StateHasChanged();
@@ -380,6 +386,8 @@
         }
         else
         {
+            person = personService.CreatePersonFromForm(accessRequestForm);
+            requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
             ModalTitle = "Data Details";
             popUpType = PopUpType.Success;
             // await OnHideModalClick();
@@ -436,6 +444,7 @@
                 }
 
             }
+            accessRequestForm = new AccessRequestForm(requestfile, person);
 
             checkIfFileIsClosed();
 
@@ -481,9 +490,11 @@
 
     private async Task UpdateFileNumber(int fileid)
     {
+        requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
+
         Requestfile updatefile = requestfile;
 
-        var rtype = requestTypes.Where(x => x.Id == requestfile.Requesttypeid).FirstOrDefault();
+        var rtype = requestTypes.Where(x => x.Id == accessRequestForm.Requesttypeid).FirstOrDefault();
 
         using (var context = DbFactory.CreateDbContext())
         {
@@ -517,6 +528,7 @@
         await AuditData("update RequestFile", "update file");
 
         requestfile = updatefile;
+        accessRequestForm = new AccessRequestForm(requestfile, person);
         StateHasChanged();
     }
 
@@ -524,10 +536,10 @@
     {
         await Task.Delay(500);
 
-        if (requestfile.Receivedate != null)
+        if (accessRequestForm.Receivedate != null)
         {
-            extensions = (await ExtensionService.GetExtensionList(requestfile.Id)).Where(x => x.Status != "del").ToList();
-            await dateService.SetDuedate(requestfile, extensions, holidays);
+            extensions = (await ExtensionService.GetExtensionList(accessRequestForm.Id)).Where(x => x.Status != "del").ToList();
+            await dateService.SetDuedate(accessRequestForm, extensions, holidays);
         }
     }
 
@@ -711,10 +723,13 @@
         requestfile.Moduser = userReg;
         requestfile.Createdate = DateTime.Today;
         requestfile.Createuser = userReg;
+
+        accessRequestForm = new AccessRequestForm(requestfile, person);
     }
 
     public async Task setClosedDateIfStatusIsClosed()
     {
+        requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
         checkIfFileIsClosed();
 
         if (fileIsClosed)
@@ -725,10 +740,12 @@
             await OnShowModalClick();
 
             requestfile.Closedate = DateTime.Today.Date;
+            accessRequestForm.Closedate = DateTime.Today.Date;
         }
         else
         {
             requestfile.Closedate = null;
+            accessRequestForm.Closedate = null;
         }
     }
 
@@ -738,6 +755,7 @@
         foreach (LkRequeststate item in requestStates)
         {
             if (requestfile.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
+            // if (accessRequestForm.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
             {
                 fileIsClosed = true;
                 break;
@@ -798,9 +816,9 @@
 </Modal>
 
 
-<EditForm Model="@requestfile" OnValidSubmit="@ValidSubmit">
-
+<EditForm Model="@accessRequestForm" Context="RequestFileForm" OnValidSubmit="@ValidSubmit" OnInvalidSubmit="@ValidSubmit">
     <DataAnnotationsValidator />
+
 
     <div class="container-fluid">
         <br />
@@ -809,27 +827,25 @@
                 <label for="lbfilenumber">
                     File Number:
                 </label>
-                <InputText id="filenumber" class="form-control" disabled="@IsDisabled" placeholder="FILE NUMBER" @bind-Value="requestfile.Filenumber" style="background-color:lightgray" />
+                <InputText id="filenumber" class="form-control" disabled="@IsDisabled" placeholder="FILE NUMBER" @bind-Value="accessRequestForm.Filenumber" style="background-color:lightgray" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span> <label for="lbrequestdate">
                     Request Date:
                 </label>
-                <InputDate id="requestdate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DATE" @bind-Value="requestfile.Requestdate" />
-                <ValidationMessage For="@(() => requestfile.Requestdate)" class="alert-danger" />
+                <InputDate id="requestdate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DATE" @bind-Value="accessRequestForm.Requestdate" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span> <label for="lbreceivedate">
                     Received Date:
                 </label>
-                <InputDate id="receivedate" class="form-control" disabled="@IsDisabled" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="requestfile.Receivedate" @bind-Value:after="setDuedate" />
-                <ValidationMessage For="@(() => requestfile.Receivedate)" />
+                <InputDate id="receivedate" class="form-control" disabled="@IsDisabled" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="accessRequestForm.Receivedate" @bind-Value:after="setDuedate" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrequestduedate">
                     Request Due Date:
                 </label>
-                <InputDate id="requestduedate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DUEDATE" @bind-Value="requestfile.Requestduedate" style="background-color:lightgray" />
+                <InputDate id="requestduedate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DUEDATE" @bind-Value="accessRequestForm.Requestduedate" style="background-color:lightgray" />
             </div>
         </div>
 
@@ -838,40 +854,38 @@
                 <label for="lbreferencenumber">
                     Reference Number:
                 </label>
-                <InputText id="referencenumber" class="form-control" disabled="@IsDisabled" placeholder="REFERENCE NUMBER" @bind-Value="requestfile.Referencenumber" />
+                <InputText id="referencenumber" class="form-control" disabled="@IsDisabled" placeholder="REFERENCE NUMBER" @bind-Value="accessRequestForm.Referencenumber" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label for="lbidviewed">
                     ID Viewed:
                 </label>
-                <InputSelect id="idviewed" class="form-select d-inline" disabled="@IsDisabled" placeholder="ID VIEWED" @bind-Value="requestfile.Idviewed">
+                <InputSelect id="idviewed" class="form-select d-inline" disabled="@IsDisabled" placeholder="ID VIEWED" @bind-Value="accessRequestForm.Idviewed">
                     <option value="">Select...</option>
                     <option value="0">Yes</option>
                     <option value="1">No</option>
                     <option value="2">NA</option>
                 </InputSelect>
-                <ValidationMessage For="@(() => requestfile.Idviewed)" class="alert-danger" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label for="lbrequesttypeid">
                     Request Type:  <b>@requestTypeDetail</b>
                 </label>
-                <InputSelect id="requesttypeid" class="form-select d-inline" disabled="@IsDisabled" placeholder="REQUEST TYPE" @bind-Value="requestfile.Requesttypeid">
+                <InputSelect id="requesttypeid" class="form-select d-inline" disabled="@IsDisabled" placeholder="REQUEST TYPE" @bind-Value="accessRequestForm.Requesttypeid">
                     <option value="">Select...</option>
                     @foreach (var lktype in requestTypes)
                     {
                         <option value="@lktype.Id">@lktype.Detail</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="@(() => requestfile.Requesttypeid)" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbprocessingdeficiency">
                     Processing Deficiency:  <b>@processingDeficiencyDetail</b>
                 </label>
-                <InputSelect id="processingdeficiency" class="form-select d-inline" disabled="@IsDisabled" placeholder="PROCESSING DEFICIENCY" @bind-Value="requestfile.Processingdeficiency">
+                <InputSelect id="processingdeficiency" class="form-select d-inline" disabled="@IsDisabled" placeholder="PROCESSING DEFICIENCY" @bind-Value="accessRequestForm.Processingdeficiency">
                     <option value="">Select...</option>
                     @foreach (var lktype in processingDeficiencies)
                     {
@@ -887,7 +901,7 @@
                 <label for="lbstatusnote">
                     Status Note:
                 </label>
-                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" disabled="@IsDisabled" @bind-Value="requestfile.Statusnote" />
+                <InputText id="statusnote" class="form-control" placeholder="STATUS NOTE" disabled="@IsDisabled" @bind-Value="accessRequestForm.Statusnote" />
             </div>
         </div>
 
@@ -907,26 +921,28 @@
         @* Subject of Request Info *@
         <br />
 
+        @* <EditForm Model="@accessRequestForm" OnValidSubmit="@ValidSubmit" OnInvalidSubmit="@ValidSubmit"> *@
+
         @if (POISelectedPersonName != null)
         {
-            person.Personofinterestfirstname = POISelectedPersonName.firstname;
-            person.Personofinterestlastname = POISelectedPersonName.lastname;
-            person.Personofinterestmiddlename = POISelectedPersonName.middlename;
+            accessRequestForm.Personofinterestfirstname = POISelectedPersonName.firstname;
+            accessRequestForm.Personofinterestlastname = POISelectedPersonName.lastname;
+            accessRequestForm.Personofinterestmiddlename = POISelectedPersonName.middlename;
             POISelectedPersonName = null;
         }
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label>First Name:</label>
-                <InputText id="poifirstname" class="form-control" disabled="@IsDisabled" @bind-Value="person.Personofinterestfirstname" />
+                <InputText id="poifirstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestfirstname" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label>Middle Name:</label>
-                <InputText id="poimiddlename" class="form-control" disabled="@IsDisabled" @bind-Value="person.Personofinterestmiddlename" />
+                <InputText id="poimiddlename" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestmiddlename" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label>Last Name:</label>
-                <InputText id="poilastname" class="form-control" disabled="@IsDisabled" @bind-Value="person.Personofinterestlastname" />
+                <InputText id="poilastname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestlastname" />
             </div>
         </div>
 
@@ -956,15 +972,15 @@
 
         @if (selectedcompanyname != null)
         {
-            person.Companyname = selectedcompanyname.companyname;
+            accessRequestForm.Companyname = selectedcompanyname.companyname;
             selectedcompanyname = null;
         }
 
         @if (selectedpersonname != null)
         {
-            person.Firstname = selectedpersonname.firstname;
-            person.Lastname = selectedpersonname.lastname;
-            person.Middlename = selectedpersonname.middlename;
+            accessRequestForm.Firstname = selectedpersonname.firstname;
+            accessRequestForm.Lastname = selectedpersonname.lastname;
+            accessRequestForm.Middlename = selectedpersonname.middlename;
             selectedpersonname = null;
 
         }
@@ -974,30 +990,30 @@
                 <label>
                     Company:
                 </label>
-                <InputText id="companyname" class="form-control" disabled="@IsDisabled" @bind-Value="person.Companyname" />
+                <InputText id="companyname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Companyname" />
             </div>
 
 
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label>First Name:</label>
-                <InputText id="firstname" class="form-control" disabled="@IsDisabled" @bind-Value="person.Firstname" />
-                <ValidationMessage For="@(() => person.Firstname)" />
+                <InputText id="firstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Firstname" />
+                @* <ValidationMessage For="@(() => person.Firstname)" /> *@
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <label>Middle Name:</label>
-                <InputText id="middlename" class="form-control" disabled="@IsDisabled" @bind-Value="person.Middlename" />
+                <InputText id="middlename" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Middlename" />
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <label>Last Name:</label>
-                <InputText id="lastname" class="form-control" disabled="@IsDisabled" @bind-Value="person.Lastname" />
+                <InputText id="lastname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Lastname" />
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <label>Birth Date:</label>
-                <InputDate id="birthdate" class="form-control" disabled="@IsDisabled" placeholder="BIRTH DATE" @bind-Value="person.Birthdate" />
+                <InputDate id="birthdate" class="form-control" disabled="@IsDisabled" placeholder="BIRTH DATE" @bind-Value="accessRequestForm.Birthdate" />
             </div>
 
         </div>
@@ -1018,11 +1034,11 @@
 
         @if (selectedaddress != null)
         {
-            person.Street = selectedaddress.Street;
-            person.City = selectedaddress.City;
-            person.Province = selectedaddress.Province;
-            person.Country = selectedaddress.Country;
-            person.Postalcode = selectedaddress.Postalcode;
+            accessRequestForm.Street = selectedaddress.Street;
+            accessRequestForm.City = selectedaddress.City;
+            accessRequestForm.Province = selectedaddress.Province;
+            accessRequestForm.Country = selectedaddress.Country;
+            accessRequestForm.Postalcode = selectedaddress.Postalcode;
 
             selectedaddress = null;
         }
@@ -1033,36 +1049,33 @@
                 <label>
                     Street:
                 </label>
-                <InputText id="street" class="form-control" disabled="@IsDisabled" @bind-Value="person.Street" />
-                <ValidationMessage For="@(() => person.Street)" />
+                <InputText id="street" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Street" />
             </div>
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label>
                     City:
                 </label>
-                <InputText id="city" class="form-control" disabled="@IsDisabled" @bind-Value="person.City" />
-                <ValidationMessage For="@(() => person.City)" />
+                <InputText id="city" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.City" />
             </div>
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label>
                     Province:
                 </label>
-                <InputText id="province" class="form-control" disabled="@IsDisabled" @bind-Value="person.Province" />
-                <ValidationMessage For="@(() => person.Province)" />
+                <InputText id="province" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Province" />
             </div>
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <label>
                     Country:
                 </label>
-                <InputText id="country" class="form-control" disabled="@IsDisabled" @bind-Value="person.Country" />
+                <InputText id="country" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Country" />
             </div>
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <label>
                     Postal Code:
                 </label>
-                <InputText id="postalcode" class="form-control" disabled="@IsDisabled" @bind-Value="person.Postalcode" />
+                <InputText id="postalcode" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Postalcode" />
             </div>
         </div>
 
@@ -1072,25 +1085,26 @@
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label>Daytime Phone:</label>
-                <InputText id="daytimephone" class="form-control" disabled="@IsDisabled" @bind-Value="person.Daytimephone" />
-                <ValidationMessage For="@(() => person.Daytimephone)" />
+                    <InputText id="daytimephone" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Daytimephone" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label>Alternate Phone:</label>
-                <InputText id="alternatephone" class="form-control" disabled="@IsDisabled" @bind-Value="person.Alternatephone" />
+                <InputText id="alternatephone" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Alternatephone" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label style="font-weight:200">Fax Phone:</label>
-                <InputText id="faxphone" class="form-control" disabled="@IsDisabled" @bind-Value="person.Faxphone" />
+                <InputText id="faxphone" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Faxphone" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label style="font-weight:200">Email:</label>
-                <InputText id="email" class="form-control" disabled="@IsDisabled" @bind-Value="person.Email" />
+                <InputText id="email" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Email" />
             </div>
 
         </div>
+
+        @* </EditForm> *@
 
         <hr />
         <div class="row">
@@ -1098,7 +1112,7 @@
                 <label for="recorddeliverymethodid">
                     Record Delivery Method:  <b>@recordDeliveryMethodDetail</b>
                 </label>
-                <InputSelect id="recorddeliverymethodid" class="form-select d-inline" disabled="@IsDisabled" placeholder="RECORD DELIVERY METHODID" @bind-Value="requestfile.Recorddeliverymethodid">
+                <InputSelect id="recorddeliverymethodid" class="form-select d-inline" disabled="@IsDisabled" placeholder="RECORD DELIVERY METHODID" @bind-Value="accessRequestForm.Recorddeliverymethodid">
                     <option value="-1">Select...</option>
                     @foreach (var lktype in recordDeliveryMethods)
                     {
@@ -1111,35 +1125,34 @@
                 <label for="analystassignedid">
                     Analyst Assigned:  <b>@analystAssignedName</b>
                 </label>
-                <InputSelect id="analystassignedid" class="form-select d-inline" disabled="@IsDisabled" placeholder="ANALYST ASSIGNED" @bind-Value="requestfile.Analystassignedid">
-                    <option value="-1">Select...</option>
+                <InputSelect id="analystassignedid" class="form-select d-inline" disabled="@IsDisabled" placeholder="ANALYST ASSIGNED" @bind-Value="accessRequestForm.Analystassignedid">
+                    <option value="">Select...</option>
                     @foreach (var lktype in analysts)
                     {
                         <option value="@lktype.Id">@lktype.Displayname</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="@(() => requestfile.Analystassignedid)" />
             </div>
             <div class="col-lg-5 col-md-3 col-sm-12">
                 <label for="previousrequests">
                     Previous Requests:
                 </label>
-                <InputText id="previousrequests" class="form-control" disabled="@IsDisabled" placeholder="PREVIOUS REQUESTS" @bind-Value="requestfile.Previousrequests" />
+                <InputText id="previousrequests" class="form-control" disabled="@IsDisabled" placeholder="PREVIOUS REQUESTS" @bind-Value="accessRequestForm.Previousrequests" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="timeframe">
                     Time Frame:
                 </label>
-                <InputText id="timeframe" class="form-control" disabled="@IsDisabled" placeholder="TIME FRAME" @bind-Value="requestfile.Timeframe" />
+                <InputText id="timeframe" class="form-control" disabled="@IsDisabled" placeholder="TIME FRAME" @bind-Value="accessRequestForm.Timeframe" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="requeststate">
                     Request State:  <b>@requestStateDetail</b>
                 </label>
 
-                    <InputSelect id="requeststate" class="form-select d-inline" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="requestfile.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
 
+                <InputSelect id="requeststate" class="form-select d-inline" disabled="@IsDisabled" placeholder="REQUEST STATE" @bind-Value="accessRequestForm.Requeststate" @bind-Value:after="setClosedDateIfStatusIsClosed">
                     @* make request state default to Active *@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)
@@ -1152,7 +1165,7 @@
                 <label for="closedate">
                     Close Date:
                 </label>
-                <InputDate id="closedate" class="form-control" disabled="@IsDisabled" placeholder="CLOSE DATE" @bind-Value="requestfile.Closedate" />
+                <InputDate id="closedate" class="form-control" disabled="@IsDisabled" placeholder="CLOSE DATE" @bind-Value="accessRequestForm.Closedate" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <span class="required">*</span>
@@ -1160,47 +1173,41 @@
                     Request Details:
                 </label>
 
-                <InputTextArea id="requestdetails" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DETAILS" @bind-Value="requestfile.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;">
-                    @((MarkupString)requestfile.Requestdetails)
+                <InputTextArea id="requestdetails" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DETAILS" @bind-Value="accessRequestForm.Requestdetails" row="15" col="150" style="min-height: 130px; overflow:auto;">
+                    @((MarkupString)accessRequestForm.Requestdetails)
                 </InputTextArea>
-                <ValidationMessage For="@(() => requestfile.Requestdetails)" />
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <label for="intakenotes">
                     Intake Notes:
                 </label>
-                <InputTextArea id="intakenotes" class="form-control" disabled="@IsDisabled" placeholder="INTAKE NOTES" @bind-Value="requestfile.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />
+                <InputTextArea id="intakenotes" class="form-control" disabled="@IsDisabled" placeholder="INTAKE NOTES" @bind-Value="accessRequestForm.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />
             </div>
         </div>
     </div>
 
 
     <hr />
-    <div style="color:red">
-        @*     @if (DisplayAlert)
-        {
-        <div> The access file request Information below is required. </div>
-        } *@
-        <ValidationSummary />
-    </div>
 
 
+    @if (tester)
+    {
+        <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    }
+    &nbsp;
+    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
+    <button type="submit" class="btn btn-primary" disabled="@IsDisabled">Save</button>
+    &nbsp;
+    @if (IsDisabled)
+    {
 
+        <button type="button" class="btn btn-primary" disabled="@(IsDisabled == true ? false : true)" @onclick="ActivateFile">Activate</button>
+    }
 </EditForm>
 
-@if (tester)
-{
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
-}
-    &nbsp;
-<button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-<button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="ValidSubmit">Save</button>
-  &nbsp;
-@if (IsDisabled)
-{
 
-    <button type="button" class="btn btn-primary" disabled="@(IsDisabled == true ? false : true)" @onclick="ActivateFile">Activate</button>
-}
+
+
 
 
 

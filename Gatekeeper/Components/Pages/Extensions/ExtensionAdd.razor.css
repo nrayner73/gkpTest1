@@ -1,11 +1,15 @@
-﻿::deep tr:nth-child(even) {
+﻿::deep table {
+    min-width: 100%;
+}
+
+::deep tr:nth-child(even) {
     background: #d8d8d8;
 }
 
-::deep .col-width {
+/*::deep .col-width {
     min-width: 62em;
     max-width: 63em;
-}
+}*/
 
 /* Sticky header while scrolling
 ::deep thead {

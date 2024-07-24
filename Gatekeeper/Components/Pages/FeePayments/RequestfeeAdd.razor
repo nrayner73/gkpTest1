@@ -306,14 +306,14 @@
                             <td> <InputNumber id="estimatedcost" class="form-control" placeholder="ESTIMATED COST" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Estimatedcost" /></td>
                             <td>
                                 <InputSelect id="requested" class="form-select d-inline" placeholder="REQUESTED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Requested">
-                                    <option value="-1">Select...</option>
+                                    <option value="">Select...</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                 </InputSelect>
                             </td>
                             <td>
                                 <InputSelect id="feewaived" class="form-select d-inline" placeholder="FEE WAIVED" @onchange="() => setfinalcost(item)" @onblur="() => setfinalcost(item)" @bind-Value="@item.Feewaived">
-                                    <option value="-1">Select...</option>
+                                    <option value="">Select...</option>
                                     <option value="NotRequested">Not Requested</option>
                                     <option value="Requested">Requested</option>
                                     <option value="Approved">Approved</option>

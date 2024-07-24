@@ -114,10 +114,9 @@
             }
         }
         LoadData();
-        if (totalPages > 0)
-        {
-            setPageConfig();
-        }
+        setPageConfig();
+        setPagingbutton(0);
+        setPageSetbutton(0);
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -142,6 +141,8 @@
     {
         POIselectedpersonname = null;
         selectedpersonname = null;
+        selectedpersonphone = null;
+        selectedpersonemail = null;
         searchrequestfiles = Enumerable.Empty<Searchrequestfile>().AsQueryable();
         fileInfo = new Searchrequestfile();
 
@@ -171,10 +172,16 @@
         int i = 0;
         foreach (var item in SelectedTypes)
         {
+            if (item == "-1")
+            {
+                mtype = "";
+                break;
+            }
 
             if (i < SelectedTypes.Count() -1 )
             {
                 mtype += item  +",";
+
             }
             else
             {
@@ -385,8 +392,10 @@
         var x = pagination.ItemsPerPage == perpage ? "page" : null;
         if(pagination.CurrentPageIndex > pagination.LastPageIndex)
         {
-           GoToPageAsync(0);
+            GoToPageAsync(0);
         }
+        setPagingbutton(pagination.CurrentPageIndex);
+        setPageSetbutton(pagination.CurrentPageIndex);
         return x;
     }
 
@@ -512,7 +521,11 @@
 
     private void setPagingbutton(int pageIndex)
     {
-        var lastPageIndex = pageTable.AsEnumerable().Max(row => row.Field<int>("pagenum"));
+        if(pageTable != null && pageTable.Rows.Count > 0)
+        {
+            lastPageIndex = pageTable.AsEnumerable().Max(row => row.Field<int>("pagenum"));
+        }
+
 
 
         if (pageIndex == 0)
@@ -542,14 +555,14 @@
     {
         currentPageSet = findPageSet(pageIndex);
 
-        firstPageIndex = pageTable.AsEnumerable()
-           .Where(x => x.Field<int>("pageset") == currentPageSet).Min(row => row.Field<int>("pagenum"));
+        if (pageTable != null && pageTable.Rows.Count > 0)
+        {
+            firstPageIndex = pageTable.AsEnumerable()
+                .Where(x => x.Field<int>("pageset") == currentPageSet).Min(row => row.Field<int>("pagenum"));
 
-        lastPageIndex = pageTable.AsEnumerable()
-                    .Where(x => x.Field<int>("pageset") == currentPageSet).Max(row => row.Field<int>("pagenum"));
-
-
-
+            lastPageIndex = pageTable.AsEnumerable()
+                        .Where(x => x.Field<int>("pageset") == currentPageSet).Max(row => row.Field<int>("pagenum"));
+        }
 
         if (totalPageSet == 0)
         {
@@ -615,7 +628,7 @@
                     <label>
                         Analyst:
                     </label>
-                    <InputSelect id="analystassignedid" class="form-control" placeholder="ANALYST" @bind-Value="fileInfo.Analystassignedid">
+                    <InputSelect id="analystassignedid" class="form-select d-inline" placeholder="ANALYST" @bind-Value="fileInfo.Analystassignedid">
                         <option value="-1">All...</option>
                         @foreach (var lktype in analysts)
                         {
@@ -628,7 +641,7 @@
                     <label for="lbrequesttypeid">
                         Request Type:
                     </label>
-                    <InputSelect id="requesttypeid" class="form-control" placeholder="REQUEST TYPE" @bind-Value="fileInfo.Requesttypeid">
+                    <InputSelect id="requesttypeid" class="form-select d-inline" placeholder="REQUEST TYPE" @bind-Value="fileInfo.Requesttypeid">
                         <option value="-1">All...</option>
                         @foreach (var lktype in requesttypes)
                         {
@@ -811,77 +824,9 @@
         <div class="col" style="padding-bottom:10px">
             Page  <span style="font-weight:bold">@(pagination.CurrentPageIndex + 1)</span> Of <span style="font-weight:bold"> @(totalPages + 1)</span> &nbsp;
         </div>
-        <div class="col align-item-end " >
-            <div>
-                <nav aria-label="Page navigation" b-3qssc0bm46>
-                    <ul class="pagination">
-                        <li class="page-item @(firstPagebutton   ? "" : "disabled")">
-                            <a class="page-link"
-                               @onclick="@(() => GoToFirstPageAsync())"
-                               aria-label="Firstpage">
-                                <i class="bi bi-chevron-double-left"></i>
-                            </a>
-                        </li>
-                        <li class="page-item @(previousPagebutton ?  "": "disabled")">
-                            <a class="page-link"
-                               @onclick="@(() => GoToPreviousPageAsync(pagination.CurrentPageIndex))"
-                               aria-label="Previous">
-                                <i class="bi bi-chevron-left"></i>
-                            </a>
-                        </li>
-                        <div class="@(previousSetbutton  ? "d-block" : "d-none")">
-                        <li class="page-item  @(previousSetbutton ?  "": "disabled")">
-                            <a class="page-link"
-                               onclick="@(() => GoToPreviousPageSetAsync())"
-                               aria-label="Previoussection">
-                                <i class="bi bi-three-dots"></i>
-                            </a>
-                        </li>
-            </div>
-                        @if (totalrecordCount > 0)
-                        {
-                            for (var pageIndex = firstPageIndex; pageIndex <= lastPageIndex; pageIndex++)
-                            {
-                                var capturedIndex = pageIndex;
-                    <li class="page-item">
-                        <a @onclick="@(() => GoToPageAsync(capturedIndex))"
-                           class="page-link"
-                           aria-current="@AriaCurrentValue(capturedIndex)"
-                           aria-label="Go to page @(pageIndex + 1)">
-                                        @(pageIndex + 1)
-                        </a>
-                    </li>
-                            }
-                        }
-            <div class="@(nextSetbutton ? "d-block" : "d-none")">
-                <li class="page-item @(nextSetbutton ? "" : "disabled")">
-                    <a class="page-link"
-                       @onclick="@(() => GoToNextPageSetAsync())"
-                       aria-label="Nextsection">
-                        <i class="bi bi-three-dots"></i>
-                    </a>
-                </li>
-            </div>
-            <li class="page-item @(nextPagebutton ? "" : "disabled")">
-                <a class="page-link"
-                   @onclick="@(() => GoToNextPageAsync(pagination.CurrentPageIndex))"
-                   aria-label="Next">
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-            </li>
-            <li class="page-item  @(lastPagebutton   ? "" : "disabled")">
-                <a class="page-link"
-                   @onclick="@(() => GoToLastPageAsync())"
-                   aria-label="Lastpage">
-                    <i class="bi bi-chevron-double-right"></i>
-                </a>
-            </li>
-            </ul>
-            </nav>
-        </div>
     </div>
 </div>
-</div>
+
 
 
 <div class="grid" tabindex="-1">
@@ -912,75 +857,71 @@
     </QuickGrid>
 </div>
 
-    <div class="row align-items-end" >
-<div class="col align-item-end ">
-    <div>
-        <nav aria-label="Page navigation" b-3qssc0bm46>
-            <ul class="pagination">
-                <li class="page-item @(firstPagebutton   ? "" : "disabled")">
-                    <a class="page-link"
-                       @onclick="@(() => GoToFirstPageAsync())"
-                       aria-label="Firstpage">
-                        <i class="bi bi-chevron-double-left"></i>
-                    </a>
-                </li>
-                <li class="page-item @(previousPagebutton ?  "": "disabled")">
-                    <a class="page-link"
-                       @onclick="@(() => GoToPreviousPageAsync(pagination.CurrentPageIndex))"
-                       aria-label="Previous">
-                        <i class="bi bi-chevron-left"></i>
-                    </a>
-                </li>
-                <div class="@(previousSetbutton  ? "d-block" : "d-none")">
+<div id="navbar">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item @(firstPagebutton   ? "" : "disabled")">
+                <a class="page-link"
+                    @onclick="@(() => GoToFirstPageAsync())"
+                    aria-label="Firstpage">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item @(previousPagebutton ?  "": "disabled")">
+                <a class="page-link"
+                    @onclick="@(() => GoToPreviousPageAsync(pagination.CurrentPageIndex))"
+                    aria-label="Previous">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            <div class="@(previousSetbutton  ? "d-block" : "d-none")">
                 <li class="page-item  @(previousSetbutton ?  "": "disabled")">
                     <a class="page-link"
-                       onclick="@(() => GoToPreviousPageSetAsync())"
-                       aria-label="Previoussection">
+                        onclick="@(() => GoToPreviousPageSetAsync())"
+                        aria-label="Previoussection">
                         <i class="bi bi-three-dots"></i>
                     </a>
                 </li>
-    </div>
-                @if (totalrecordCount > 0)
+            </div>
+            @if (totalrecordCount > 0)
+            {
+                for (var pageIndex = firstPageIndex; pageIndex <= lastPageIndex; pageIndex++)
                 {
-                    for (var pageIndex = firstPageIndex; pageIndex <= lastPageIndex; pageIndex++)
-                    {
-                        var capturedIndex = pageIndex;
-            <li class="page-item">
-                <a @onclick="@(() => GoToPageAsync(capturedIndex))"
-                   class="page-link"
-                   aria-current="@AriaCurrentValue(capturedIndex)"
-                   aria-label="Go to page @(pageIndex + 1)">
-                                @(pageIndex + 1)
+                    var capturedIndex = pageIndex;
+                    <li class="page-item">
+                        <a @onclick="@(() => GoToPageAsync(capturedIndex))"
+                            class="page-link"
+                            aria-current="@AriaCurrentValue(capturedIndex)"
+                            aria-label="Go to page @(pageIndex + 1)">
+                                        @(pageIndex + 1)
+                        </a>
+                    </li>
+                }
+            }
+            <div class="@(nextSetbutton ? "d-block" : "d-none")">
+                <li class="page-item @(nextSetbutton ? "" : "disabled")">
+                    <a class="page-link"
+                        @onclick="@(() => GoToNextPageSetAsync())"
+                        aria-label="Nextsection">
+                        <i class="bi bi-three-dots"></i>
+                    </a>
+                </li>
+            </div>
+            <li class="page-item @(nextPagebutton ? "" : "disabled")">
+                <a class="page-link"
+                    @onclick="@(() => GoToNextPageAsync(pagination.CurrentPageIndex))"
+                    aria-label="Next">
+                    <i class="bi bi-chevron-right"></i>
                 </a>
             </li>
-                    }
-                }
-    <div class="@(nextSetbutton ? "d-block" : "d-none")">
-        <li class="page-item @(nextSetbutton ? "" : "disabled")">
-            <a class="page-link"
-               @onclick="@(() => GoToNextPageSetAsync())"
-               aria-label="Nextsection">
-                <i class="bi bi-three-dots"></i>
-            </a>
-        </li>
-    </div>
-    <li class="page-item @(nextPagebutton ? "" : "disabled")">
-        <a class="page-link"
-           @onclick="@(() => GoToNextPageAsync(pagination.CurrentPageIndex))"
-           aria-label="Next">
-            <i class="bi bi-chevron-right"></i>
-        </a>
-    </li>
-    <li class="page-item  @(lastPagebutton   ? "" : "disabled")">
-        <a class="page-link"
-           @onclick="@(() => GoToLastPageAsync())"
-           aria-label="Lastpage">
-            <i class="bi bi-chevron-double-right"></i>
-        </a>
-    </li>
-    </ul>
+            <li class="page-item  @(lastPagebutton   ? "" : "disabled")">
+                <a class="page-link"
+                    @onclick="@(() => GoToLastPageAsync())"
+                    aria-label="Lastpage">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+        </ul>
     </nav>
 </div>
-    </div>
-    </div>
 <br />

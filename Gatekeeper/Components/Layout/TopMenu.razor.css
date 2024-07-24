@@ -1,6 +1,7 @@
 ﻿a:hover {
     font-weight: bold;
     color: darkblue;
+    
 }
 
 a:active {
@@ -8,14 +9,15 @@ a:active {
     color: white;
 }
 
-.navbar-nav .navbar-brand {
-
+#search-tab {
+    border: none;
+    background-color: transparent;
 }
 
-    .navbar-nav .navbar-brand:Hover {
-        font-weight: bold;
-        color: darkblue;
-    }
+    #search-tab:Hover {
+    font-weight: bold;
+    color: darkblue;
+}
 
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
     color: white;

@@ -8,6 +8,11 @@ using System.Diagnostics.Eventing.Reader;
 using Gatekeeper.Models.Lookups;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using BlazorBootstrap;
+using Gatekeeper.Components.Pages.RecordDeliveryMethods;
+using Gatekeeper.Components.Pages.RequestType;
+using System.Net.NetworkInformation;
+using System.Reflection;
 
 namespace Gatekeeper.Services
 {
@@ -18,6 +23,45 @@ namespace Gatekeeper.Services
         public RequestfileService(AppDbContext context)
         {
             _context = context;
+        }
+
+        public Requestfile CreateRequestFileFromForm(AccessRequestForm accessRequestForm)
+        {
+            var requestFile = new Requestfile();
+
+            requestFile.Id = accessRequestForm.Id;
+            requestFile.Yearid = accessRequestForm.Yearid;
+            requestFile.Filenumber = accessRequestForm.Filenumber;
+            requestFile.Requestdate = accessRequestForm.Requestdate;
+            requestFile.Receivedate = accessRequestForm.Receivedate;
+            requestFile.Requestduedate = accessRequestForm.Requestduedate;
+            requestFile.Referencenumber = accessRequestForm.Referencenumber;
+            requestFile.Statusnote = accessRequestForm.Statusnote;
+            requestFile.Idviewed = accessRequestForm.Idviewed;
+            requestFile.Requesttypeid = accessRequestForm.Requesttypeid;
+            requestFile.Recorddeliverymethodid = accessRequestForm.Recorddeliverymethodid;
+            requestFile.Processingdeficiency = accessRequestForm.Processingdeficiency;
+            requestFile.Personid = accessRequestForm.RFPersonid;
+            requestFile.Analystassignedid = accessRequestForm.Analystassignedid;
+            requestFile.Requestdetails = accessRequestForm.Requestdetails;
+            requestFile.Previousrequests = accessRequestForm.Previousrequests;
+            requestFile.Intakenotes = accessRequestForm.Intakenotes;
+            requestFile.Timeframe = accessRequestForm.Timeframe;
+            requestFile.Requeststate = accessRequestForm.Requeststate;
+            requestFile.Closedate = accessRequestForm.Closedate;
+            requestFile.Archivedate = accessRequestForm.Archivedate;
+            requestFile.Oipccomment = accessRequestForm.Oipccomment;
+            requestFile.Feepayment = accessRequestForm.Feepayment;
+            requestFile.Remarks = accessRequestForm.Remarks;
+            requestFile.Moddate = accessRequestForm.Moddate;
+            requestFile.Moduser = accessRequestForm.Moduser;
+            requestFile.Createdate = accessRequestForm.Createdate;
+            requestFile.Createuser = accessRequestForm.Createuser;
+            requestFile.Status = accessRequestForm.Status;
+            requestFile.Gkpid = accessRequestForm.Gkpid;
+
+
+            return requestFile;
         }
 
         public async Task<IEnumerable<Requestfile>> GetRequestfileList(Searchrequestfile searchfilter)

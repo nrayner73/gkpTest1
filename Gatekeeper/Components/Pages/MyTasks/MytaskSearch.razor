@@ -123,10 +123,13 @@
             }
         }
         LoadData();
-        if (totalPages > 0)
-        {
-            setPageConfig();
-        }
+
+        setPageConfig();
+        setPagingbutton(0);
+        setPageSetbutton(0);
+
+
+
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -234,7 +237,7 @@
             searchrequestfilesOnhold = searchfileService.GetRequestfileList(fileInfo).AsQueryable<Searchrequestfile>();
 
             searchrequestfiles = searchrequestfilesActive.Concat(searchrequestfilesOnhold);
-            
+
             // filter records to only those assigned to current analyst
             searchrequestfiles = searchrequestfiles.Where(x => x.Analystassignedid == useranalyst.Id).AsQueryable<Searchrequestfile>();
 
@@ -277,7 +280,7 @@
         return await Task.FromResult(personnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
     }
 
-        private async Task<IEnumerable<PersonEmail>> SearchPersonEmail(string searchText)
+    private async Task<IEnumerable<PersonEmail>> SearchPersonEmail(string searchText)
     {
         return await Task.FromResult(personemails.Where(x => (x.email ).ToLower().Contains(searchText.ToLower())));
     }
@@ -322,23 +325,33 @@
 
     #region Paging Setting
 
+    private int lastPageItems;
+    private int currentPageSet;
+
+    private bool firstPagebutton = false;
+    private bool previousPagebutton = false;
+    private bool previousSetbutton = false;
+
+    private bool lastPagebutton = true;
+    private bool nextPagebutton = true;
+    private bool nextSetbutton = true;
+
+    private int lastPageIndex { get; set; }
+    private int firstPageIndex { get; set; } = 0;
+
+
     private async void setPageConfig()
     {
-
-
         if (totalrecordCount == 0)
         {
             LoadData();
         }
         else
         {
-
-
             pageTable = new DataTable();
             pageTable.Columns.Add("recid", typeof(int));
             pageTable.Columns.Add("pagenum", typeof(int));
             pageTable.Columns.Add("pageset", typeof(int));
-
 
             DataRow dr = null;
             int pset = 0;
@@ -361,7 +374,6 @@
                 }
             }
 
-
             string columnName = "pagenum";
 
             // Use LINQ to query the DataTable and retrieve the maximum value from the specified column
@@ -378,6 +390,7 @@
             {
                 dr = dt.NewRow();
                 dr["id"] = i;
+                // dr["pagecount"] = pset;
                 dr["pagecount"] = pset;
                 if (pset <= pageSet)
                 {
@@ -389,12 +402,9 @@
                 {
                     pset = 0;
                     setcount += 1;
-
-
                 }
                 else
                 {
-
                     pset += 1;
                 }
             }
@@ -410,8 +420,6 @@
             columnName = "pageset";
             totalPageSet = pageTable.AsEnumerable()
          .Max(row => row.Field<int>(columnName));
-
-            // currentPageSet = 0;
         }
     }
 
@@ -425,45 +433,26 @@
     {
         setPageConfig();
         var x = pagination.ItemsPerPage == perpage ? "page" : null;
-
+        if (pagination.CurrentPageIndex > pagination.LastPageIndex)
+        {
+            GoToPageAsync(0);
+        }
+        setPagingbutton(pagination.CurrentPageIndex);
+        setPageSetbutton(pagination.CurrentPageIndex);
         return x;
-
     }
-
-
-
-    private int lastPageItems;
-    private int currentPageSet;
-
-    private bool firstPagebutton = false;
-    private bool previousPagebutton = false;
-    private bool previousSetbutton = false;
-
-    private bool lastPagebutton = true;
-    private bool nextPagebutton = true;
-    private bool nextSetbutton = true;
-
-
-
-    private int lastPageIndex { get; set; }
-    private int firstPageIndex { get; set; } = 0;
-
 
     private async Task GoToNextPageSetAsync()
     {
-
         if (currentPageSet <= totalPageSet)
         {
             currentPageSet += 1;
-
         }
-
 
         if (currentPageSet == totalPageSet)
         {
             firstPageIndex = (currentPageSet * (pageSet + 1));
             lastPageIndex = (int)totalPages;
-
         }
         else
         {
@@ -471,26 +460,22 @@
             lastPageIndex = firstPageIndex + pageSet;
         }
 
-
         setPagingbutton(firstPageIndex);
+        setPageSetbutton(firstPageIndex);
         await pagination.SetCurrentPageIndexAsync(firstPageIndex);
-
     }
 
     private async Task GoToPreviousPageSetAsync()
     {
-
         if (currentPageSet > 0)
         {
             currentPageSet -= 1;
         }
 
-
         if (currentPageSet == totalPageSet)
         {
             firstPageIndex = (currentPageSet * (pageSet + 1)) - 1;
             lastPageIndex = (int)totalPages;
-
         }
         else
         {
@@ -498,16 +483,14 @@
             lastPageIndex = firstPageIndex + pageSet;
         }
 
-
         setPagingbutton(firstPageIndex);
+        setPageSetbutton(firstPageIndex);
         await pagination.SetCurrentPageIndexAsync(firstPageIndex);
-
     }
 
     private int findPageSet(int pageIndex)
     {
         int pset = pageTable.AsEnumerable().Where(x => x.Field<int>("pagenum") == pageIndex).Select(x => x.Field<int>("pageset")).FirstOrDefault();
-
         return pset;
     }
 
@@ -515,10 +498,8 @@
     {
         currentPageSet = 0;
 
-
         firstPageIndex = 0;
         lastPageIndex = firstPageIndex + pageSet;
-
 
         firstPagebutton = false;
         previousSetbutton = false;
@@ -528,145 +509,110 @@
         nextPagebutton = true;
         lastPagebutton = true;
 
-
         await pagination.SetCurrentPageIndexAsync(firstPageIndex);
     }
 
     private async Task GoToLastPageAsync()
     {
 
-        totalPageSet = pageTable.AsEnumerable()
-                              .Max(row => row.Field<int>("pageset"));
+        var pageIndex = pageTable.AsEnumerable().Max(row => row.Field<int>("pagenum"));
+        setPagingbutton(pageIndex);
+        setPageSetbutton(pageIndex);
 
-        currentPageSet = (int)totalPageSet;
-
-        // firstPageIndex = (currentPageSet * (pageSet + 1));
-        // lastPageIndex = (int)totalPages ;
-
-        firstPageIndex = pageTable.AsEnumerable()
-          .Where(x => x.Field<int>("pageset") == currentPageSet).Min(row => row.Field<int>("pagenum"));
-
-        lastPageIndex = pageTable.AsEnumerable()
-                    .Where(x => x.Field<int>("pageset") == currentPageSet).Max(row => row.Field<int>("pagenum"));
-
-        firstPagebutton = true;
-        previousSetbutton = true;
-        previousPagebutton = true;
-
-        nextSetbutton = false;
-        nextPagebutton = false;
-        lastPagebutton = false;
-
-
-        await pagination.SetCurrentPageIndexAsync(firstPageIndex);
+        await pagination.SetCurrentPageIndexAsync(pageIndex);
     }
 
     private async Task GoToPreviousPageAsync(int pageIndex)
     {
         pageIndex -= 1;
-        // currentPageSet = findPageSet(pageIndex);
-        // if (pageIndex == 0)
-        // {
-        //     await GoToFirstPageAsync();
-        // }
-        // else if (pageIndex == totalrecordCount)
-        // {
-        //     await GoToLastPageAsync();
-        // }
 
         setPagingbutton(pageIndex);
+        setPageSetbutton(pageIndex);
         await pagination.SetCurrentPageIndexAsync(pageIndex);
     }
 
     private async Task GoToNextPageAsync(int pageIndex)
     {
         pageIndex += 1;
-        // currentPageSet = findPageSet(pageIndex);
-        // if (pageIndex == 0)
-        // {
-        //     await GoToFirstPageAsync();
-        // }
-        // else if (pageIndex == totalPages)
-        // {
-        //     await GoToLastPageAsync();
-
-        // }
 
         setPagingbutton(pageIndex);
+        setPageSetbutton(pageIndex);
         await pagination.SetCurrentPageIndexAsync(pageIndex);
     }
 
-    //Paging
     private async Task GoToPageAsync(int pageIndex)
     {
         currentPageSet = findPageSet(pageIndex);
         setPagingbutton(pageIndex);
+        setPageSetbutton(pageIndex);
         await pagination.SetCurrentPageIndexAsync(pageIndex);
     }
 
     private void setPagingbutton(int pageIndex)
     {
-        currentPageSet = findPageSet(pageIndex);
-
-        // pageTable.AsEnumerable().Where(x => x.Field<int>("pag") == pageIndex).Select(x => x.Field<int>("pageset")).FirstOrDefault(); ;
-        firstPageIndex = pageTable.AsEnumerable()
-           .Where(x => x.Field<int>("pageset") == currentPageSet).Min(row => row.Field<int>("pagenum"));
-
-        lastPageIndex = pageTable.AsEnumerable()
-                    .Where(x => x.Field<int>("pageset") == currentPageSet).Max(row => row.Field<int>("pagenum"));
-
-
-
-        if (currentPageSet == totalPageSet)
+        if(pageTable != null && pageTable.Rows.Count > 0)
         {
-            // firstPageIndex = (currentPageSet * (pageSet + 1));
-            // lastPageIndex = (int)totalPages - 1;
+            lastPageIndex = pageTable.AsEnumerable().Max(row => row.Field<int>("pagenum"));
+        }
 
-
-
-            firstPagebutton = true;
-            previousSetbutton = true;
-            previousPagebutton = true;
-
-            nextSetbutton = false;
-            if (pageIndex < lastPageIndex)
-            {
-                nextPagebutton = true;
-            }
-            else
-            {
-                nextPagebutton = false;
-            }
-            lastPagebutton = false;
-
+        if (pageIndex == 0)
+        {
+            previousPagebutton = false;
+            firstPagebutton = false;
         }
         else
         {
-            // firstPageIndex = (currentPageSet * (pageSet + 1));
-            // lastPageIndex = firstPageIndex + pageSet;
+            previousPagebutton = true;
+            firstPagebutton = true;
+        }
 
+        if (pageIndex < lastPageIndex)
+        {
+            nextPagebutton = true;
+            lastPagebutton = true;
+        }
+        else
+        {
+            nextPagebutton = false;
+            lastPagebutton = false;
+        }
+
+    }
+
+    private void setPageSetbutton(int pageIndex)
+    {
+        currentPageSet = findPageSet(pageIndex);
+
+        if (pageTable != null && pageTable.Rows.Count > 0)
+        {
+            firstPageIndex = pageTable.AsEnumerable()
+                .Where(x => x.Field<int>("pageset") == currentPageSet).Min(row => row.Field<int>("pagenum"));
+
+            lastPageIndex = pageTable.AsEnumerable()
+                        .Where(x => x.Field<int>("pageset") == currentPageSet).Max(row => row.Field<int>("pagenum"));
+        } 
+
+        if (totalPageSet == 0)
+        {
+            previousSetbutton = false;
+            nextSetbutton = false;
+        }
+        else if (currentPageSet == totalPageSet)
+        {
+            previousSetbutton = true;   
+            nextSetbutton = false;
+        }
+        else
+        {
             if (currentPageSet == 0)
             {
-                // firstPageIndex = 0;
-                // lastPageIndex = firstPageIndex + pageSet;
-
-                firstPagebutton = false;
                 previousSetbutton = false;
-                previousPagebutton = false;
-
                 nextSetbutton = true;
-                nextPagebutton = true;
-                lastPagebutton = true;
             }
             else if (currentPageSet > 0 && currentPageSet < totalPageSet)
             {
-                firstPagebutton = true;
                 previousSetbutton = true;
-                previousPagebutton = true;
-
                 nextSetbutton = true;
-                nextPagebutton = true;
-                lastPagebutton = true;
             }
         }
     }
@@ -896,76 +842,7 @@
         <div class="col" style="padding-bottom:10px">
             Page  <span style="font-weight:bold">@(pagination.CurrentPageIndex + 1)</span> Of <span style="font-weight:bold"> @(totalPages + 1)</span> &nbsp;
         </div>
-        <Paginator State="@pagination" />
-        @* <div class="col align-item-end " >
-            <div>
-                <nav aria-label="Page navigation" b-3qssc0bm46>
-                    <ul class="pagination">
-                        <li class="page-item @(firstPagebutton   ? "" : "disabled")">
-                            <a class="page-link"
-                               @onclick="@(() => GoToFirstPageAsync())"
-                               aria-label="Firstpage">
-                                <i class="bi bi-chevron-double-left"></i>
-                            </a>
-                        </li>
-                        <li class="page-item @(previousPagebutton ?  "": "disabled")">
-                            <a class="page-link"
-                               @onclick="@(() => GoToPreviousPageAsync(pagination.CurrentPageIndex))"
-                               aria-label="Previous">
-                                <i class="bi bi-chevron-left"></i>
-                            </a>
-                        </li>
-                        <div class="@(previousSetbutton  ? "d-block" : "d-none")">
-                        <li class="page-item  @(previousSetbutton ?  "": "disabled")">
-                            <a class="page-link"
-                               onclick="@(() => GoToPreviousPageSetAsync())"
-                               aria-label="Previoussection">
-                                <i class="bi bi-three-dots"></i>
-                            </a>
-                        </li>
-            </div>
-                        @if (totalrecordCount > 0)
-                        {
-                            for (var pageIndex = firstPageIndex; pageIndex <= lastPageIndex; pageIndex++)
-                            {
-                                var capturedIndex = pageIndex;
-                    <li class="page-item">
-                        <a @onclick="@(() => GoToPageAsync(capturedIndex))"
-                           class="page-link"
-                           aria-current="@AriaCurrentValue(capturedIndex)"
-                           aria-label="Go to page @(pageIndex + 1)">
-                                        @(pageIndex + 1)
-                        </a>
-                    </li>
-                            }
-                        }
-            <div class="@(nextSetbutton ? "d-block" : "d-none")">
-                <li class="page-item @(nextSetbutton ? "" : "disabled")">
-                    <a class="page-link"
-                       @onclick="@(() => GoToNextPageSetAsync())"
-                       aria-label="Nextsection">
-                        <i class="bi bi-three-dots"></i>
-                    </a>
-                </li>
-            </div>
-            <li class="page-item @(nextPagebutton ? "" : "disabled")">
-                <a class="page-link"
-                   @onclick="@(() => GoToNextPageAsync(pagination.CurrentPageIndex))"
-                   aria-label="Next">
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-            </li>
-            <li class="page-item  @(lastPagebutton   ? "" : "disabled")">
-                <a class="page-link"
-                   @onclick="@(() => GoToLastPageAsync())"
-                   aria-label="Lastpage">
-                    <i class="bi bi-chevron-double-right"></i>
-                </a>
-            </li>
-            </ul>
-            </nav>
-        </div> 
-    </div>*@
+
 </div>
 </div>
 
@@ -997,5 +874,73 @@
         </TemplateColumn>
     </QuickGrid>
 </div>
-<Paginator State="@pagination" />
+
+
+<div id="navbar">
+    <nav aria-label="Page navigation" b-3qssc0bm46>
+        <ul class="pagination">
+            <li class="page-item @(firstPagebutton   ? "" : "disabled")">
+                <a class="page-link"
+                    @onclick="@(() => GoToFirstPageAsync())"
+                    aria-label="Firstpage">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item @(previousPagebutton ?  "": "disabled")">
+                <a class="page-link"
+                    @onclick="@(() => GoToPreviousPageAsync(pagination.CurrentPageIndex))"
+                    aria-label="Previous">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            <div class="@(previousSetbutton  ? "d-block" : "d-none")">
+                <li class="page-item  @(previousSetbutton ?  "": "disabled")">
+                    <a class="page-link"
+                        onclick="@(() => GoToPreviousPageSetAsync())"
+                        aria-label="Previoussection">
+                        <i class="bi bi-three-dots"></i>
+                    </a>
+                </li>
+            </div>
+            @if (totalrecordCount > 0)
+            {
+                for (var pageIndex = firstPageIndex; pageIndex <= lastPageIndex; pageIndex++)
+                {
+                    var capturedIndex = pageIndex;
+                    <li class="page-item">
+                        <a @onclick="@(() => GoToPageAsync(capturedIndex))"
+                            class="page-link"
+                            aria-current="@AriaCurrentValue(capturedIndex)"
+                            aria-label="Go to page @(pageIndex + 1)">
+                                        @(pageIndex + 1)
+                        </a>
+                    </li>
+                }
+            }
+            <div class="@(nextSetbutton ? "d-block" : "d-none")">
+                <li class="page-item @(nextSetbutton ? "" : "disabled")">
+                    <a class="page-link"
+                       @onclick="@(() => GoToNextPageSetAsync())"
+                       aria-label="Nextsection">
+                        <i class="bi bi-three-dots"></i>
+                    </a>
+                </li>
+            </div>
+            <li class="page-item @(nextPagebutton ? "" : "disabled")">
+                <a class="page-link"
+                   @onclick="@(() => GoToNextPageAsync(pagination.CurrentPageIndex))"
+                   aria-label="Next">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="page-item  @(lastPagebutton   ? "" : "disabled")">
+                <a class="page-link"
+                   @onclick="@(() => GoToLastPageAsync())"
+                   aria-label="Lastpage">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
 <br />

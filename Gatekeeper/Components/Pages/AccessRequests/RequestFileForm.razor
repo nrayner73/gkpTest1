@@ -242,7 +242,7 @@
 
             if (accessRequestForm.Analystassignedid == null || accessRequestForm.Analystassignedid < 0)
             {
-                AlertText1.Add("- Analyst");
+                AlertText1.Add("- Analyst Assigned");
             }
 
             if (accessRequestForm.Requestdetails == null || accessRequestForm.Requestdetails == "")
@@ -921,8 +921,6 @@
         @* Subject of Request Info *@
         <br />
 
-        @* <EditForm Model="@accessRequestForm" OnValidSubmit="@ValidSubmit" OnInvalidSubmit="@ValidSubmit"> *@
-
         @if (POISelectedPersonName != null)
         {
             accessRequestForm.Personofinterestfirstname = POISelectedPersonName.firstname;
@@ -998,7 +996,6 @@
                 <span class="required">*</span>
                 <label>First Name:</label>
                 <InputText id="firstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Firstname" />
-                @* <ValidationMessage For="@(() => person.Firstname)" /> *@
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
@@ -1103,8 +1100,6 @@
             </div>
 
         </div>
-
-        @* </EditForm> *@
 
         <hr />
         <div class="row">

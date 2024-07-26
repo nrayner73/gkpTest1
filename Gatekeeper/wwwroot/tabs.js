@@ -1,4 +1,4 @@
-﻿
+﻿let cFileNumber = 0;
 window.addEventListener("load", (event) => {
     //alert("page is fully loaded");
     //alert(location.pathname);
@@ -12,28 +12,38 @@ window.addEventListener("load", (event) => {
     }
 });
 
+function assignFileNumber(fileno) {
 
+    cFileNumber = fileno;
+
+   // alert(cFileNumber);
+
+}
 
 function showTopmenu() {
     var topmenu = document.getElementById("fileTabs");
-    
-    //alert("show top menu");
-    document.getElementById("fileTabs").style.display = "contents";
-    topmenu.style.display.replace("none","contents");
-    document.getElementById("file-tab").classList.toggle("active");
+
+  /*  alert("show top menu");*/
+
+    if (typeof(topmenu) != 'undefined' && topmenu != null) {
+       
+        document.getElementById("fileTabs").style.display = "contents";
+        topmenu.style.display.replace("none", "contents");
+        document.getElementById("file-tab").classList.toggle("active");
+    }
 }
 
 function hideTopmenu() {
 
     //if (location.pathname == "/accessrequests/add") {
-    if (location.pathname == "/accessrequests/add" || location.pathname == "/feepayment/add" || location.pathname == "/disclosure/add" || location.pathname == "/extension/add") {
-        showTopmenu();
-    }
-    else {
-        //sessionStorage.Clear();
-        var topmenu = document.getElementById("fileTabs");
-        topmenu.style.display = "none";
-    }
+    //if (location.pathname == "/accessrequests/add" || location.pathname == "/feepayment/add" || location.pathname == "/disclosure/add" || location.pathname == "/extension/add") {
+    //    showTopmenu();
+    //}
+    //else {
+    //    //sessionStorage.Clear();
+    //    var topmenu = document.getElementById("fileTabs");
+    //    topmenu.style.display = "none";
+    //}
 }
 
 function changetab(elname) {

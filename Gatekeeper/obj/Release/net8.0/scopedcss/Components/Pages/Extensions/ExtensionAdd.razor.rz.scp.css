@@ -1,11 +1,15 @@
+[b-m2q7303c84] table {
+    min-width: 100%;
+}
+
 [b-m2q7303c84] tr:nth-child(even) {
     background: #d8d8d8;
 }
 
-[b-m2q7303c84] .col-width {
+/*::deep .col-width {
     min-width: 62em;
     max-width: 63em;
-}
+}*/
 
 /* Sticky header while scrolling
 ::deep thead {

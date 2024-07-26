@@ -59,7 +59,7 @@
 .nav-item[b-e4iuz7yxhz] {
     font-size: 0.9rem;
     padding-bottom: 0.5rem;
-    min-width: 25rem;
+    min-width: 13rem;
 }
 
     .nav-item:first-of-type[b-e4iuz7yxhz] {
@@ -110,7 +110,7 @@
         display: block;
 
         /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
+        height: calc(100vh - 8.5rem);
         overflow-y: auto;
     }
 }

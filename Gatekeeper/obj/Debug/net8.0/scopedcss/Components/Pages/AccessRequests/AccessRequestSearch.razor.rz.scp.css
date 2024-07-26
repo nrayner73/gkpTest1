@@ -10,6 +10,11 @@ nav {
     font-family: arial;
     font-size: medium;
 }
+
+#navbar[b-vrjkvxbnqu] {
+    float: right;
+}
+
 /*::deep th.country-name {
     width: 14rem;
 }*/

@@ -11,7 +11,7 @@
 
 
 
-<nav id="fileTabs" class="navbar navbar-expand-lg bg-body-tertiary" style="display:none" >
+<nav id="fileTabs" class="navbar navbar-expand-lg bg-body-tertiary" style="display:none">
     <div class="container-fluid">
         <button id="search-tab" class="navbar-brand" @onclick="@(() => navigationManager.NavigateTo("mytasks/search"))" href="#" Match="NavLinkMatch.All">Search</button>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,7 @@
     private string? userReg;
     protected async override Task OnInitializedAsync()
     {
-        loginState.OnChange += StateHasChanged;
+        //loginState.OnChange += StateHasChanged;
 
         if (loginState.gFileId > 0)
         {

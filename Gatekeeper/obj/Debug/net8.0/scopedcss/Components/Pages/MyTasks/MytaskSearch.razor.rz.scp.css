@@ -22,6 +22,10 @@
     font-family: arial;
     font-size: medium ;
 }
+
+#navbar[b-cnhds8r9c9] {
+    float: right;
+}
 /* Don't collapse rows even if they are empty */
 /*::deep tbody tr {
     height: 1.8rem;

@@ -161,7 +161,7 @@ main[b-bqdrc1gtje] {
 .nav-item[b-e4iuz7yxhz] {
     font-size: 0.9rem;
     padding-bottom: 0.5rem;
-    min-width: 25rem;
+    min-width: 13rem;
 }
 
     .nav-item:first-of-type[b-e4iuz7yxhz] {
@@ -212,7 +212,7 @@ main[b-bqdrc1gtje] {
         display: block;
 
         /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
+        height: calc(100vh - 8.5rem);
         overflow-y: auto;
     }
 }
@@ -220,6 +220,7 @@ main[b-bqdrc1gtje] {
 a:hover[b-bbh6r6pxsf] {
     font-weight: bold;
     color: darkblue;
+    
 }
 
 a:active[b-bbh6r6pxsf] {
@@ -227,13 +228,29 @@ a:active[b-bbh6r6pxsf] {
     color: white;
 }
 
+#search-tab[b-bbh6r6pxsf] {
+    border: none;
+    background-color: transparent;
+}
+
+    #search-tab:Hover[b-bbh6r6pxsf] {
+    font-weight: bold;
+    color: darkblue;
+}
+
 .navbar-nav .nav-link.active[b-bbh6r6pxsf], .navbar-nav .nav-link.show[b-bbh6r6pxsf] {
     color: white;
     background-color: steelblue;
     font-weight: bold;
-    border-radius:4px;
-    float:right;
+    border-radius: 4px;
+    float: right;
 }
+
+.navbar-nav .nav-link:hover[b-bbh6r6pxsf] {
+    font-weight: bold;
+    color: darkblue;
+}
+
 /* _content/Gatekeeper/Components/Pages/AccessRequests/AccessRequestSearch.razor.rz.scp.css */
 /**, ::after, ::before {
 box-sizing :border-box;
@@ -247,6 +264,11 @@ nav {
     font-family: arial;
     font-size: medium;
 }
+
+#navbar[b-vrjkvxbnqu] {
+    float: right;
+}
+
 /*::deep th.country-name {
     width: 14rem;
 }*/
@@ -342,14 +364,18 @@ nav {
     height: 1.8rem;
 }
 /* _content/Gatekeeper/Components/Pages/Extensions/ExtensionAdd.razor.rz.scp.css */
+[b-m2q7303c84] table {
+    min-width: 100%;
+}
+
 [b-m2q7303c84] tr:nth-child(even) {
     background: #d8d8d8;
 }
 
-[b-m2q7303c84] .col-width {
+/*::deep .col-width {
     min-width: 62em;
     max-width: 63em;
-}
+}*/
 
 /* Sticky header while scrolling
 ::deep thead {
@@ -434,6 +460,10 @@ nav {
 [b-cnhds8r9c9] tr {
     font-family: arial;
     font-size: medium ;
+}
+
+#navbar[b-cnhds8r9c9] {
+    float: right;
 }
 /* Don't collapse rows even if they are empty */
 /*::deep tbody tr {

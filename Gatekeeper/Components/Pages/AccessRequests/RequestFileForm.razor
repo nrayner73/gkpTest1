@@ -1,4 +1,5 @@
 @rendermode InteractiveServer
+
 @inject IDbContextFactory<AppDbContext> DbFactory
 @inject IPersonnameService personNameService
 @inject IAddressService addressService
@@ -127,15 +128,18 @@
 
     protected async override Task OnParametersSetAsync()
     {
-        if (requestfile.Yearid == 0 || requestfile.Yearid is null)
-        {
-            requestfile.Filenumber = "TBD";
-        }
+
 
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
 
+        if (loginState.gFileId > 0)
+        {
+            fileid = (int)loginState.gFileId;
+            GetDataContext();
+        } 
+       
         var AccessPerson = Configuration["Testers"];
 
         tester = false;
@@ -147,23 +151,33 @@
         }
 
         SuccessMessage = "";
-
         accessRequestForm = new AccessRequestForm(requestfile, person);
         StateHasChanged();
+        
+
     }
 
     private string? userReg;
     protected async override Task OnInitializedAsync()
     {
-        GetData();
-        GetDataContext();
-        accessRequestForm = new AccessRequestForm(requestfile, person);
+        // GetData();
+        // GetDataContext();
+        // accessRequestForm = new AccessRequestForm(requestfile, person);
     }
+
+    protected virtual void  OnAfterRender()
+    {
+        var RQID =  sessionStorage.GetItemAsync<string>("RQID");
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender) 
         {
-
+            if (requestfile.Yearid == 0 || requestfile.Yearid is null)
+            {
+                requestfile.Filenumber = "TBD";
+            }
             if (fileid > 0)
             {
                 await sessionStorage.SetItemAsync("RQID", fileid);
@@ -192,8 +206,8 @@
             }
 
             setTestdata = false;
-            JSRuntime.InvokeVoidAsync("showTopmenu");
-            JSRuntime.InvokeVoidAsync("changetab", "file-tab");
+             JSRuntime.InvokeVoidAsync("showTopmenu");
+             JSRuntime.InvokeVoidAsync("changetab", "file-tab");
             #endregion
 
             StateHasChanged();
@@ -369,7 +383,6 @@
             await OnShowModalClick();
             //  navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
         }
-
     }
 
     private async Task ValidSubmit()
@@ -401,7 +414,7 @@
 
                 await personService.UpdatePerson(person);
                 await AuditData("update Person", "update person");
-                await Task.Delay(1000);
+                // await Task.Delay(1000);
                 await UpdateFileNumber(requestfile.Id);
                 //UpdateFileNumber(requestfile.Id);
                 SuccessMessage = "The data has been updated successfully";
@@ -456,9 +469,13 @@
             {
                 IsDisabled = false;
             }
+            //   StateHasChanged();
+            //   await OnShowModalClick();
 
-            StateHasChanged();
-            await OnShowModalClick();
+            navigationManager.NavigateTo($"/accessrequests/search", true);
+
+
+
         }
     }
 
@@ -490,6 +507,8 @@
 
     private async Task UpdateFileNumber(int fileid)
     {
+        requestfile = new Requestfile();
+
         requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
 
         Requestfile updatefile = requestfile;
@@ -520,11 +539,17 @@
                 // updatefile.Requestdetails = "Request Details For " + requestfile.Filenumber;
                 // updatefile.Previousrequests = "Test For " + requestfile.Filenumber;
                 // updatefile.Intakenotes = "Intake Notes For " + requestfile.Filenumber;
-
             }
         }
-        await requestFileService.UpdateRequestfile(updatefile);
-        await Task.Delay(1000);
+        using (var context = DbFactory.CreateDbContext())
+        {
+
+
+            context.Requestfiles.Update(updatefile);
+        }
+
+        // await requestFileService.UpdateRequestfile(updatefile);
+        // await Task.Delay(1000);
         await AuditData("update RequestFile", "update file");
 
         requestfile = updatefile;
@@ -605,6 +630,7 @@
             holidays = context.Holidays.Where(x => x.Status != "del").ToList();
             requestTypes = context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
             //requestfiles = context.Requestfiles.ToList(); -- moved to UpdateFileNumber
+
             if (fileid > 0)
             {
                 //assigned Access Request File object
@@ -615,6 +641,8 @@
 
                 requestfile = loginState.Requestfile;
                 orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
+
+                JSRuntime.InvokeVoidAsync("assignFileNumber", requestfile.Id);
                 checkIfFileIsClosed();
 
                 if (fileIsClosed)
@@ -651,6 +679,7 @@
                 operson = (Person)context.Entry(person).GetDatabaseValues().ToObject();
             }
         }
+        accessRequestForm = new AccessRequestForm(requestfile, person);
     }
     #endregion
 
@@ -754,14 +783,14 @@
         fileIsClosed = false;
         foreach (LkRequeststate item in requestStates)
         {
-            if (requestfile.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
+            if (requestfile.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn"))
             // if (accessRequestForm.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
             {
                 fileIsClosed = true;
                 break;
             }
         }
-        return fileIsClosed;    
+        return fileIsClosed;
     }
 }
 
@@ -823,10 +852,12 @@
     <div class="container-fluid">
         <br />
         <div class="row">
+
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbfilenumber">
                     File Number:
                 </label>
+             
                 <InputText id="filenumber" class="form-control" disabled="@IsDisabled" placeholder="FILE NUMBER" @bind-Value="accessRequestForm.Filenumber" style="background-color:lightgray" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
@@ -895,7 +926,7 @@
             </div>
         </div>
 
-         <div class="row">
+        <div class="row">
 
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbstatusnote">
@@ -910,7 +941,7 @@
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
                     <label style="font-weight:bold;color:blue;">Search Subject of Request:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" disabled="@IsDisabled" @bind-Value="POISelectedPersonName" >
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" disabled="@IsDisabled" @bind-Value="POISelectedPersonName">
                         <SelectedTemplate Context="POIPersonName">@POIPersonName.firstname @POIPersonName.lastname @POIPersonName.middlename</SelectedTemplate>
                         <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
                     </BlazoredTypeahead>
@@ -1085,7 +1116,7 @@
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label>Daytime Phone:</label>
-                    <InputText id="daytimephone" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Daytimephone" />
+                <InputText id="daytimephone" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Daytimephone" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
@@ -1108,6 +1139,7 @@
 
         <hr />
         <div class="row">
+    
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="recorddeliverymethodid">
                     Record Delivery Method:  <b>@recordDeliveryMethodDetail</b>

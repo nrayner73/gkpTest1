@@ -161,6 +161,7 @@ main[b-bqdrc1gtje] {
 .nav-item[b-e4iuz7yxhz] {
     font-size: 0.9rem;
     padding-bottom: 0.5rem;
+    min-width: 13rem;
 }
 
     .nav-item:first-of-type[b-e4iuz7yxhz] {
@@ -211,7 +212,7 @@ main[b-bqdrc1gtje] {
         display: block;
 
         /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
+        height: calc(100vh - 8.5rem);
         overflow-y: auto;
     }
 }
@@ -219,6 +220,7 @@ main[b-bqdrc1gtje] {
 a:hover[b-bbh6r6pxsf] {
     font-weight: bold;
     color: darkblue;
+    
 }
 
 a:active[b-bbh6r6pxsf] {
@@ -226,38 +228,71 @@ a:active[b-bbh6r6pxsf] {
     color: white;
 }
 
+#search-tab[b-bbh6r6pxsf] {
+    border: none;
+    background-color: transparent;
+}
+
+    #search-tab:Hover[b-bbh6r6pxsf] {
+    font-weight: bold;
+    color: darkblue;
+}
+
 .navbar-nav .nav-link.active[b-bbh6r6pxsf], .navbar-nav .nav-link.show[b-bbh6r6pxsf] {
     color: white;
     background-color: steelblue;
     font-weight: bold;
-    border-radius:4px;
-    float:right;
+    border-radius: 4px;
+    float: right;
 }
+
+.navbar-nav .nav-link:hover[b-bbh6r6pxsf] {
+    font-weight: bold;
+    color: darkblue;
+}
+
 /* _content/Gatekeeper/Components/Pages/AccessRequests/AccessRequestSearch.razor.rz.scp.css */
-[b-vrjkvxbnqu] th.country-name {
-    width: 14rem;
+/**, ::after, ::before {
+box-sizing :border-box;
 }
+
+nav {
+    display: block;
+    unicode-bidi: isolate;
+}*/
+[b-vrjkvxbnqu] tr {
+    font-family: arial;
+    font-size: medium;
+}
+
+#navbar[b-vrjkvxbnqu] {
+    float: right;
+}
+
+/*::deep th.country-name {
+    width: 14rem;
+}*/
 
 /* Subtle stripe effect */
-[b-vrjkvxbnqu] tr:nth-child(even) {
+/*::deep tr:nth-child(even) {
     background: #d8d8d8;
-}
+}*/
 
 /* Don't collapse rows even if they are empty */
-[b-vrjkvxbnqu] tbody tr {
+/*::deep tbody tr {
     height: 1.8rem;
 }
 
-.page-size-chooser[b-vrjkvxbnqu] {
+.page-size-chooser {
     display: flex;
     align-items: revert;
     margin-bottom: 1rem;
 }
 
-.page-size-chooser select[b-vrjkvxbnqu] {
+.page-size-chooser select {
     margin: 0 1rem;
     padding: 0.25rem 0.5rem;
-}
+}*/
 
 /* _content/Gatekeeper/Components/Pages/AnalystNotes/AnalystNoteAdd.razor.rz.scp.css */
 [b-l5pgvhum4i] tr:nth-child(even) {
@@ -293,14 +328,13 @@ a:active[b-bbh6r6pxsf] {
 }
     */
 /* _content/Gatekeeper/Components/Pages/Analysts/AnalystAdd.razor.rz.scp.css */
-[b-c731o5n56r] th.country-name {
-    width: 14rem;
-}
-[b-c731o5n56r] .col-width {
-    min-width: 32em;
-    max-width: 32em;
+[b-c731o5n56r] table {
+    min-width: 100%;
 }
 
+[b-c731o5n56r] th.filter-name {
+    width: 14rem;
+}
 
 /* Subtle stripe effect */
 [b-c731o5n56r] tr:nth-child(even) {
@@ -310,21 +344,6 @@ a:active[b-bbh6r6pxsf] {
 /* Don't collapse rows even if they are empty */
 [b-c731o5n56r] tbody tr {
     height: 1.8rem;
-}
-
-.page-size-chooser[b-c731o5n56r] {
-    display: flex;
-    align-items: revert;
-    margin-bottom: 1rem;
-}
-
-page-size-chooser select[b-c731o5n56r] {
-  margin: 0 1rem;
-  padding: 0.25rem 0.5rem;
-}
-
-border-bottom[b-c731o5n56r] {
-border-bottom:double;
 }
 /* _content/Gatekeeper/Components/Pages/Cities/CityAdd.razor.rz.scp.css */
 [b-ksxcbb4iv8] table {
@@ -345,14 +364,18 @@ border-bottom:double;
     height: 1.8rem;
 }
 /* _content/Gatekeeper/Components/Pages/Extensions/ExtensionAdd.razor.rz.scp.css */
+[b-m2q7303c84] table {
+    min-width: 100%;
+}
+
 [b-m2q7303c84] tr:nth-child(even) {
     background: #d8d8d8;
 }
 
-[b-m2q7303c84] .col-width {
+/*::deep .col-width {
     min-width: 62em;
     max-width: 63em;
-}
+}*/
 
 /* Sticky header while scrolling
 ::deep thead {
@@ -419,48 +442,57 @@ border-bottom:double;
     overflow-y: auto;
 }
 */
-[b-cnhds8r9c9] th.full-name {
+/*::deep th.full-name {
     width: 14rem;
 }
 
-[b-cnhds8r9c9] .col-width {
+::deep .col-width {
     min-width: 30em;
     max-width: 30em;
-}
+}*/
 
 /* Subtle stripe effect */
 [b-cnhds8r9c9] tr:nth-child(even) {
-    background: #d8d8d8;
+    /*    background: #e9e8e8 ;
+    background: #d8d8d8;*/
 }
 
+[b-cnhds8r9c9] tr {
+    font-family: arial;
+    font-size: medium ;
+}
+
+#navbar[b-cnhds8r9c9] {
+    float: right;
+}
 /* Don't collapse rows even if they are empty */
-[b-cnhds8r9c9] tbody tr {
+/*::deep tbody tr {
     height: 1.8rem;
     width:100%;
-}
+}*/
 
-.page-size-chooser[b-cnhds8r9c9] {
+/*.page-size-chooser {
     display: flex;
     align-items: revert;
     margin-bottom: 1rem;
 }
 
-.page-size-chooser select[b-cnhds8r9c9] {
+.page-size-chooser select {
     margin: 0 1rem;
     padding: 0.25rem 0.5rem;
 }
 
-.flag[b-cnhds8r9c9] {
+.flag {
 
    color: red;
     font-weight: 200;
 
 }
 
-.flagblue[b-cnhds8r9c9] {
+.flagblue {
     font-weight: 200;
     color: blue;
-}
+}*/
 /* _content/Gatekeeper/Components/Pages/PaymentTypes/PaymentTypeAdd.razor.rz.scp.css */
 [b-yu3dijjj8z] table {
     min-width: 100%;

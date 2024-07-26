@@ -141,7 +141,7 @@ namespace Gatekeeper.Models
         public int PersonId { get; set; }
         [Required]
         public string? Firstname { get; set; }
-
+        [Required]
         public string? Lastname { get; set; }
 
         public string? Middlename { get; set; }

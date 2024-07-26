@@ -294,6 +294,11 @@
                 AlertText2.Add("- First Name");
             }
 
+            if (accessRequestForm.Lastname == null || accessRequestForm.Lastname == "")
+            {
+                AlertText2.Add("- Last Name");
+            }
+
             if (accessRequestForm.Street == null || accessRequestForm.Street == "")
             {
                 AlertText2.Add("- Street");
@@ -315,12 +320,12 @@
             }
             if (AlertText2.Count > 0)
             {
-                AlertText2.Insert(0, "The person request Information below is required.");
+                AlertText2.Insert(0, "The information below about the Person requesting the file is required.");
             }
         }
         else
         {
-            AlertText2.Add("Person information is required.");
+            AlertText2.Add("Information about the person requesting the file is required.");
         }
     }
 
@@ -1004,6 +1009,7 @@
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
+                <span class="required">*</span>
                 <label>Last Name:</label>
                 <InputText id="lastname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Lastname" />
             </div>

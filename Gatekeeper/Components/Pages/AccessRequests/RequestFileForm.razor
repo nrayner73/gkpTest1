@@ -28,10 +28,16 @@
 @inject AppState appState;
 @inject NavigationManager navigationManager
 
+ 
+
 @page "/accessrequests/add/{fileid:int?}"
 
 @code {
     #region "Parameters"
+
+    
+    [CascadingParameter(Name = "RequestFormId")] int RF_Id { get; set; }
+
 
     protected bool IsDisabled { get; set; }
     private string ModalTitle = string.Empty;
@@ -121,6 +127,8 @@
     public List<AddressInfo>? addresses { get; set; } = new List<AddressInfo>();
     private AddressInfo selectedaddress;
     private AddressInfo address { get; set; } = new AddressInfo();
+
+
     #endregion
     #endregion
 
@@ -128,8 +136,8 @@
 
     protected async override Task OnParametersSetAsync()
     {
-
-
+        var x = RF_Id;
+       
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
@@ -137,9 +145,10 @@
         if (loginState.gFileId > 0)
         {
             fileid = (int)loginState.gFileId;
+          
             GetDataContext();
         } 
-       
+
         var AccessPerson = Configuration["Testers"];
 
         tester = false;
@@ -153,7 +162,8 @@
         SuccessMessage = "";
         accessRequestForm = new AccessRequestForm(requestfile, person);
         StateHasChanged();
-        
+
+   
 
     }
 
@@ -851,8 +861,10 @@
 
     <div class="container-fluid">
         <br />
+
         <div class="row">
 
+       
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbfilenumber">
                     File Number:

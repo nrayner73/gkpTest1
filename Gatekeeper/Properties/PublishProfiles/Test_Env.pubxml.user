@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>\\cps-test-03\inetpub\wwwroot\Gatekeeper\</_PublishTargetUrl>
-    <History>False|2024-07-25T21:48:17.1341726Z;</History>
+    <History>True|2024-07-26T18:43:10.7787021Z;False|2024-07-25T15:48:17.1341726-06:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

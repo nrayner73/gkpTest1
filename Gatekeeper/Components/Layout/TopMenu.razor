@@ -19,7 +19,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <button id="file-tab" class="nav-link active" @onclick="@(() => navigationManager.NavigateTo("accessrequests/add"))" href="#">Access Request</button>
+                <button id="file-tab" class="nav-link active" @onclick="@(() => navigationManager.NavigateTo("accessrequests/add",true))">Access Request</button>
                 <button id="payment-tab" class="nav-link disabled" @onclick="@(() => navigationManager.NavigateTo("feepayment/add"))" href="#">Payment</button>
                 <button id="disclosure-tab" class="nav-link disabled" @onclick="@(() => navigationManager.NavigateTo("disclosure/add"))" href="#">Disclosure</button>
                 <button id="extension-tab" class="nav-link disabled" @onclick="@(() => navigationManager.NavigateTo("extension/add"))" href="#">Extension</button>

@@ -73,6 +73,7 @@
     private double totalrecordCount { get; set; } = 0;
     private int stateActive = 0;
     private int stateOnhold= 0;
+    // int RequestFormId { get; set; } = 9878;
     #endregion
 
     #region  "Component Lifecycle"
@@ -249,6 +250,8 @@
     private void goToAddPage(int fileid)
     {
         setSession(fileid);
+
+        // RequestFormId = fileid;
         navigationManager.NavigateTo($"/accessrequests/add/{fileid}");
     }
 
@@ -262,6 +265,7 @@
             await sessionStorage.SetItemAsync("objFileRequest", requestfile);
 
             loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
+            // RequestFormId = (int)loginState.gFileId;
             requestfile = loginState.Requestfile;
         }
     }
@@ -627,12 +631,17 @@
 }
 
 <h3>My Assignments</h3>
-
+@* <div >
+    <CascadingValue Value="@RequestFormId" Name="RequestFormId">
+        <Gatekeeper.Components.Pages.AccessRequests.RequestFileForm></Gatekeeper.Components.Pages.AccessRequests.RequestFileForm>
+    </CascadingValue>
+</div> *@
 <EditForm Model="@fileInfo">
     @if (showpanel)
     {
         <p id="searchpanel">
             <div class="row">
+ 
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label>
                         File Number:

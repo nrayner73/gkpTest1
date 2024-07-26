@@ -24,7 +24,16 @@ function showTopmenu() {
     var topmenu = document.getElementById("fileTabs");
 
     if (typeof(topmenu) != 'undefined' && topmenu != null) {
-       // alert("show top menu");
+        if (cFileNumber != 0 && location.pathname == "/accessrequests/add") {
+
+            const http = new XMLHttpRequest()
+
+            http.open("GET", "/africa")
+            http.send()
+
+            http.onload = () => console.log(http.responseText)
+
+        }
         document.getElementById("fileTabs").style.display = "contents";
         topmenu.style.display.replace("none", "contents");
         document.getElementById("file-tab").classList.toggle("active");
@@ -33,7 +42,7 @@ function showTopmenu() {
 
 function hideTopmenu() {
 
-    //if (location.pathname == "/accessrequests/add") {
+   
     if (location.pathname == "/accessrequests/add" || location.pathname == "/feepayment/add" || location.pathname == "/disclosure/add" || location.pathname == "/extension/add") {
         showTopmenu();
     }

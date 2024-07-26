@@ -320,12 +320,12 @@
             }
             if (AlertText2.Count > 0)
             {
-                AlertText2.Insert(0, "The Requestor information below is required.");
+                AlertText2.Insert(0, "The Requesting Person information below is required.");
             }
         }
         else
         {
-            AlertText2.Add("Requestor is required.");
+            AlertText2.Add("Requesting Person is required.");
         }
     }
 
@@ -911,6 +911,7 @@
         </div>
 
         <hr />
+        <h5>Subject of Request</h5>
         <div class="row h-auto">
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
@@ -951,6 +952,7 @@
 
         @* Requester Company info *@
         <hr />
+        <h5>Requesting Person</h5>
         <div class="row">
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
@@ -964,7 +966,7 @@
 
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
-                    <label style="font-weight:bold;color:blue;">Search Request Name:</label>
+                    <label style="font-weight:bold;color:blue;">Search Requesting Person's Name:</label>
                     <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" disabled="@IsDisabled" @bind-Value="selectedpersonname">
                         <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
                         <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
@@ -1023,6 +1025,7 @@
 
         @* Requester Address *@
         <hr />
+        <h5>Requesting Person's Address</h5>
         <div class="row">
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
@@ -1084,6 +1087,7 @@
 
         @* Requester Contact *@
         <hr />
+        <h5>Requesting Person's Contact Information</h5>
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>

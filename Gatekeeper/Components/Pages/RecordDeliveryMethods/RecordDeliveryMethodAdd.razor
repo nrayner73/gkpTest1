@@ -13,14 +13,11 @@
 
 @inject IConfiguration Configuration
 @inject IDbContextFactory<AppDbContext> DbFactory
-
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @inject ISearchLkRecordDeliveryMethodService searchlkrecorddeliverymethodservice
-@inject ILkSectionService lkSectionService
-
 @inject IAuditlogService auditlogService
 
 @inject NavigationManager navigationManager
@@ -35,11 +32,11 @@
 
     private System.Security.Claims.ClaimsPrincipal user;
     private string? userReg;
-    protected string Message = string.Empty;
-    protected string StatusClass = string.Empty;
-    private bool Saved;
     private string savetype = string.Empty;
-    private bool alertMessageShow = false;
+    private string ModalTitle = string.Empty;
+    private string? SuccessMessage { get; set; }
+    public List<string> AlertText = new List<string>();
+    public bool DisplayAlert { get; set; }
 
     [Inject]
     private ILkRecordDeliveryMethodService lkrecorddeliverymethodservice { get; set; }
@@ -56,13 +53,11 @@
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
     bool tester = false;
-    bool showpanel = true;
     bool showid = false;
 
     #endregion
 
     #region "Component Lifecycle"
-
 
     protected async override Task OnInitializedAsync()
     {
@@ -120,63 +115,58 @@
         StateHasChanged();
     }
 
-    private async Task AuditData(string act, string type)
+    private async Task ValidSubmit()
     {
-        auditlog = new AuditLog();
+        ValidateData();
 
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-
-        if (type == "update" || type == "delete")
+        if (AlertText.Count > 0)
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(olkrecorddeliverymethod, lkrecorddeliverymethod, act).ToString();
-        }
-
-        await auditlogService.CreateAuditlog(auditlog);
-    }
-
-    protected void HandleInvalidSubmit()
-    {
-        StatusClass = "alert-danger";
-        Message = "There are some validation errors. Please try again.";
-    }
-
-    protected async Task HandleValidSubmit()
-    {
-        Saved = false;
-
-        lkrecorddeliverymethod.Moddate = DateTime.Now;
-        lkrecorddeliverymethod.Moduser = userReg;
-
-        if (savetype == "update")
-        {
-            await lkrecorddeliverymethodservice.UpdateLkRecorddeliverymethod(lkrecorddeliverymethod);
-            await AuditData("Update Record Delivery Method", "update");
+            ModalTitle = "Data was not saved due to missing information. ";
+            DisplayAlert = true;
+            await OnShowModalClick();
         }
         else
         {
-            lkrecorddeliverymethod.Createdate = DateTime.Now;
-            lkrecorddeliverymethod.Createuser = userReg;
-            await lkrecorddeliverymethodservice.CreateLkRecorddeliverymethod(lkrecorddeliverymethod);
-            await AuditData("Create Record Delivery Method", "create");
+            ModalTitle = "Data Details";
+            DisplayAlert = false;
+            
+            if (savetype == "update")
+            {
+                lkrecorddeliverymethod.Moddate = DateTime.Now;
+                lkrecorddeliverymethod.Moduser = userReg;
+
+                await lkrecorddeliverymethodservice.UpdateLkRecorddeliverymethod(lkrecorddeliverymethod);
+                await AuditData("Update Record Delivery Method", "update");
+                
+                SuccessMessage = "The data has been updated successfully";
+            }
+            else
+            {
+                lkrecorddeliverymethod.Createdate = DateTime.Now;
+                lkrecorddeliverymethod.Createuser = userReg;
+                await lkrecorddeliverymethodservice.CreateLkRecorddeliverymethod(lkrecorddeliverymethod);
+                await AuditData("Create Record Delivery Method", "create");
+
+                SuccessMessage = "The data has been added successfully";
+            }
+          
+            StateHasChanged();
+            await OnShowModalClick();
+        }
+    }
+
+    private void ValidateData()
+    {
+        AlertText = new List<string>();
+        if (lkrecorddeliverymethod.Detail == null)
+        {
+            AlertText.Add("- Record Delivery Method");
         }
 
-        StatusClass = "alert-success";
-        Message = "Data updated successfully";
-        alertMessageShow = true;
-        await InvokeAsync(() => StateHasChanged());
-        await Task.Delay(1000);
-
-        alertMessageShow = false;
-        Saved = true;
-        navigationManager.NavigateTo($"/lkrecorddeliverymethod/add", true);
-        LoadData();
-        lkrecorddeliverymethod = new LkRecorddeliverymethod();
-        StateHasChanged();
+        if (AlertText.Count > 0)
+        {
+            AlertText.Insert(0, "The Request Delivery Method information below is required.");
+        }
     }
 
     private async void UpdateData(int id)
@@ -191,14 +181,12 @@
                 {
                     lkrecorddeliverymethod = context.LkRecorddeliverymethods.Where(x => x.Id == id).FirstOrDefault();
                     olkrecorddeliverymethod = (LkRecorddeliverymethod)context.Entry(lkrecorddeliverymethod).GetDatabaseValues().ToObject();
-
                     StateHasChanged();
                 }
             }
         }
     }
-
-
+    
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
     {
@@ -216,18 +204,29 @@
                 AuditData("Delete Delivery Method", "delete");
             }
 
-            StatusClass = "alert-success";
-            Message = "Data deleted successfully";
-            alertMessageShow = true;
+            SuccessMessage = "Data deleted successfully";
             await InvokeAsync(() => StateHasChanged());
             await Task.Delay(1000);
-
-            alertMessageShow = false;
-            Saved = true;
-
             navigationManager.NavigateTo($"/lkrecorddeliverymethod/add/", true);
         }
 
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olkrecorddeliverymethod, lkrecorddeliverymethod, act).ToString();
+        }
+        await auditlogService.CreateAuditlog(auditlog);
     }
 
     private void ClearData()
@@ -235,20 +234,62 @@
         lkrecorddeliverymethod = new LkRecorddeliverymethod();
     }
 
+    private Modal modal = default!;
+
+    private async Task OnShowModalClick()
+    {
+        await modal.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modal.HideAsync();
+        navigationManager.NavigateTo($"/lkrecorddeliverymethod/add/", true);
+    }
+
     #endregion
 }
 
-   @if (alertMessageShow)
-{
-    <br />
-    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
-}
+<h1>Record Delivery Methods</h1>
 
-<h5>Record Delivery Methods: </h5>
+<Modal @ref="modal" Size="ModalSize.Large">
+    <HeaderTemplate>
+        @if (DisplayAlert)
+        {
+            <h4 style="color:red">@ModalTitle</h4>
+        }
+        else
+        {
+            <h4 style="color:black">@ModalTitle</h4>
 
-<EditForm Model="@lkrecorddeliverymethod" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        }
+    </HeaderTemplate>
+    <BodyTemplate>
+        @if (DisplayAlert)
+        {
+            @if (AlertText.Count > 0)
+            {
+
+                @foreach (var item in AlertText)
+                {
+                    <div style="color:red">&nbsp; @item</div>
+
+                }
+            }
+        }
+        else
+        {
+            <div style="color:green">&nbsp; @SuccessMessage</div>
+        }
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
+    </FooterTemplate>
+</Modal>
+
+<EditForm Model="@lkrecorddeliverymethod" OnValidSubmit="@ValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <ValidationSummary/>
     <div class="container-fluid">
         <div class="container-fluid">
             <div class="row">
@@ -264,7 +305,7 @@
     <br />
 
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-primary" @onclick="ValidSubmit">Save</button>
 </EditForm>
 
 <br />
@@ -293,6 +334,8 @@
 
 <ConfirmDialog @ref="dialog" />
 
+<Paginator State="@pagination" />
+
 <div class="grid" tabindex="-1">
     <QuickGrid Items="@searchlkrecorddeliverymethods" Virtualize="true" Pagination="@pagination">
         @if (showid)
@@ -308,4 +351,3 @@
     </QuickGrid>
 </div>
 
-<Paginator State="@pagination" />

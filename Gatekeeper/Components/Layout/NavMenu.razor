@@ -30,7 +30,7 @@
             @if (adminrole)
             {
             <div class="nav-item px-2">
-                <Button class="nav-link" @onclick="@(() => navigate("/accessrequests/search"))" href="#">
+                <Button class="nav-link" @onclick="@(() => navigate("/accessrequests/search"))">
                     <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Access Request
                 </Button>
             </div>
@@ -166,7 +166,14 @@
         {
             HideMenu();
         }
-        navigationManager.NavigateTo(url);
+        if (url == "/accessrequests/search")
+        {
+            navigationManager.NavigateTo(url, true);
+        } else
+        {
+            navigationManager.NavigateTo(url);
+        }
+
     }
 
     protected override async Task OnParametersSetAsync()

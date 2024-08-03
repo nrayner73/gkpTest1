@@ -13,7 +13,6 @@ public partial class LkRecorddeliverymethod
 {
  [Key]
 public int Id{ get; set; }
-[Required]
 [Column(TypeName = "varchar(255)")]
 [Required(ErrorMessage = " ")]
 public string? Detail{ get; set; }

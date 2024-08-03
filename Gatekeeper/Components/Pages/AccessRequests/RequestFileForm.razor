@@ -26,6 +26,7 @@
 @inject LoginState loginState;
 @inject AppState appState;
 @inject NavigationManager navigationManager
+@inject ISearchrequestfileService searchfileService
 
 @page "/accessrequests/add/{fileid:int?}"
 
@@ -127,6 +128,7 @@
 
     protected async override Task OnParametersSetAsync()
     {
+
         if (requestfile.Yearid == 0 || requestfile.Yearid is null)
         {
             requestfile.Filenumber = "TBD";
@@ -148,7 +150,8 @@
 
         SuccessMessage = "";
 
-        accessRequestForm = new AccessRequestForm(requestfile, person);
+        // accessRequestForm = new AccessRequestForm(requestfile, person);
+        accessRequestForm.UpdateAccessRequestForm(requestfile, person);
         StateHasChanged();
     }
 
@@ -157,7 +160,8 @@
     {
         GetData();
         GetDataContext();
-        accessRequestForm = new AccessRequestForm(requestfile, person);
+        // accessRequestForm = new AccessRequestForm(requestfile, person);
+        accessRequestForm.UpdateAccessRequestForm(requestfile, person);
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -210,7 +214,8 @@
         person = new Person();
         requestfile.Filenumber = "TBD";
         requestfile.Requeststate = 2;
-        accessRequestForm = new AccessRequestForm(requestfile, person);
+        // accessRequestForm = new AccessRequestForm(requestfile, person);
+        accessRequestForm.UpdateAccessRequestForm(requestfile, person);
         session.ClearAsync();
     }
 
@@ -361,7 +366,10 @@
                 accessRequestForm.Moddate = DateTime.Today;
 
                 await UpdateFileNumber(accessRequestForm.Id);
-                UpdateFileNumber(accessRequestForm.Id);
+                await SaveRequestFileUpdate();
+                // UpdateFileNumber(accessRequestForm.Id);
+
+
             }
 
             StateHasChanged();
@@ -386,11 +394,10 @@
         }
         else
         {
-            person = personService.CreatePersonFromForm(accessRequestForm);
-            requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
-            ModalTitle = "Data Details";
-            popUpType = PopUpType.Success;
-            // await OnHideModalClick();
+            person.UpdatePersonFromForm(accessRequestForm);
+            requestfile.updateRequestFile(accessRequestForm);
+
+
             if (person.Id != 0 && requestfile.Id != 0)
             {
                 person.Moduser = userReg;
@@ -403,8 +410,9 @@
                 await AuditData("update Person", "update person");
                 await Task.Delay(1000);
                 await UpdateFileNumber(requestfile.Id);
+                await SaveRequestFileUpdate();
                 //UpdateFileNumber(requestfile.Id);
-                SuccessMessage = "The data has been updated successfully";
+                // SuccessMessage = "The data has been updated successfully";
             }
             else
             {
@@ -422,29 +430,49 @@
                 await AuditData("create Person", "create person");
                 if (person.Id != null)
                 {
-                    requestfile.Personid = person.Id;
-                    requestfile.Moduser = userReg;
-                    requestfile.Createuser = userReg;
+                    accessRequestForm.RFPersonid = person.Id;
+                    accessRequestForm.Moduser = userReg;
+                    accessRequestForm.Createuser = userReg;
 
-                    requestfile.Moddate = DateTime.Today;
-                    requestfile.Createdate = DateTime.Today;
+                    accessRequestForm.Moddate = DateTime.Today;
+                    accessRequestForm.Createdate = DateTime.Today;
 
                     /*********************************************************/
                     /**** Create Request File without Receive Date First  ****/
                     /*********************************************************/
+                    try
+                    {
+                        await UpdateFileNumber(requestfile.Id);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("failed to update file number");
+                        popUpType = PopUpType.Alert;
+                        ModalTitle = "Save Failed";
+                        AlertText1 = ["File Number Update failed"];
+                        AlertText2 = new List<string>();
+                        await OnShowModalClick();
+                        return;
+                    }
 
-                    await requestFileService.CreateRequestfile(requestfile);
+                    await SaveNewRequestFile();
+
+                    accessRequestForm.UpdateAccessRequestForm(requestfile, person);
+
+
                     await AuditData("Create RequestFile", "create file");
                     await Task.Delay(1000);
-                    await UpdateFileNumber(requestfile.Id);
+
+
                     await sessionStorage.SetItemAsync("RQID", requestfile.Id);
                     await sessionStorage.SetItemAsync("objFileRequest", requestfile);
                     loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
-                    SuccessMessage = "The data has been saved successfully.";
+                    // SuccessMessage = "The data has been saved successfully.";
                 }
 
             }
-            accessRequestForm = new AccessRequestForm(requestfile, person);
+            // accessRequestForm = new AccessRequestForm(requestfile, person);
+            accessRequestForm.UpdateAccessRequestForm(requestfile, person);
 
             checkIfFileIsClosed();
 
@@ -458,7 +486,7 @@
             }
 
             StateHasChanged();
-            await OnShowModalClick();
+            // await OnShowModalClick();
         }
     }
 
@@ -488,31 +516,42 @@
         await auditlogService.CreateAuditlog(auditlog);
     }
 
+
     private async Task UpdateFileNumber(int fileid)
     {
-        requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
+        // requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
+        requestfile.updateRequestFile(accessRequestForm);
 
-        Requestfile updatefile = requestfile;
+        // Requestfile updatefile = requestfile;
 
         var rtype = requestTypes.Where(x => x.Id == accessRequestForm.Requesttypeid).FirstOrDefault();
 
         using (var context = DbFactory.CreateDbContext())
         {
-            requestfiles = context.Requestfiles.ToList();
+
+            try
+            {
+                requestfiles = context.Requestfiles.ToList();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
         }
 
         // If receive date is not null then update file number with new format
-        if (updatefile.Filenumber == "TBD" && requestfile.Receivedate != null)
+        if (requestfile.Filenumber == "TBD" && requestfile.Receivedate != null)
         {
-            updatefile = requestfile;
+            requestfile = requestfile;
 
-            int year = ((DateTime)updatefile.Receivedate).Year;
-            updatefile.Yearid = requestfiles.Where(x => x.Receivedate.ToString().Contains(year.ToString())).Count() + 1;
+            int year = ((DateTime)requestfile.Receivedate).Year;
+            requestfile.Yearid = requestfiles.Where(x => x.Receivedate.ToString().Contains(year.ToString())).Count() + 1;
         }
 
-        if (updatefile.Yearid != null)
+        if (requestfile.Yearid != null)
         {
-            updatefile.Filenumber = ((DateTime)requestfile.Receivedate).Year + "-" + rtype.Refertype + "-" + ((int)requestfile.Yearid).ToString("D4");
+            requestfile.Filenumber = ((DateTime)requestfile.Receivedate).Year + "-" + rtype.Refertype + "-" + ((int)requestfile.Yearid).ToString("D4");
             // Start Test Data
             if (setTestdata)
             {
@@ -523,13 +562,76 @@
 
             }
         }
-        await requestFileService.UpdateRequestfile(updatefile);
-        await Task.Delay(1000);
+
+        accessRequestForm.UpdateAccessRequestForm(requestfile, person);
+
+        // await requestFileService.UpdateRequestfile(updatefile);
+        // await AuditData("update RequestFile", "update file");
+
+        // requestfile = updatefile;
+        // accessRequestForm.UpdateAccessRequestForm(requestfile, person);
+        // StateHasChanged();
+    }
+
+    public async Task SaveRequestFileUpdate()
+    {
+
+        requestfile.updateRequestFile(accessRequestForm);
+        Requestfile updatefile = requestfile;
+        try
+        {
+            await requestFileService.UpdateRequestfile(updatefile);
+        } catch (Exception e)
+        {
+            popUpType = PopUpType.Alert;
+            ModalTitle = "Save Failed";
+            AlertText1 = ["Access Request Failed to save"];
+            AlertText2 = new List<string>();
+            await OnShowModalClick();
+            return;
+        }
+
         await AuditData("update RequestFile", "update file");
 
         requestfile = updatefile;
-        accessRequestForm = new AccessRequestForm(requestfile, person);
+        accessRequestForm.UpdateAccessRequestForm(requestfile, person);
         StateHasChanged();
+
+        popUpType = PopUpType.Success;
+        ModalTitle = "File Saved";
+        SuccessMessage = "The data has been updated successfully";
+        await OnShowModalClick();
+    }
+
+    public async Task SaveNewRequestFile()
+    {
+
+        requestfile.updateRequestFile(accessRequestForm);
+        Requestfile updatefile = requestfile;
+        try
+        {
+            await requestFileService.CreateRequestfile(requestfile);
+        }
+        catch (Exception e)
+        {
+            popUpType = PopUpType.Alert;
+            ModalTitle = "Save Failed";
+            AlertText1 = ["Access Request Failed to save"];
+            AlertText2 = new List<string>();
+            await OnShowModalClick();
+            return;
+        }
+
+        await AuditData("update RequestFile", "update file");
+
+        requestfile = updatefile;
+        accessRequestForm.UpdateAccessRequestForm(requestfile, person);
+        StateHasChanged();
+
+        popUpType = PopUpType.Success;
+        ModalTitle = "File Created";
+        SuccessMessage = "The data has been saved successfully.";
+        await OnShowModalClick();
     }
 
     public async Task setDuedate()
@@ -604,6 +706,10 @@
 
             holidays = context.Holidays.Where(x => x.Status != "del").ToList();
             requestTypes = context.LkRequesttypes.Where(x => x.Status != "del").OrderBy(x => x.Sortby).ToList();
+
+
+
+
             //requestfiles = context.Requestfiles.ToList(); -- moved to UpdateFileNumber
             if (fileid > 0)
             {
@@ -724,12 +830,12 @@
         requestfile.Createdate = DateTime.Today;
         requestfile.Createuser = userReg;
 
-        accessRequestForm = new AccessRequestForm(requestfile, person);
+        accessRequestForm.UpdateAccessRequestForm(requestfile, person);
     }
 
     public async Task setClosedDateIfStatusIsClosed()
     {
-        requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
+        requestfile.updateRequestFile(accessRequestForm);
         checkIfFileIsClosed();
 
         if (fileIsClosed)
@@ -755,7 +861,6 @@
         foreach (LkRequeststate item in requestStates)
         {
             if (requestfile.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
-            // if (accessRequestForm.Requeststate == item.Id && (item.Detail == "Abandoned" || item.Detail == "Closed" || item.Detail == "Withdrawn" ))
             {
                 fileIsClosed = true;
                 break;

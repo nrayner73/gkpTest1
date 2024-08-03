@@ -10,6 +10,33 @@ namespace Gatekeeper.Models;
 [Table("person", Schema = "gkp")]
 public partial class Person
 {
+
+    public void UpdatePersonFromForm(AccessRequestForm accessRequestForm)
+    {
+        Id = accessRequestForm.PersonId;
+        Firstname = accessRequestForm.Firstname;
+        Lastname = accessRequestForm.Lastname;
+        Middlename = accessRequestForm.Middlename;
+        Previousname = accessRequestForm.Previousname;
+        Companyname = accessRequestForm.Companyname;
+        Birthdate = accessRequestForm.Birthdate;
+        Daytimephone = accessRequestForm.Daytimephone;
+        Alternatephone = accessRequestForm.Alternatephone;
+        Faxphone = accessRequestForm.Faxphone;
+        Email = accessRequestForm.Email;
+        Street = accessRequestForm.Street;
+        City = accessRequestForm.City;
+        Province = accessRequestForm.Province;
+        Postalcode = accessRequestForm.Postalcode;
+        Country = accessRequestForm.Country;
+        Personofinterestfirstname = accessRequestForm.Personofinterestfirstname;
+        Personofinterestlastname = accessRequestForm.Personofinterestlastname;
+        Personofinterestmiddlename = accessRequestForm.Personofinterestmiddlename;
+        Remark = accessRequestForm.Remark;
+
+
+    }
+
     [Key]
     public int Id { get; set; }
     [Column(TypeName = "varchar(1000)")]

@@ -12,34 +12,6 @@ namespace Gatekeeper.Services
     {
         private AppDbContext _context;
 
-        public Person CreatePersonFromForm(AccessRequestForm accessRequestForm)
-        {
-            Person person = new Person();
-            person.Id = accessRequestForm.PersonId;
-            person.Firstname = accessRequestForm.Firstname;
-            person.Lastname = accessRequestForm.Lastname;
-            person.Middlename = accessRequestForm.Middlename;
-            person.Previousname = accessRequestForm.Previousname;
-            person.Companyname = accessRequestForm.Companyname;
-            person.Birthdate = accessRequestForm.Birthdate;
-            person.Daytimephone = accessRequestForm.Daytimephone;
-            person.Alternatephone = accessRequestForm.Alternatephone;
-            person.Faxphone = accessRequestForm.Faxphone;
-            person.Email = accessRequestForm.Email;
-            person.Street = accessRequestForm.Street;
-            person.City = accessRequestForm.City;
-            person.Province = accessRequestForm.Province;
-            person.Postalcode = accessRequestForm.Postalcode;
-            person.Country = accessRequestForm.Country;
-            person.Personofinterestfirstname = accessRequestForm.Personofinterestfirstname;
-            person.Personofinterestlastname = accessRequestForm.Personofinterestlastname;
-            person.Personofinterestmiddlename = accessRequestForm.Personofinterestmiddlename;
-            person.Remark = accessRequestForm.Remark;
-
-            return person;
-
-        }
-
         public PersonService(AppDbContext context)
         {
             _context = context;

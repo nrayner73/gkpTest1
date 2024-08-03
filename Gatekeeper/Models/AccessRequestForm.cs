@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 
 namespace Gatekeeper.Models
 {
     public class AccessRequestForm
     {
-
-        public AccessRequestForm() { }
-
-        public AccessRequestForm(Requestfile requestFile, Person person)
+        public  void UpdateAccessRequestForm (Requestfile requestFile, Person person)
         {
             //RequestFile
             Id = requestFile.Id;
@@ -65,10 +63,6 @@ namespace Gatekeeper.Models
             Personofinterestlastname = person.Personofinterestlastname;
             Personofinterestmiddlename = person.Personofinterestmiddlename;
             Remark = person.Remark;
-
-
-
-
         }
 
         //Request File fields

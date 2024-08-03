@@ -10,6 +10,42 @@ namespace Gatekeeper.Models;
 [Table("requestfiles", Schema = "gkp")]
 public partial class Requestfile
 {
+
+    public void updateRequestFile(AccessRequestForm accessRequestForm)
+    {
+        Id = accessRequestForm.Id;
+        Yearid = accessRequestForm.Yearid;
+        Filenumber = accessRequestForm.Filenumber;
+        Requestdate = accessRequestForm.Requestdate;
+        Receivedate = accessRequestForm.Receivedate;
+        Requestduedate = accessRequestForm.Requestduedate;
+        Referencenumber = accessRequestForm.Referencenumber;
+        Statusnote = accessRequestForm.Statusnote;
+        Idviewed = accessRequestForm.Idviewed;
+        Requesttypeid = accessRequestForm.Requesttypeid;
+        Recorddeliverymethodid = accessRequestForm.Recorddeliverymethodid;
+        Processingdeficiency = accessRequestForm.Processingdeficiency;
+        Personid = accessRequestForm.RFPersonid;
+        Analystassignedid = accessRequestForm.Analystassignedid;
+        Requestdetails = accessRequestForm.Requestdetails;
+        Previousrequests = accessRequestForm.Previousrequests;
+        Intakenotes = accessRequestForm.Intakenotes;
+        Timeframe = accessRequestForm.Timeframe;
+        Requeststate = accessRequestForm.Requeststate;
+        Closedate = accessRequestForm.Closedate;
+        Archivedate = accessRequestForm.Archivedate;
+        Oipccomment = accessRequestForm.Oipccomment;
+        Feepayment = accessRequestForm.Feepayment;
+        Remarks = accessRequestForm.Remarks;
+        Moddate = accessRequestForm.Moddate;
+        Moduser = accessRequestForm.Moduser;
+        Createdate = accessRequestForm.Createdate;
+        Createuser = accessRequestForm.Createuser;
+        Status = accessRequestForm.Status;
+        Gkpid = accessRequestForm.Gkpid;
+    }
+
+
     [Key]
     public int Id { get; set; }
     

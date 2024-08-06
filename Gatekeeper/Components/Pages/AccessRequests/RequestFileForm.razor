@@ -103,6 +103,8 @@
     string? recordDeliveryMethodDetail { get; set; } = null;
     string? analystAssignedName { get; set; } = null;
     string? requestStateDetail { get; set; } = null;
+
+    public bool saving = false;
     #endregion
 
     #region TypeAhead Parameters
@@ -399,6 +401,7 @@
         }
         else
         {
+            saving = true;
             person.UpdatePersonFromForm(accessRequestForm);
             requestfile.updateRequestFile(accessRequestForm);
 
@@ -413,7 +416,7 @@
 
                 await personService.UpdatePerson(person);
                 await AuditData("update Person", "update person");
-                await Task.Delay(1000);
+                // await Task.Delay(1000);
                 await UpdateFileNumber(requestfile.Id);
                 await SaveRequestFileUpdate();
                 //UpdateFileNumber(requestfile.Id);
@@ -466,7 +469,7 @@
 
 
                     await AuditData("Create RequestFile", "create file");
-                    await Task.Delay(1000);
+                    // await Task.Delay(1000);
 
 
                     await sessionStorage.SetItemAsync("RQID", requestfile.Id);
@@ -491,6 +494,7 @@
             }
 
             StateHasChanged();
+            saving = false;
             // await OnShowModalClick();
         }
     }
@@ -580,7 +584,7 @@
 
     public async Task SaveRequestFileUpdate()
     {
-
+        saving = true;
         requestfile.updateRequestFile(accessRequestForm);
         Requestfile updatefile = requestfile;
         try
@@ -606,11 +610,12 @@
         ModalTitle = "File Saved";
         SuccessMessage = "The data has been updated successfully";
         await OnShowModalClick();
+        saving = false;
     }
 
     public async Task SaveNewRequestFile()
     {
-
+        saving = true;
         requestfile.updateRequestFile(accessRequestForm);
         Requestfile updatefile = requestfile;
         try
@@ -637,11 +642,12 @@
         ModalTitle = "File Created";
         SuccessMessage = "The data has been saved successfully.";
         await OnShowModalClick();
+        saving = false;
     }
 
     public async Task setDuedate()
     {
-        await Task.Delay(1000);
+        // await Task.Delay(1000);
 
         if (accessRequestForm.Receivedate != null)
         {
@@ -1322,12 +1328,12 @@
     }
     &nbsp;
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-    <button type="submit" class="btn btn-primary" disabled="@IsDisabled">Save</button>
+    <button type="submit" class="btn btn-primary" disabled="@(IsDisabled || saving)">Save</button>
     &nbsp;
     @if (IsDisabled)
     {
 
-        <button type="button" class="btn btn-primary" disabled="@(IsDisabled == true ? false : true)" @onclick="ActivateFile">Activate</button>
+        <button type="button" class="btn btn-primary" disabled="@((IsDisabled == true ? false : true) || saving)" @onclick="ActivateFile">Activate</button>
     }
 </EditForm>
 

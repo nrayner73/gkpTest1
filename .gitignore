@@ -29,3 +29,10 @@
 /Gatekeeper/obj/Debug/net8.0/project.razor.vs.bin
 /Gatekeeper/obj/Debug/net8.0/ref/Gatekeeper.dll
 /Gatekeeper/obj/Release/net8.0/Gatekeeper.AssemblyInfoInputs.cache
+/Gatekeeper/Properties/PublishProfiles/FolderProfile1.pubxml
+
+Gatekeeper/Properties/PublishProfiles/FolderProfile1.pubxml.user
+
+Gatekeeper/Properties/PublishProfiles/TestDeploy.pubxml
+
+Gatekeeper/Properties/PublishProfiles/TestDeploy.pubxml.user

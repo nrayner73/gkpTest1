@@ -636,12 +636,20 @@
 
     public async Task setDuedate()
     {
-        await Task.Delay(500);
+        await Task.Delay(1000);
 
         if (accessRequestForm.Receivedate != null)
         {
             extensions = (await ExtensionService.GetExtensionList(accessRequestForm.Id)).Where(x => x.Status != "del").ToList();
-            await dateService.SetDuedate(accessRequestForm, extensions, holidays);
+            try
+            {
+                await dateService.SetDuedate(accessRequestForm, extensions, holidays);
+            } catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw e;
+            }
+
         }
     }
 

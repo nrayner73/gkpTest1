@@ -247,7 +247,7 @@
 
             if (accessRequestForm.Analystassignedid == null || accessRequestForm.Analystassignedid < 0)
             {
-                AlertText1.Add("- Analyst");
+                AlertText1.Add("- Analyst Assigned");
             }
 
             if (accessRequestForm.Requestdetails == null || accessRequestForm.Requestdetails == "")
@@ -297,6 +297,11 @@
             if (accessRequestForm.Firstname == null || accessRequestForm.Firstname == "")
             {
                 AlertText2.Add("- First Name");
+            }
+
+            if (accessRequestForm.Lastname == null || accessRequestForm.Lastname == "")
+            {
+                AlertText2.Add("- Last Name");
             }
 
             if (accessRequestForm.Street == null || accessRequestForm.Street == "")
@@ -1020,49 +1025,11 @@
             </div>
         </div>
 
-        <hr />
-        <div class="row h-auto">
-            <div class="col-lg-6 col-md-3 col-sm-12">
-                <div class="input-group ">
-                    <label style="font-weight:bold;color:blue;">Search Subject of Request:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" disabled="@IsDisabled" @bind-Value="POISelectedPersonName" >
-                        <SelectedTemplate Context="POIPersonName">@POIPersonName.firstname @POIPersonName.lastname @POIPersonName.middlename</SelectedTemplate>
-                        <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
-                    </BlazoredTypeahead>
-                </div>
-            </div>
-        </div>
 
-        @* Subject of Request Info *@
-        <br />
-
-        @* <EditForm Model="@accessRequestForm" OnValidSubmit="@ValidSubmit" OnInvalidSubmit="@ValidSubmit"> *@
-
-        @if (POISelectedPersonName != null)
-        {
-            accessRequestForm.Personofinterestfirstname = POISelectedPersonName.firstname;
-            accessRequestForm.Personofinterestlastname = POISelectedPersonName.lastname;
-            accessRequestForm.Personofinterestmiddlename = POISelectedPersonName.middlename;
-            POISelectedPersonName = null;
-        }
-        <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label>First Name:</label>
-                <InputText id="poifirstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestfirstname" />
-            </div>
-
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label>Middle Name:</label>
-                <InputText id="poimiddlename" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestmiddlename" />
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label>Last Name:</label>
-                <InputText id="poilastname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestlastname" />
-            </div>
-        </div>
 
         @* Requester Company info *@
         <hr />
+        <h5>Applicant Name</h5>
         <div class="row">
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
@@ -1076,7 +1043,7 @@
 
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
-                    <label style="font-weight:bold;color:blue;">Search Request Name:</label>
+                    <label style="font-weight:bold;color:blue;">Search Applicant Name:</label>
                     <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" disabled="@IsDisabled" @bind-Value="selectedpersonname">
                         <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
                         <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
@@ -1113,7 +1080,6 @@
                 <span class="required">*</span>
                 <label>First Name:</label>
                 <InputText id="firstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Firstname" />
-                @* <ValidationMessage For="@(() => person.Firstname)" /> *@
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
@@ -1122,6 +1088,7 @@
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
+                <span class="required">*</span>
                 <label>Last Name:</label>
                 <InputText id="lastname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Lastname" />
             </div>
@@ -1133,8 +1100,10 @@
 
         </div>
 
+
         @* Requester Address *@
         <hr />
+        <h5>Applicant Address</h5>
         <div class="row">
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
@@ -1195,7 +1164,9 @@
         </div>
 
         @* Requester Contact *@
+
         <hr />
+        <h5>Applicant Contact Information</h5>
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
@@ -1219,7 +1190,47 @@
 
         </div>
 
-        @* </EditForm> *@
+        <hr />
+        <h5>Subject of Request</h5>
+        <div class="row h-auto">
+            <div class="col-lg-6 col-md-3 col-sm-12">
+                <div class="input-group ">
+                    <label style="font-weight:bold;color:blue;">Search Subject of Request:</label>
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" disabled="@IsDisabled" @bind-Value="POISelectedPersonName">
+                        <SelectedTemplate Context="POIPersonName">@POIPersonName.firstname @POIPersonName.lastname @POIPersonName.middlename</SelectedTemplate>
+                        <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
+                    </BlazoredTypeahead>
+                </div>
+            </div>
+        </div>
+
+
+        <br />
+        @* Subject of Request Info *@
+
+        @if (POISelectedPersonName != null)
+        {
+            accessRequestForm.Personofinterestfirstname = POISelectedPersonName.firstname;
+            accessRequestForm.Personofinterestlastname = POISelectedPersonName.lastname;
+            accessRequestForm.Personofinterestmiddlename = POISelectedPersonName.middlename;
+            POISelectedPersonName = null;
+        }
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label>First Name:</label>
+                <InputText id="poifirstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestfirstname" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label>Middle Name:</label>
+                <InputText id="poimiddlename" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestmiddlename" />
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label>Last Name:</label>
+                <InputText id="poilastname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestlastname" />
+            </div>
+        </div>
+
 
         <hr />
         <div class="row">

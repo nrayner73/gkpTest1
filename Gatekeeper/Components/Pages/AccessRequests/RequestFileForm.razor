@@ -763,6 +763,8 @@
                 }
                 person = context.People.Where(x => x.Id == requestfile.Personid).FirstOrDefault();
                 operson = (Person)context.Entry(person).GetDatabaseValues().ToObject();
+
+                accessRequestForm.UpdateAccessRequestForm(requestfile, person);
             }
         }
     }

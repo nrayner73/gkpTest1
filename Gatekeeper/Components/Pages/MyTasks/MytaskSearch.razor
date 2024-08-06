@@ -249,7 +249,7 @@
     private void goToAddPage(int fileid)
     {
         setSession(fileid);
-        navigationManager.NavigateTo($"/accessrequests/add/{fileid}");
+        navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
     }
 
     private async Task setSession(int fileid)

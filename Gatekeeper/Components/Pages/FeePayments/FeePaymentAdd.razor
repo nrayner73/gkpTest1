@@ -80,6 +80,16 @@
 
     protected bool IsDisabled { get; set; } = false;
 
+
+
+    #endregion
+
+    #region totals
+    public decimal totalfees = 0;
+    public decimal totalpayments = 0;
+    public decimal totalrefunds = 0;
+    public decimal amountowing = 0;
+    public decimal overpaidamount = 0;
     #endregion
 
     #region "Component Lifecycle"
@@ -166,6 +176,7 @@
                 {
                     IsDisabled = true;
                 }
+                CalculateTotals();
             }
 
         }
@@ -178,6 +189,47 @@
         // searchrequestfees = searchrequestfeeService.GetRequestfeeList(fileid).ToList();
         // searchpayments = searchpaymentService.GetPaymentList(fileid).ToList();
         // StateHasChanged();
+    }
+
+    private void CalculateTotals()
+    {
+        totalfees = 0;
+        foreach (Requestfee fee in requestfees)
+        {
+            totalfees += fee.Finalcost ?? 0;
+        }
+
+        totalpayments = 0;
+        foreach (Payment payment in payments)
+        {
+            if (payment.Payamount > 0)
+            {
+                totalpayments += payment.Payamount ?? 0;
+            }
+            
+        }
+
+        totalrefunds = 0;
+        foreach (Payment payment in payments)
+        {
+            if(payment.Payamount < 0)
+            {
+                totalrefunds -= payment.Payamount ?? 0;
+            }
+
+        }
+
+        amountowing = totalfees - totalpayments + totalrefunds;
+        if(amountowing < 0)
+        {
+            amountowing = 0;
+        }
+
+        overpaidamount = totalpayments - totalfees - totalrefunds;
+        if(overpaidamount < 0)
+        {
+            overpaidamount = 0;
+        }
     }
 
     protected void HandleInvalidSubmit()
@@ -285,6 +337,7 @@
 
         //LoadData();
         getDataContext();
+        CalculateTotals();
         StateHasChanged();
     }
 
@@ -333,7 +386,45 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
+<br />
+<h5>Totals</h5>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label for="totalfees">
+                    Total Fees:
+                </label>
+                <InputNumber id="totalfees" class="form-control" disabled="true" placeholder="0" @bind-Value="totalfees" style="background-color:lightgray" />
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label for="totalpayments">
+                    Total Payments:
+                </label>
+                <InputNumber id="totalpayments" class="form-control" disabled="true" placeholder="0" @bind-Value="totalpayments" style="background-color:lightgray" />
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label for="totalrefunds">
+                    Total Refund(s):
+                </label>
+            <InputNumber id="totalrefunds" class="form-control" disabled="true" placeholder="0" @bind-Value="totalrefunds" style="background-color:lightgray" />
+            </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <label for="amountowing">
+                Amount Owing:
+            </label>
+            <InputNumber id="amountowing" class="form-control" disabled="true" placeholder="0" @bind-Value="amountowing" style="background-color:lightgray" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <label for="overpaidamount">
+                Over Paid Amount:
+            </label>
+            <InputNumber id="overpaidamount" class="form-control" disabled="true" placeholder="0" @bind-Value="overpaidamount" style="background-color:lightgray" />
+        </div>
+        </div>
+    </div>
+
 <EditForm Model="@requestfile" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <br />
     <h5>Fees</h5>
     <RequestfeeAdd savetype=""
                    analysts="@analysts"
@@ -342,6 +433,7 @@
                    requestfees="@requestfees" 
                    IsDisabled="@IsDisabled" />
 
+    <br />
     <h5>Payments</h5>
     <PaymentAdd savetype="@savetype" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payments="@payments" IsDisabled="@IsDisabled"></PaymentAdd>
     <div class="col-lg-3 col-md-3 col-sm-12">

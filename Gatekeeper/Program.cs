@@ -43,15 +43,15 @@ if (System.Environment.MachineName.ToLower() == "cps-dev-03")
 }
 else if (System.Environment.MachineName.ToLower() == "cps-test-03")
 {
-    conStr = builder.Configuration.GetConnectionString("gkConnectionStringDev");
+    conStr = builder.Configuration.GetConnectionString("gkConnectionStringTest");
 }
 else if (System.Environment.MachineName.ToLower() == "cps-stage-03")
 {
-    conStr = builder.Configuration.GetConnectionString("gkConnectionStringDev");
+    conStr = builder.Configuration.GetConnectionString("gkConnectionStringStage");
 }
 else if (System.Environment.MachineName.ToLower() == "cps-prod-03")
 {
-    conStr = builder.Configuration.GetConnectionString("gkConnectionStringDev");
+    conStr = builder.Configuration.GetConnectionString("gkConnectionStringProd");
 }
 else
 {

@@ -43,6 +43,7 @@
     bool showpanel = false;
     bool showyear = false;
     bool showid = false;
+    private bool filtering = false;
     #endregion
 
     #region Lookup Parameters
@@ -146,13 +147,14 @@
         selectedpersonemail = null;
         searchrequestfiles = Enumerable.Empty<Searchrequestfile>().AsQueryable();
         fileInfo = new Searchrequestfile();
+        filtering = false;
 
         LoadData();
     }
 
     private void FilterData()
     {
-        // LoadData();
+        filtering = true;
 
         if (fileInfo.Requesttypeid < 0)
         {
@@ -207,7 +209,7 @@
     private async void LoadData()
     {
         lastPageIndex = pageSet;
-        if (searchrequestfiles == null || searchrequestfiles.Count() == 0)
+        if (filtering == false && (searchrequestfiles == null || searchrequestfiles.Count() == 0))
         {
             foreach (var item in fileInfo.GetType().GetProperties())
             {

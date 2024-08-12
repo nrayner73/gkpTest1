@@ -43,6 +43,7 @@
     private string savetype = string.Empty;
     private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
+    public bool tester { get; set; } = false;
 
     [Parameter]
     public int fileid { get; set; }
@@ -111,6 +112,13 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
     }
 
 
@@ -431,11 +439,18 @@
                    fileid="@fileid"
                    requestfile="@requestfile"
                    requestfees="@requestfees" 
-                   IsDisabled="@IsDisabled" />
+                   IsDisabled="@IsDisabled" 
+                   tester="@tester" />
 
     <br />
     <h5>Payments</h5>
-    <PaymentAdd savetype="@savetype" analysts="@analysts" fileid="@fileid" paymenttype="@paymentTypes" payments="@payments" IsDisabled="@IsDisabled"></PaymentAdd>
+    <PaymentAdd savetype="@savetype" 
+                analysts="@analysts" 
+                fileid="@fileid" 
+                paymenttype="@paymentTypes" 
+                payments="@payments" 
+                IsDisabled="@IsDisabled" 
+                tester="@tester"/>
     <div class="col-lg-3 col-md-3 col-sm-12">
         <label for="notes">
             Notes:

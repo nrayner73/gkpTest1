@@ -51,6 +51,9 @@
     [Parameter]
     public int fileid { get; set; }
 
+    [Parameter]
+    public bool tester { get; set; } = false;
+
     //Audit
     private AuditLog auditlog = new AuditLog();
 
@@ -277,7 +280,10 @@
 <ConfirmDialog @ref="dialog" />
 <button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="EditData">Edit</button>
 <button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="AddNew">Add New</button>
-<button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="AddNewWithData">Add New With Filled Data</button>
+@if (tester)
+{
+    <button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="AddNewWithData">Add New With Filled Data</button>
+}
 
 <table class="table table-striped">
     <thead class="table-info">

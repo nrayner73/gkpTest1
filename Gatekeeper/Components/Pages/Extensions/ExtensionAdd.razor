@@ -89,6 +89,13 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
     }
 
     protected async override void OnAfterRender(bool firstRender)
@@ -374,8 +381,10 @@
         </div>
     </div>
     <hr />
-
+    @if (tester)
+    {
     <button type="button" class="btn btn-primary" @onclick="FillData" disabled="@IsDisabled">Fill Data</button>
+    }
     <button type="button" class="btn btn-primary" @onclick="ClearData" disabled="@IsDisabled">Add New</button>
     @if (!IsDisabled)
     {

@@ -32,7 +32,10 @@
     public string savetype { get; set; } = string.Empty;
     private string FileNumber = string.Empty;
     private bool alertMessageShow = false;
+
     private bool isEditing = false;
+    [Parameter]
+    public bool tester { get; set; } = false;
 
     [Parameter]
     public int fileid { get; set; }
@@ -73,6 +76,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+
     }
 
 
@@ -248,7 +252,10 @@
 <ConfirmDialog @ref="dialog" />
 <button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="EditData">Edit</button>
 <button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="AddNew">Add New</button>
-<button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="AddNewWithData">Add New With Filled Data</button>
+@if (tester)
+{
+    <button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="AddNewWithData">Add New With Filled Data</button>
+}
 <table class="table table-striped">
     <thead class="table-warning">
         <tr>

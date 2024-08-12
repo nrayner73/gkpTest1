@@ -327,12 +327,12 @@
             }
             if (AlertText2.Count > 0)
             {
-                AlertText2.Insert(0, "The person request Information below is required.");
+                AlertText2.Insert(0, "The Applicant information below is required.");
             }
         }
         else
         {
-            AlertText2.Add("Person information is required.");
+            AlertText2.Add("Applicant information is required.");
         }
     }
 
@@ -415,7 +415,7 @@
                 requestfile.Moddate = DateTime.Today;
 
                 await personService.UpdatePerson(person);
-                await AuditData("update Person", "update person");
+                await AuditData("update Applicant", "update applicant");
                 // await Task.Delay(1000);
                 await UpdateFileNumber(requestfile.Id);
                 await SaveRequestFileUpdate();
@@ -435,7 +435,7 @@
                 person.Moddate = DateTime.Today;
                 person.Createdate = DateTime.Today;
                 await personService.CreatePerson(person);
-                await AuditData("create Person", "create person");
+                await AuditData("create Applicant", "create applicant");
                 if (person.Id != null)
                 {
                     accessRequestForm.RFPersonid = person.Id;

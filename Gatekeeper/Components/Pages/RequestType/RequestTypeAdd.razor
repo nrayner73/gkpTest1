@@ -9,6 +9,7 @@
 @using System;
 
 @* @inject IViewRequestTypeService searchRequestTypeService *@
+@inject IConfiguration Configuration
 @inject ILkRequesttypeService searchRequestTypeService
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
@@ -57,6 +58,7 @@
 
     string nameFilter;
 
+    bool tester = false;
     bool showid = false;
     #endregion
 
@@ -75,6 +77,13 @@
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
+
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
     }
 
 
@@ -286,8 +295,10 @@
     </div>
 
     <hr />
-
+    @if (tester)
+    {
     <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    }
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 

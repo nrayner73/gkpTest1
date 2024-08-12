@@ -12,6 +12,7 @@
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IConfiguration Configuration
 
 @inject IRequestfileService requestFileService
 @inject IAuditlogService auditlogService
@@ -63,6 +64,7 @@
     //int minMedals;
     //int maxMedals = 120;
 
+    bool tester = false;
     //bool showpanel = true;
     bool showid = false;
     #endregion
@@ -86,6 +88,13 @@
         var user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
         //analysts = (await analystService.GetAnalystsList()).ToList();
+
+        var AccessPerson = Configuration["Testers"];
+        tester = false;
+        if (AccessPerson.Contains(userReg))
+        {
+            tester = true;
+        }
     }
 
 
@@ -300,7 +309,10 @@
 
     <hr />
 
+    @if (tester)
+    {
     <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+    }
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
     <button type="submit" class="btn btn-primary">Save</button>
 

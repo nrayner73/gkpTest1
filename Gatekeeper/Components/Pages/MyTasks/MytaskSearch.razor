@@ -42,7 +42,7 @@
     private DataTable pageTable = new DataTable();
 
     // QuickGrid<Searchrequestfile>? grid;
-    bool showpanel = false;
+    bool showpanel = true;
     bool showyear = false;
     bool showid = false;
     string userReg = string.Empty;
@@ -627,7 +627,7 @@
     #endregion
 }
 
-<h3>My Assignments</h3>
+<h3>Assigned Files</h3>
 
 <EditForm Model="@fileInfo">
     @if (showpanel)

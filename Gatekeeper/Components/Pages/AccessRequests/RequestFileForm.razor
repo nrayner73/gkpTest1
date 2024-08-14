@@ -152,7 +152,6 @@
 
         SuccessMessage = "";
 
-        // accessRequestForm = new AccessRequestForm(requestfile, person);
         accessRequestForm.UpdateAccessRequestForm(requestfile, person);
         StateHasChanged();
     }
@@ -162,7 +161,6 @@
     {
         GetData();
         GetDataContext();
-        // accessRequestForm = new AccessRequestForm(requestfile, person);
         accessRequestForm.UpdateAccessRequestForm(requestfile, person);
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -216,8 +214,8 @@
         person = new Person();
         requestfile.Filenumber = "TBD";
         requestfile.Requeststate = 2;
-        // accessRequestForm = new AccessRequestForm(requestfile, person);
         accessRequestForm.UpdateAccessRequestForm(requestfile, person);
+        JSRuntime.InvokeVoidAsync("disabledtab");
         session.ClearAsync();
     }
 
@@ -357,14 +355,12 @@
             popUpType = PopUpType.Alert;
             await OnShowModalClick();
             IsDisabled = true;
-            //return;
         }
         else
         {
             IsDisabled = false;
             ModalTitle = "Data Details";
             popUpType = PopUpType.Success;
-            // await OnHideModalClick();
             if (accessRequestForm.PersonId != 0 && accessRequestForm.Id != 0)
             {
                 accessRequestForm.Requeststate = requestStates.Where(x => x.Detail == "Active").FirstOrDefault().Id;
@@ -374,15 +370,11 @@
 
                 await UpdateFileNumber(accessRequestForm.Id);
                 await SaveRequestFileUpdate();
-                // UpdateFileNumber(accessRequestForm.Id);
-
-
             }
 
             StateHasChanged();
             SuccessMessage = "The data has been activated successfully";
             await OnShowModalClick();
-            //  navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
         }
 
     }
@@ -396,8 +388,6 @@
             ModalTitle = "Data was not saved due to missing information. ";
             popUpType = PopUpType.Alert;
             await OnShowModalClick();
-            //return;
-
         }
         else
         {
@@ -419,8 +409,6 @@
                 // await Task.Delay(1000);
                 await UpdateFileNumber(requestfile.Id);
                 await SaveRequestFileUpdate();
-                //UpdateFileNumber(requestfile.Id);
-                // SuccessMessage = "The data has been updated successfully";
             }
             else
             {
@@ -469,17 +457,13 @@
 
 
                     await AuditData("Create RequestFile", "create file");
-                    // await Task.Delay(1000);
-
 
                     await sessionStorage.SetItemAsync("RQID", requestfile.Id);
                     await sessionStorage.SetItemAsync("objFileRequest", requestfile);
                     loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
-                    // SuccessMessage = "The data has been saved successfully.";
                 }
 
             }
-            // accessRequestForm = new AccessRequestForm(requestfile, person);
             accessRequestForm.UpdateAccessRequestForm(requestfile, person);
 
             checkIfFileIsClosed();
@@ -495,7 +479,6 @@
 
             StateHasChanged();
             saving = false;
-            // await OnShowModalClick();
         }
     }
 
@@ -528,10 +511,7 @@
 
     private async Task UpdateFileNumber(int fileid)
     {
-        // requestfile = requestFileService.CreateRequestFileFromForm(accessRequestForm);
         requestfile.updateRequestFile(accessRequestForm);
-
-        // Requestfile updatefile = requestfile;
 
         var rtype = requestTypes.Where(x => x.Id == accessRequestForm.Requesttypeid).FirstOrDefault();
 
@@ -573,13 +553,6 @@
         }
 
         accessRequestForm.UpdateAccessRequestForm(requestfile, person);
-
-        // await requestFileService.UpdateRequestfile(updatefile);
-        // await AuditData("update RequestFile", "update file");
-
-        // requestfile = updatefile;
-        // accessRequestForm.UpdateAccessRequestForm(requestfile, person);
-        // StateHasChanged();
     }
 
     public async Task SaveRequestFileUpdate()
@@ -642,13 +615,12 @@
         ModalTitle = "File Created";
         SuccessMessage = "The data has been saved successfully.";
         await OnShowModalClick();
+        JSRuntime.InvokeVoidAsync("activetab");
         saving = false;
     }
 
     public async Task setDuedate()
     {
-        // await Task.Delay(1000);
-
         if (accessRequestForm.Receivedate != null)
         {
             extensions = (await ExtensionService.GetExtensionList(accessRequestForm.Id)).Where(x => x.Status != "del").ToList();
@@ -1332,7 +1304,6 @@
     &nbsp;
     @if (IsDisabled)
     {
-
         <button type="button" class="btn btn-primary" disabled="@((IsDisabled == true ? false : true) || saving)" @onclick="ActivateFile">Activate</button>
     }
 </EditForm>

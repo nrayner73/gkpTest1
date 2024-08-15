@@ -1289,7 +1289,11 @@
                     <option value="2" selected>Active</option>
                     @foreach (var lktype in requestStates)
                     {
-                        <option value="@lktype.Id">@lktype.Detail</option>
+                        @if(lktype.Id != 2)
+                        {
+                            <option value="@lktype.Id">@lktype.Detail</option>
+                        }
+
                     }
                 </InputSelect>
             </div>

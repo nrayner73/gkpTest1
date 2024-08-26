@@ -600,6 +600,9 @@
     }
     #endregion
 }
+
+<h1>Access Requests</h1>
+
 <EditForm Model="@fileInfo">
     @if (showpanel)
     {
@@ -671,7 +674,7 @@
                         Applicant Name:
                     </label>
                     <div class="input-group ">
-                        <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
+                        <BlazoredTypeahead class="blazored-typeahead__clear" placeholder="Search Applicants" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
                             <SelectedTemplate Context="personname">@personname.firstname @personname.middlename  @personname.lastname</SelectedTemplate>
                             <ResultTemplate Context="personname">@personname.firstname @personname.middlename @personname.lastname </ResultTemplate>
                         </BlazoredTypeahead>
@@ -698,7 +701,7 @@
                         Phone Number:
                     </label>
                     <div class="input-group ">
-                        <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonPhone" @bind-Value="selectedpersonphone">
+                        <BlazoredTypeahead class="blazored-typeahead__clear" placeholder="Search Phone Numbers" SearchMethod="SearchPersonPhone" @bind-Value="selectedpersonphone">
                             <SelectedTemplate Context="personphone">@personphone.daytimephone</SelectedTemplate>
                             <ResultTemplate Context="personphone">@personphone.daytimephone </ResultTemplate>
                         </BlazoredTypeahead>
@@ -714,7 +717,7 @@
                         Email Address:
                     </label>
                     <div class="input-group ">
-                        <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonEmail" @bind-Value="selectedpersonemail">
+                        <BlazoredTypeahead class="blazored-typeahead__clear" placeholder="Search Emails" SearchMethod="SearchPersonEmail" @bind-Value="selectedpersonemail">
                             <SelectedTemplate Context="personemail">@personemail.email</SelectedTemplate>
                             <ResultTemplate Context="personemail">@personemail.email</ResultTemplate>
                         </BlazoredTypeahead>
@@ -730,7 +733,7 @@
                         Subject of Request:
                     </label>
                     <div class="input-group ">
-                        <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIpersonName" @bind-Value="POIselectedpersonname">
+                        <BlazoredTypeahead class="blazored-typeahead__clear" placeholder="Search Subjects of Requests" SearchMethod="SearchPOIpersonName" @bind-Value="POIselectedpersonname">
                             <SelectedTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.middlename @POIpersonname.lastname</SelectedTemplate>
                             <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.middlename @POIpersonname.lastname</ResultTemplate>
                         </BlazoredTypeahead>
@@ -784,7 +787,7 @@
         </p>
         <div>
             <button class="btn btn-primary" @onclick="FilterData">Search</button>
-            <button type="button" class="btn btn-primary" @onclick="ClearSearch">Reset</button>
+            <button type="button" class="btn btn-outline-primary" @onclick="ClearSearch">Reset</button>
         </div>
         <hr />
     }
@@ -833,7 +836,7 @@
 
 
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@searchrequestfiles" Virtualize="true" Pagination="@pagination" Class="bb-table table table-hover table-bordered table-striped">
+    <QuickGrid Items="@searchrequestfiles" Pagination="@pagination" Class="bb-table table table-hover table-bordered table-striped">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
@@ -853,9 +856,7 @@
         <PropertyColumn Property="@(r => r.Statusnote)" Title="Status Note" Sortable="true" />
 
         <TemplateColumn Title="Actions">
-            <a @onclick="()=>goToAddPage(context.Id)" class="link-primary">
-                <i class="fas fa-edit">Edit</i>
-            </a>
+            <button type="button" class="btn btn-primary" @onclick="()=>goToAddPage(context.Id)" aria-label="Edit">Edit</button>
         </TemplateColumn>
     </QuickGrid>
 </div>

@@ -265,7 +265,7 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Request Type:</h5>
+<h1>Request Type</h1>
 
 <EditForm Model="@requestType" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
@@ -331,7 +331,7 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="grid">
-    <QuickGrid Items="@UnfilteredRequestTypes" Virtualize="true" Pagination="@pagination">
+    <QuickGrid Items="@UnfilteredRequestTypes" Pagination="@pagination">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
@@ -343,7 +343,7 @@
         <PropertyColumn Property="@(r => r.Sortby)" Title="Order" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
-            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+            <button type="button" class="btn btn-outline-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
         </TemplateColumn>
     </QuickGrid>
 </div>

@@ -327,7 +327,7 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Extensions</h5>
+<h1>Extensions</h1>
 
 <EditForm Model="@extension" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
@@ -386,6 +386,7 @@
     <button type="button" class="btn btn-primary" @onclick="FillData" disabled="@IsDisabled">Fill Data</button>
     }
     <button type="button" class="btn btn-primary" @onclick="ClearData" disabled="@IsDisabled">Add New</button>
+    &nbsp;
     @if (!IsDisabled)
     {
     <button type="submit" class="btn btn-primary" disabled="@IsDisabled">Save</button>
@@ -422,7 +423,7 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@searchextensions" Virtualize="true" Pagination="@pagination">
+    <QuickGrid Items="@searchextensions" Pagination="@pagination">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
@@ -433,7 +434,7 @@
         <PropertyColumn Property="@(r => r.Dayamount)" Title="Number of Extension Days" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))" disabled="@IsDisabled">Edit</button>
-            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))" disabled="@IsDisabled">Del</button>
+            <button type="button" class="btn btn-outline-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))" disabled="@IsDisabled">Del</button>
         </TemplateColumn>
     </QuickGrid>
 </div>

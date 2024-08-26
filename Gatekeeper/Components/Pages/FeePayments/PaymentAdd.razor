@@ -301,7 +301,7 @@
                                 <InputNumber id="payamount" class="form-control" placeholder="PAY AMOUNT" @onchange="() => UpdateData(item)" @bind-Value="@item.Payamount" />
                                 </td>
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
+                                <button type="button" class="btn btn-outline-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
                             </td>
                         </tr>
                     }
@@ -322,7 +322,7 @@
                             <td>@item.Authorization</td>
                             <td>@item.Payamount</td>
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
+                                <button type="button" class="btn btn-outline-primary" onclick="@(()=>ShowConfirmationAsync(item))">Del</button>
                             </td>
                         </tr>
                     }

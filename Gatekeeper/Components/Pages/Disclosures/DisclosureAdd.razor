@@ -398,7 +398,7 @@
 
 }
 
-
+<h1>Disclosures</h1>
 <EditForm Model="@summarydisclosure" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     @if (alertMessageShow)
     {
@@ -477,6 +477,7 @@
     }
     &nbsp;
     <button type="button" class="btn btn-primary" @onclick="ClearData" disabled="@IsDisabled">Add New</button>
+    &nbsp;
     @if (!IsDisabled)
     {
         <button type="submit" class="btn btn-primary" disabled="@IsDisabled">Save</button>

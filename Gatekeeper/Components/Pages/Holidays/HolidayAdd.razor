@@ -283,7 +283,7 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Holiday:</h5>
+<h1>Holidays</h1>
 
 <EditForm Model="@holiday" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
@@ -306,14 +306,14 @@
     </div>
 
     <hr />
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-outline-primary" @onclick="ClearData">Add New</button>
+    <button type="button" class="btn btn-outline-primary" @onclick="CopyLastYear">Create from Last Year Holiday</button>
     @if (tester)
     {
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+        <button type="button" class="btn btn-outline-primary" @onclick="FillData">Fill Data</button>
     }
-    <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-    <button type="button" class="btn btn-primary" @onclick="CopyLastYear">Create from Last Year Holiday</button>
-    <button type="submit" class="btn btn-primary">Save</button>
-
 </EditForm>
 
 <br />
@@ -343,7 +343,7 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="grid">
-    <QuickGrid Items="@FilteredYear" Virtualize="true" Pagination="@pagination">
+    <QuickGrid Items="@FilteredYear" Pagination="@pagination">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
@@ -360,7 +360,7 @@
         <PropertyColumn Property="@(r => r.Holidaydate)" Title="Holiday Date" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
-            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+            <button type="button" class="btn btn-outline-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
         </TemplateColumn>
     </QuickGrid>
 </div>

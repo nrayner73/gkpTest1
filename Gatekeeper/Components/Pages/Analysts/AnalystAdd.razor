@@ -280,7 +280,7 @@
     <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
 }
 
-<h5>Analysts: </h5>
+<h1>Analysts</h1>
 
 <EditForm Model="@analyst" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <DataAnnotationsValidator />
@@ -363,7 +363,7 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@analystList" Virtualize="true" Pagination="@pagination">
+    <QuickGrid Items="@analystList" Pagination="@pagination">
         <PropertyColumn Property="@(r => r.Regno)" Title="Regno" Sortable="true" />
         <PropertyColumn Property="@(r => r.Localname)" Title="Localname" Sortable="true" class="col-width" />
         <PropertyColumn Property="@(r => r.Displayname)" Title="Displayname" Sortable="true" class="col-width" />
@@ -371,7 +371,7 @@
         <PropertyColumn Property="@(r => r.Role)" Title="Role" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
-            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+            <button type="button" class="btn btn-outline-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
         </TemplateColumn>
     </QuickGrid>
 </div>

@@ -407,7 +407,7 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="grid" tabindex="-1">
-    <QuickGrid  Items="@searchanalystnotes" Virtualize="true" Pagination="@pagination">
+    <QuickGrid  Items="@searchanalystnotes" Pagination="@pagination">
         @if (showid)
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
@@ -421,7 +421,7 @@
         <PropertyColumn Property="@(r => r.Analyst)" Title="Analyst" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
-            <button type="button" class="btn btn-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
+            <button type="button" class="btn btn-outline-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
         </TemplateColumn>
     </QuickGrid>
 </div>

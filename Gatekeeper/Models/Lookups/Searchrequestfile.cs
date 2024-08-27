@@ -38,7 +38,10 @@ namespace Gatekeeper.Models.Lookups
         public string? POImiddlename { get; set; } = string.Empty;
         public string? Requestdetails { get; set; } = string.Empty;
         public string? Intakenotes { get; set; } = string.Empty;
-       
+
+        public DateOnly? RequestDueDateFrom { get; set; }
+        public DateOnly? RequestDueDateTo { get; set; }
+
 
 
     }

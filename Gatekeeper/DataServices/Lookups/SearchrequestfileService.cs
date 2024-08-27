@@ -31,10 +31,8 @@ namespace Gatekeeper.DataServices.Lookups
                 new SqlParameter { ParameterName = "@yearid",Value = searchfilter.Yearid == null ? (object)DBNull.Value : searchfilter.Yearid  } ,
                 new SqlParameter { ParameterName = "@fileyear",Value = searchfilter.Fileyear  == null ? (object)DBNull.Value : searchfilter.Fileyear } ,
                 new SqlParameter { ParameterName = "@filenumber",Value = string.IsNullOrEmpty(searchfilter.Filenumber) ? (object)DBNull.Value : searchfilter.Filenumber } ,
-                new SqlParameter { ParameterName = "@requestdate",Value = searchfilter.Requestdate == null ? (object)DBNull.Value : searchfilter.Requestdate } ,
-                new SqlParameter { ParameterName = "@receivefromdate",Value = searchfilter.Receivedate == null ? (object)DBNull.Value : searchfilter.Receivedate } ,
-                new SqlParameter { ParameterName = "@receivetodate",Value = searchfilter.Receivedate == null ? (object)DBNull.Value : searchfilter.Receivedate } ,
-                new SqlParameter { ParameterName = "@requestduedate",Value = searchfilter.Requestduedate == null ? (object)DBNull.Value : searchfilter.Requestduedate } ,
+                new SqlParameter { ParameterName = "@requestduedatefrom",Value = searchfilter.RequestDueDateFrom == null ? (object)DBNull.Value : searchfilter.RequestDueDateFrom } ,
+                new SqlParameter { ParameterName = "@requestduedateto",Value = searchfilter.RequestDueDateTo == null ? (object)DBNull.Value : searchfilter.RequestDueDateTo } ,
                 new SqlParameter { ParameterName = "@referencenumber",Value = string.IsNullOrEmpty(searchfilter.Referencenumber) ? (object)DBNull.Value : searchfilter.Referencenumber } ,
                 new SqlParameter { ParameterName = "@statusnote",Value = string.IsNullOrEmpty(searchfilter.Statusnote) ? (object)DBNull.Value : searchfilter.Statusnote } ,
                 new SqlParameter { ParameterName = "@requesttypeid",Value = searchfilter.Requesttypeid == null ? (object)DBNull.Value : searchfilter.Requesttypeid } ,
@@ -65,10 +63,8 @@ namespace Gatekeeper.DataServices.Lookups
             " @yearid, " +
             " @fileyear, " +
             " @filenumber, " +
-            " @requestdate, " +
-            " @requestduedate, " +
-            " @receivefromdate, " +
-            " @receivetodate, " +
+            " @requestduedatefrom, " +
+            " @requestduedateto, " +
             " @referencenumber, " +
             " @statusnote, " +
             " @requesttypeid, " +

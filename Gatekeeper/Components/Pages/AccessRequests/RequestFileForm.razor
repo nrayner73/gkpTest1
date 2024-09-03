@@ -33,7 +33,10 @@
 @code {
     #region "Parameters"
 
+    protected bool IsClosed { get; set; }
+    protected bool ReadOnly { get; set; }
     protected bool IsDisabled { get; set; }
+
     private string ModalTitle = string.Empty;
     //Audit
     private AuditLog auditlog = new AuditLog();
@@ -167,6 +170,18 @@
     {
         if (firstRender)
         {
+            ReadOnly = await sessionStorage.GetItemAsync<bool>("ReadOnly");
+            checkIfFileIsClosed();
+            if (fileIsClosed)
+            {
+                IsClosed = true;
+                IsDisabled = true;
+            }
+            else
+            {
+                IsClosed = false;
+                IsDisabled = ReadOnly;
+            }
 
             if (fileid > 0)
             {
@@ -354,11 +369,14 @@
             ModalTitle = "Data was not saved due to missing information. ";
             popUpType = PopUpType.Alert;
             await OnShowModalClick();
+            IsClosed = true;
             IsDisabled = true;
         }
         else
         {
-            IsDisabled = false;
+            IsClosed = false;
+            IsDisabled = ReadOnly;
+
             ModalTitle = "Data Details";
             popUpType = PopUpType.Success;
             if (accessRequestForm.PersonId != 0 && accessRequestForm.Id != 0)
@@ -445,9 +463,10 @@
                         Console.WriteLine("failed to update file number");
                         popUpType = PopUpType.Alert;
                         ModalTitle = "Save Failed";
-                        AlertText1 = ["File Number Update failed"];
+                        AlertText1 = ["File Number Update failed.  Contact Support.  This is probably because of invalid data in the database."];
                         AlertText2 = new List<string>();
                         await OnShowModalClick();
+                        saving = false;
                         return;
                     }
 
@@ -470,11 +489,13 @@
 
             if (fileIsClosed)
             {
+                IsClosed = true;
                 IsDisabled = true;
             }
             else
             {
-                IsDisabled = false;
+                IsClosed = false;
+                IsDisabled = ReadOnly;
             }
 
             StateHasChanged();
@@ -712,15 +733,19 @@
 
                 requestfile = loginState.Requestfile;
                 orequestfile = (Requestfile)context.Entry(requestfile).GetDatabaseValues().ToObject();
-                checkIfFileIsClosed();
 
+                // ReadOnly = requestfile.ReadOnly;
+
+                checkIfFileIsClosed();
                 if (fileIsClosed)
                 {
+                    IsClosed = true;
                     IsDisabled = true;
                 }
                 else
                 {
-                    IsDisabled = false;
+                    IsClosed = false;
+                    IsDisabled = ReadOnly;
                 }
 
                 if (requestfile.Yearid == 0 || requestfile.Yearid is null)
@@ -1151,7 +1176,7 @@
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label>Daytime Phone:</label>
-                    <InputText id="daytimephone" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Daytimephone" />
+                <InputText id="daytimephone" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Daytimephone" />
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-12">
@@ -1289,7 +1314,7 @@
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <label for="intakenotes">
-                    Intake Notes:
+                    Intake Notes:disabled="@(IsDisabled || @ReadOnly)
                 </label>
                 <InputTextArea id="intakenotes" class="form-control" disabled="@IsDisabled" placeholder="INTAKE NOTES" @bind-Value="accessRequestForm.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />
             </div>
@@ -1302,15 +1327,15 @@
 
     @if (tester)
     {
-        <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
+        <button type="button" class="btn btn-primary" disabled="@(IsDisabled || saving)" @onclick="FillData">Fill Data</button>
     }
     &nbsp;
 @*     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button> *@
     <button type="submit" class="btn btn-primary" disabled="@(IsDisabled || saving)">Save</button>
     &nbsp;
-    @if (IsDisabled)
+    @if (IsClosed && !ReadOnly)
     {
-        <button type="button" class="btn btn-primary" disabled="@((IsDisabled == true ? false : true) || saving)" @onclick="ActivateFile">Activate</button>
+        <button type="button" class="btn btn-primary" disabled="@((IsClosed == true ? false : true) || saving)" @onclick="ActivateFile">Activate</button>
     }
 </EditForm>
 

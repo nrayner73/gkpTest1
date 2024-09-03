@@ -250,13 +250,13 @@
 
     }
 
-    private void goToAddPage(int fileid)
+    private void goToAddPage(int fileid, bool readOnly)
     {
-        setSession(fileid);
+        setSession(fileid, readOnly);
         navigationManager.NavigateTo($"/accessrequests/add/{fileid}", true);
     }
 
-    private async Task setSession(int fileid)
+    private async Task setSession(int fileid, bool readOnly)
     {
         if (fileid > 0)
         {
@@ -264,6 +264,7 @@
 
             await sessionStorage.SetItemAsync("RQID", requestfile.Id);
             await sessionStorage.SetItemAsync("objFileRequest", requestfile);
+            await sessionStorage.SetItemAsync("ReadOnly", readOnly);
 
             loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
             requestfile = loginState.Requestfile;
@@ -824,7 +825,7 @@
 
 
         <div class="col-8  text-end">
-            <button type="button" class="btn btn-warning" @onclick="()=>goToAddPage(0)">Add New</button>
+            <button type="button" class="btn btn-warning" @onclick="()=>goToAddPage(0, false)">Add New</button>
         </div>
     </div>
 
@@ -872,7 +873,8 @@
         <PropertyColumn Property="@(r => r.Statusnote)" Title="Status Note" Sortable="true" />
 
         <TemplateColumn Title="Actions">
-            <button type="button" class="btn btn-primary" @onclick="()=>goToAddPage(context.Id)" aria-label="Edit">Edit</button>
+            <button type="button" class="btn btn-primary" @onclick="()=>goToAddPage(context.Id, true)" aria-label="View">View</button>
+            <button type="button" class="btn btn-primary" @onclick="()=>goToAddPage(context.Id, false)" aria-label="Edit">Edit</button>
         </TemplateColumn>
     </QuickGrid>
 </div>

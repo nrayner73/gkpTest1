@@ -132,6 +132,12 @@
             JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "payment-tab");
 
+            var ReadOnly = await sessionStorage.GetItemAsync<bool>("ReadOnly");
+            if (ReadOnly == true)
+            {
+                IsDisabled = true;
+                confirmExternalNavigation = false;
+            }
 
             //clear save type
             savetype = string.Empty;
@@ -183,6 +189,7 @@
                 if (context.LkRequeststates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").Any(x => x.Id == requestfile.Requeststate))
                 {
                     IsDisabled = true;
+                    confirmExternalNavigation = false;
                 }
                 CalculateTotals();
             }
@@ -214,7 +221,7 @@
             {
                 totalpayments += payment.Payamount ?? 0;
             }
-            
+
         }
 
         totalrefunds = 0;
@@ -372,6 +379,13 @@
     private async Task OnBeforeInternalNavigation(LocationChangingContext context)
     {
         if (context.TargetLocation.Contains("feepayment/add", StringComparison.OrdinalIgnoreCase))
+        {
+            confirmExternalNavigation = false;
+            return;
+        }
+
+        //Do not confirm before exiting when editing is disabled
+        if(IsDisabled)
         {
             confirmExternalNavigation = false;
             return;

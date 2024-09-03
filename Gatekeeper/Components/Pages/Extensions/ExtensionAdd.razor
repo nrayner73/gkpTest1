@@ -108,6 +108,12 @@
             JSRuntime.InvokeVoidAsync("activetab");
             JSRuntime.InvokeVoidAsync("changetab", "extension-tab");
 
+            var ReadOnly = await sessionStorage.GetItemAsync<bool>("ReadOnly");
+            if (ReadOnly == true)
+            {
+                IsDisabled = true;
+            }
+
             //set save type
             savetype = string.Empty;
 

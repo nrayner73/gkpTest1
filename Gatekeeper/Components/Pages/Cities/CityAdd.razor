@@ -13,14 +13,11 @@
 
 @inject IConfiguration Configuration
 @inject IDbContextFactory<AppDbContext> DbFactory
-
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @inject ISearchLkCityService searchlkcityservice
-@inject ILkCityService lkCityService
-
 @inject IAuditlogService auditlogService
 
 @inject NavigationManager navigationManager
@@ -29,17 +26,16 @@
 @inject LoginState loginState;
 
 @page "/lkcity/add"
-
 @code {
     #region "Variables"
 
     private System.Security.Claims.ClaimsPrincipal user;
     private string? userReg;
-    protected string Message = string.Empty;
-    protected string StatusClass = string.Empty;
-    private bool Saved;
     private string savetype = string.Empty;
-    private bool alertMessageShow = false;
+    private string ModalTitle = string.Empty;
+    private string? SuccessMessage { get; set; }
+    public List<string> AlertText = new List<string>();
+    public bool DisplayAlert { get; set; }
 
     [Inject]
     private ILkCityService lkcityservice { get; set; }
@@ -56,13 +52,11 @@
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
     bool tester = false;
-    bool showpanel = true;
     bool showid = false;
 
     #endregion
 
     #region "Component Lifecycle"
-
 
     protected async override Task OnInitializedAsync()
     {
@@ -96,7 +90,7 @@
         {
             //set save type
             savetype = string.Empty;
-            
+
             // Load data to grid
             LoadData();
 
@@ -104,7 +98,7 @@
             lkcity.Createuser = userReg;
             lkcity.Moduser = userReg;
             lkcity.Createdate = DateTime.Today;
-            
+
             StateHasChanged();
             firstRender = false;
         }
@@ -120,63 +114,58 @@
         StateHasChanged();
     }
 
-    private async Task AuditData(string act, string type)
+    private async Task ValidSubmit()
     {
-        auditlog = new AuditLog();
+        ValidateData();
 
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-
-        if (type == "update" || type == "delete")
+        if (AlertText.Count > 0)
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(olkcity, lkcity, act).ToString();
-        }
-
-        await auditlogService.CreateAuditlog(auditlog);
-    }
-
-    protected void HandleInvalidSubmit()
-    {
-        StatusClass = "alert-danger";
-        Message = "There are some validation errors. Please try again.";
-    }
-
-    protected async Task HandleValidSubmit()
-    {
-        Saved = false;
-
-        lkcity.Moddate = DateTime.Now;
-        lkcity.Moduser = userReg;
-
-        if (savetype == "update")
-        {
-            await lkcityservice.UpdateLkCity(lkcity);
-            await AuditData("Update City", "update");
+            ModalTitle = "Data was not saved due to missing information. ";
+            DisplayAlert = true;
+            await OnShowModalClick();
         }
         else
         {
-            lkcity.Createdate = DateTime.Now;
-            lkcity.Createuser = userReg;
-            await lkcityservice.CreateLkCity(lkcity);
-            await AuditData("Create City", "create");
+            ModalTitle = "Data Details";
+            DisplayAlert = false;
+            
+            if (savetype == "update")
+            {
+                lkcity.Moddate = DateTime.Now;
+                lkcity.Moduser = userReg;
+
+                await lkcityservice.UpdateLkCity(lkcity);
+                await AuditData("Update City", "update");
+                
+                SuccessMessage = "The data has been updated successfully";
+            }
+            else
+            {
+                lkcity.Createdate = DateTime.Now;
+                lkcity.Createuser = userReg;
+                await lkcityservice.CreateLkCity(lkcity);
+                await AuditData("Create City", "create");
+
+                SuccessMessage = "The data has been added successfully";
+            }
+          
+            StateHasChanged();
+            await OnShowModalClick();
+        }
+    }
+
+    private void ValidateData()
+    {
+        AlertText = new List<string>();
+        if (lkcity.Detail == null)
+        {
+            AlertText.Add("- City");
         }
 
-        StatusClass = "alert-success";
-        Message = "Data updated successfully";
-        alertMessageShow = true;
-        await InvokeAsync(() => StateHasChanged());
-        await Task.Delay(1000);
-
-        alertMessageShow = false;
-        Saved = true;
-        navigationManager.NavigateTo($"/lkcity/add", true);
-        LoadData();
-        lkcity = new LkCity();
-        StateHasChanged();
+        if (AlertText.Count > 0)
+        {
+            AlertText.Insert(0, "The City information below is required.");
+        }
     }
 
     private async void UpdateData(int id)
@@ -191,14 +180,12 @@
                 {
                     lkcity = context.LkCities.Where(x => x.Id == id).FirstOrDefault();
                     olkcity = (LkCity)context.Entry(lkcity).GetDatabaseValues().ToObject();
-
                     StateHasChanged();
                 }
             }
         }
     }
-
-
+    
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
     {
@@ -216,45 +203,98 @@
                 AuditData("Delete City", "delete");
             }
 
-            StatusClass = "alert-success";
-            Message = "Data deleted successfully";
-            alertMessageShow = true;
+            SuccessMessage = "Data deleted successfully";
             await InvokeAsync(() => StateHasChanged());
             await Task.Delay(1000);
-
-            alertMessageShow = false;
-            Saved = true;
-
             navigationManager.NavigateTo($"/lkcity/add/", true);
         }
 
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olkcity, lkcity, act).ToString();
+        }
+        await auditlogService.CreateAuditlog(auditlog);
     }
 
     private void ClearData()
     {
         lkcity = new LkCity();
     }
-    
-    #endregion
-}
 
-   @if (alertMessageShow)
-{
-    <br />
-    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
+    private Modal modal = default!;
+
+    private async Task OnShowModalClick()
+    {
+        await modal.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modal.HideAsync();
+        navigationManager.NavigateTo($"/lkcity/add/", true);
+    }
+
+    #endregion
 }
 
 <h1>Cities</h1>
 
-<EditForm Model="@lkcity" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+<Modal @ref="modal" Size="ModalSize.Large">
+    <HeaderTemplate>
+        @if (DisplayAlert)
+        {
+            <h4 style="color:red">@ModalTitle</h4>
+        }
+        else
+        {
+            <h4 style="color:black">@ModalTitle</h4>
+
+        }
+    </HeaderTemplate>
+    <BodyTemplate>
+        @if (DisplayAlert)
+        {
+            @if (AlertText.Count > 0)
+            {
+
+                @foreach (var item in AlertText)
+                {
+                    <div style="color:red">&nbsp; @item</div>
+
+                }
+            }
+        }
+        else
+        {
+            <div style="color:green">&nbsp; @SuccessMessage</div>
+        }
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
+    </FooterTemplate>
+</Modal>
+
+<EditForm Model="@lkcity" OnValidSubmit="@ValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <ValidationSummary/>
     <div class="container-fluid">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <label for="lbCity">
-                        City Detail:
+                        City:
                     </label>
                     <InputText id="detail" class="form-control" placeholder="CITY" @bind-Value="lkcity.Detail" />
                 </div>
@@ -264,7 +304,7 @@
     <br />
 
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-primary" @onclick="ValidSubmit">Save</button>
 </EditForm>
 
 <br />
@@ -299,7 +339,7 @@
         {
             <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
         }
-        
+
         <PropertyColumn Property="@(r => r.Detail)" Title="Detail" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
@@ -309,3 +349,4 @@
 </div>
 
 <Paginator State="@pagination" />
+

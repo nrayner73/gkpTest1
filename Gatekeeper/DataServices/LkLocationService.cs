@@ -4,7 +4,6 @@ using System.Numerics;
 using Gatekeeper.Models;
 using Gatekeeper.Interfaces;
 using Gatekeeper.Interfaces.Lookups;
-using static System.Collections.Specialized.BitVector32;
 
 namespace Gatekeeper.Services
 {
@@ -44,7 +43,7 @@ namespace Gatekeeper.Services
             await _context.SaveChangesAsync();
             return lklocation;
         }
-        public async System.Threading.Tasks.Task UpdateLkLocation(LkLocationsearch lklocation)
+        public async Task UpdateLkLocation(LkLocationsearch lklocation)
         {
             _context.LkLocationsearchs.Update(lklocation);
             await _context.SaveChangesAsync();

@@ -29,6 +29,8 @@ namespace Gatekeeper.Models.Lookups
 
         public virtual DbSet<SearchLkCity> LkCityInfos { get; set; }
 
+        public virtual DbSet<SearchLkRequestType> LkRequestTypeInfos { get; set; }
+
         //public virtual DbSet<LkRequeststate> LkRequeststates { get; set; }
         public virtual DbSet<SearchLkRequestState> LkRequestStateInfos { get; set; }
         

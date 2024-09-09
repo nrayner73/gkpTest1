@@ -143,6 +143,7 @@ builder.Services.AddScoped<ISearchAnalystnoteService, SearchAnalystnoteService>(
 builder.Services.AddScoped<ISearchLkLocationService, SearchLkLocationService>();
 builder.Services.AddScoped<ISearchLkPaymentTypeService, SearchLkPaymentTypeService>();
 builder.Services.AddScoped<ISearchLkRecordDeliveryMethodService, SearchLkRecordDeliveryMethodService>();
+builder.Services.AddScoped<ISearchLkRequestTypeService, SearchLkRequestTypeService>();
 builder.Services.AddScoped<ISearchLkRequestStateService, SearchLkRequestStateService>();
 builder.Services.AddScoped<ISearchLkSectionService, SearchLkSectionService>();
 builder.Services.AddScoped<ISearchmytaskService, SearchmytaskService>();

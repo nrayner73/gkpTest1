@@ -1,83 +1,81 @@
 ﻿@rendermode InteractiveServer
 @using System.Text
+@using BlazorBootstrap
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Text.Encodings.Web
+@using Gatekeeper.Classes;
+@using Gatekeeper.DataServices;
+@using Gatekeeper.DataServices.Lookups;
+@using Gatekeeper.Models;
+@using System.Xml.Linq;
 @using System.Text.RegularExpressions
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using BlazorBootstrap
-@using System.Reflection;
-@using System;
 
-@* @inject IViewRequestTypeService searchRequestTypeService *@
 @inject IConfiguration Configuration
-@inject ILkRequesttypeService searchRequestTypeService
+@inject IDbContextFactory<AppDbContext> DbFactory
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-@inject IRequestfileService requestFileService
+@inject ISearchLkRequestTypeService searchlkrequesttypeservice
+
 @inject IAuditlogService auditlogService
+
 @inject NavigationManager navigationManager
+@inject AppState appState
+@implements IDisposable
+@inject LoginState loginState;
 
 @page "/requesttype/add"
 
-
 @code {
     #region "Variables"
+
     private System.Security.Claims.ClaimsPrincipal user;
     private string? userReg;
-    protected string Message = string.Empty;
-    protected string StatusClass = string.Empty;
-    private bool Saved;
     private string savetype = string.Empty;
-    private string FileNumber = string.Empty;
-    private bool alertMessageShow = false;
-    private int nextId;
+    private string ModalTitle = string.Empty;
+    private string? SuccessMessage { get; set; }
+    public List<string> AlertText = new List<string>();
+    public bool DisplayAlert { get; set; }
 
-    [Parameter]
-    public int fileid { get; set; }
+    [Inject]
+    private ILkRequesttypeService lkrequesttypeservice { get; set; }
 
+    private LkRequesttype lkrequesttype { get; set; } = new LkRequesttype();
+    private LkRequesttype olkrequesttype { get; set; } = new LkRequesttype();
+
+    private List<LkRequesttype> lkrequesttypes { get; set; } = new List<LkRequesttype>();
     //Audit
     private AuditLog auditlog = new AuditLog();
 
-    [Inject]
-    private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
-
-    [Inject]
-    private ILkRequesttypeService requestTypeService { get; set; }
-    private LkRequesttype requestType { get; set; } = new LkRequesttype();
-    private LkRequesttype orequestType { get; set; } = new LkRequesttype();
-
-    private Requestfile requestfile { get; set; } = new Requestfile();
-    public List<Analyst>? analysts { get; set; } = new List<Analyst>();
-
-
-    //Data Grid -- Blazor QuickGrid
-    private IQueryable<LkRequesttype> searchRequestTypes;
+    private IQueryable<SearchLkRequestType> searchlkrequesttypes;
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
-
-    string nameFilter;
 
     bool tester = false;
     bool showid = false;
+
     #endregion
 
-
     #region "Component Lifecycle"
+
     protected async override Task OnInitializedAsync()
     {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        var user = authstate.User;
-        var name = user.Identity.Name;
-        LoadData();
+    }
+
+    public void Dispose()
+    {
+        loginState.OnChange -= StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
     {
+        //get user information
         var authState = await authenticationProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        user = authState.User;
         userReg = user.Identity?.Name.ToString().ToUpper().Replace("CPSENTERPRISE\\", "");
 
+        //show-hide fill data button
         var AccessPerson = Configuration["Testers"];
         tester = false;
         if (AccessPerson.Contains(userReg))
@@ -86,100 +84,89 @@
         }
     }
 
-
     protected async override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            //set save type
             savetype = string.Empty;
+
+            // Load data to grid
+            LoadData();
+
+            // assign current date and current log on user to create date, mod date, create user and mod user
+            lkrequesttype.Createuser = userReg;
+            lkrequesttype.Moduser = userReg;
+            lkrequesttype.Createdate = DateTime.Today;
+
             StateHasChanged();
             firstRender = false;
         }
     }
+
     #endregion
 
     #region "Methods"
 
-    IQueryable<LkRequesttype> UnfilteredRequestTypes
+    private void LoadData()
     {
-        get
+        searchlkrequesttypes = searchlkrequesttypeservice.GetLkRequestTypeList().AsQueryable<SearchLkRequestType>();
+        StateHasChanged();
+    }
+
+    private async Task ValidSubmit()
+    {
+        ValidateData();
+
+        if (AlertText.Count > 0)
         {
-            var result = searchRequestTypes;
-            return result;
-        }
-    }
-
-    private  async void LoadData()
-    {
-        searchRequestTypes = searchRequestTypeService.GetLkRequesttypeList().AsQueryable<LkRequesttype>();
-        nextId = (searchRequestTypes.Max(x => x.Id) + 1);
-        requestType.Sortby = nextId;
-    }
-
-    protected void HandleInvalidSubmit()
-    {
-        StatusClass = "alert-danger";
-        Message = "There are some validation errors. Please try again.";
-    }
-
-    protected async Task HandleValidSubmit()
-    {
-        Saved = false;
-
-        requestType.Moddate = DateTime.Now;
-        requestType.Moduser = userReg;
-
-        if (savetype == "update")
-        {
-
-            if (requestType.Sortby == null)
-            {
-                requestType.Sortby = requestType.Id;
-            }
-            await requestTypeService.UpdateLkRequesttype(requestType);
-            await AuditData("Update Request Types", "update");
+            ModalTitle = "Data was not saved due to missing information. ";
+            DisplayAlert = true;
+            await OnShowModalClick();
         }
         else
         {
-            requestType.Createdate = DateTime.Now;
-            requestType.Createuser = userReg;
-            if (requestType.Sortby == null)
+            ModalTitle = "Data Details";
+            DisplayAlert = false;
+            
+            if (savetype == "update")
             {
-                requestType.Sortby = nextId;
+                lkrequesttype.Moddate = DateTime.Now;
+                lkrequesttype.Moduser = userReg;
+
+                await lkrequesttypeservice.UpdateLkRequesttype(lkrequesttype);
+                await AuditData("Update Request Type", "update");
+                
+                SuccessMessage = "The data has been updated successfully";
             }
-            await requestTypeService.CreateLkRequesttype(requestType);
-            await AuditData("Create Request Types", "create");
+            else
+            {
+                lkrequesttype.Createdate = DateTime.Now;
+                lkrequesttype.Createuser = userReg;
+                await lkrequesttypeservice.CreateLkRequesttype(lkrequesttype);
+                await AuditData("Create Request Type", "create");
 
+                SuccessMessage = "The data has been added successfully";
+            }
+          
+            StateHasChanged();
+            await OnShowModalClick();
         }
-
-        StatusClass = "alert-success";
-        Message = "Data updated successfully";
-        alertMessageShow = true;
-        await InvokeAsync(() => StateHasChanged());
-        await Task.Delay(1000);
-
-        alertMessageShow = false;
-        Saved = true;
-        navigationManager.NavigateTo($"/requesttype/add", true);
     }
 
-    private async Task AuditData(string act, string type)
+    private void ValidateData()
     {
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-        auditlog.ActivityXml = auditlogService.GetAuditxml(orequestType, requestType, act).ToString();
-
-        if (type == "update" || type == "delete")
+        AlertText = new List<string>();
+        if (lkrequesttype.Detail == null)
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(orequestType, requestType, act).ToString();
+            AlertText.Add("- Request Type");
         }
 
-        await auditlogService.CreateAuditlog(auditlog);
+        if (AlertText.Count > 0)
+        {
+            AlertText.Insert(0, "The Request Type information below is required.");
+        }
     }
 
     private async void UpdateData(int id)
@@ -188,20 +175,18 @@
         if (id > 0)
         {
             savetype = "update";
-            GetData(id);
+            using (var context = DbFactory.CreateDbContext())
+            {
+                if (id != null && id > 0)
+                {
+                    lkrequesttype = context.LkRequesttypes.Where(x => x.Id == id).FirstOrDefault();
+                    lkrequesttype = (LkRequesttype)context.Entry(lkrequesttype).GetDatabaseValues().ToObject();
+                    StateHasChanged();
+                }
+            }
         }
     }
-
-    private async void GetData(int id)
-    {
-        if (id != null && id > 0)
-        {
-            orequestType = await requestTypeService.GetLkRequesttypeById(id);
-            requestType = await requestTypeService.GetLkRequesttypeById(id);
-            StateHasChanged();
-        }
-    }
-
+    
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
     {
@@ -214,94 +199,114 @@
         {
             if (id != null && id > 0)
             {
-                requestType = await requestTypeService.GetLkRequesttypeById(id);
-                await requestTypeService.DeleteLkRequesttype(requestType);
+                lkrequesttype = await lkrequesttypeservice.GetLkRequesttypeById(id);
+                await lkrequesttypeservice.DeleteLkRequesttype(lkrequesttype);
                 AuditData("Delete Request Type", "delete");
             }
 
-            StatusClass = "alert-success";
-            Message = "Data deleted successfully";
-            alertMessageShow = true;
+            SuccessMessage = "Data deleted successfully";
             await InvokeAsync(() => StateHasChanged());
             await Task.Delay(1000);
-
-            alertMessageShow = false;
-            Saved = true;
-
-            navigationManager.NavigateTo($"/requesttype/add", true);
-
-            LoadData();
-            StateHasChanged();
+            navigationManager.NavigateTo($"/requesttype/add/", true);        
         }
-        else
+
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
         {
-            // do something
+            auditlog.ActivityXml = auditlogService.GetAuditxml(olkrequesttype, lkrequesttype, act).ToString();
         }
+        await auditlogService.CreateAuditlog(auditlog);
     }
 
     private void ClearData()
     {
-        requestType = new LkRequesttype();
-        requestType.Sortby = nextId;
-
+        lkrequesttype = new LkRequesttype();
     }
 
-    private void FillData()
+    private Modal modal = default!;
+
+    private async Task OnShowModalClick()
     {
-        requestType.Detail = "requestTypeDetail";
-        requestType.Moddate = DateTime.Now;
-        requestType.Moduser = userReg;
-        requestType.Createdate = DateTime.Now;
-        requestType.Createuser = userReg;
-        requestType.Status = "status";
-        requestType.Sortby = nextId;
+        await modal.ShowAsync();
     }
+
+    private async Task OnHideModalClick()
+    {
+        await modal.HideAsync();
+        navigationManager.NavigateTo($"/requesttype/add/", true);
+    
+    }
+
     #endregion
 }
 
-@if (alertMessageShow)
-{
-    <br />
-    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
-}
+<h1>Request Types</h1>
 
-<h1>Request Type</h1>
+<Modal @ref="modal" Size="ModalSize.Large">
+    <HeaderTemplate>
+        @if (DisplayAlert)
+        {
+            <h4 style="color:red">@ModalTitle</h4>
+        }
+        else
+        {
+            <h4 style="color:black">@ModalTitle</h4>
 
-<EditForm Model="@requestType" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        }
+    </HeaderTemplate>
+    <BodyTemplate>
+        @if (DisplayAlert)
+        {
+            @if (AlertText.Count > 0)
+            {
+
+                @foreach (var item in AlertText)
+                {
+                    <div style="color:red">&nbsp; @item</div>
+
+                }
+            }
+        }
+        else
+        {
+            <div style="color:green">&nbsp; @SuccessMessage</div>
+        }
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
+    </FooterTemplate>
+</Modal>
+
+<EditForm Model="@lkrequesttype" OnValidSubmit="@ValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <ValidationSummary/>
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbrequesttypename">
-                    Request Type:
-                </label>
-                <InputText id="requesttypename" class="form-control" placeholder="REQUEST TYPE" @bind-Value="requestType.Detail" />
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbrequesttyperefer">
-                    Reference:
-                </label>
-                <InputText id="requesttyperefer" class="form-control" placeholder="REFERENCE" @bind-Value="requestType.Refertype" />
-            </div>
-
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label for="lbSortBy">
-                    Order:
-                </label>
-                <InputNumber id="sortby" class="form-control" @bind-Value="requestType.Sortby" />
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <label for="lbRecordDeliveryMethod">
+                        Record Delivery Method:
+                    </label>
+                    <InputText id="detail" class="form-control" placeholder="REQUEST TYPE" @bind-Value="lkrequesttype.Detail" />
+                </div>
             </div>
         </div>
     </div>
+    <br />
 
-    <hr />
-    @if (tester)
-    {
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
-    }
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-    <button type="submit" class="btn btn-primary">Save</button>
-
+    <button type="button" class="btn btn-primary" @onclick="ValidSubmit">Save</button>
 </EditForm>
 
 <br />
@@ -309,7 +314,8 @@
 <div class="row" style="width:100%;padding-bottom: 1em;">
     <div class="col-lg-5" style="float:left">
         Show:
-        <label><input type="checkbox" @bind="showid" /> ID Column</label>
+        <label><input type="checkbox" @bind="showid" /> Record Id</label>
+        &nbsp;&nbsp;&nbsp;
     </div>
     <div class="col-lg-5" style="float:left">
         <div class="page-size-chooser">
@@ -319,7 +325,6 @@
                 <option>10</option>
                 <option>20</option>
             </select>
-
         </div>
     </div>
     <div class="col-lg-2" style="float:revert">
@@ -330,17 +335,14 @@
 
 <ConfirmDialog @ref="dialog" />
 
-<div class="grid">
-    <QuickGrid Items="@UnfilteredRequestTypes" Pagination="@pagination">
+<div class="grid" tabindex="-1">
+    <QuickGrid Items="@searchlkrequesttypes" Pagination="@pagination">
         @if (showid)
         {
-            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" />
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
         }
-        <PropertyColumn Property="@(r => r.Detail)" Title="Description" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Refertype)" Title="Reference" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Moddate)" Title="Modified Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Moduser)" Title="Modified By" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Sortby)" Title="Order" Sortable="true" />
+
+        <PropertyColumn Property="@(r => r.Detail)" Title="Detail" Sortable="true" />
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" onclick="@(()=>UpdateData(context.Id))">Edit</button>
             <button type="button" class="btn btn-outline-primary" onclick="@(()=>ShowConfirmationAsync(context.Id))">Del</button>
@@ -349,3 +351,4 @@
 </div>
 
 <Paginator State="@pagination" />
+

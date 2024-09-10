@@ -15,6 +15,11 @@ namespace Gatekeeper.DataServices
         {
             _context = context;
         }
+        //public async Task<IEnumerable<Analyst>> GetAnalystsList()
+        //{
+        //    return await _context.Analysts
+        //            .ToListAsync();
+        //}
 
         public List<Analyst> GetAnalystsList()
         {
@@ -25,6 +30,7 @@ namespace Gatekeeper.DataServices
 
             return items;
         }
+
 
         public async Task<Analyst> GetAnalystById(int id)
         {

@@ -13,15 +13,12 @@
 
 @inject IConfiguration Configuration
 @inject IDbContextFactory<AppDbContext> DbFactory
-
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-@* @inject ISearchLkRequestStateService searchlkrequeststateservice
-@inject ILkRequestStateService lkRequestStateService *@
-@inject IAnalystService analystService
-
+@* @inject ISearchLkRecordDeliveryMethodService searchlkrecorddeliverymethodservice *@
+@inject ISearchAnalystService searchanalystservice
 @inject IAuditlogService auditlogService
 
 @inject NavigationManager navigationManager
@@ -36,34 +33,35 @@
 
     private System.Security.Claims.ClaimsPrincipal user;
     private string? userReg;
-    protected string Message = string.Empty;
-    protected string StatusClass = string.Empty;
-    private bool Saved;
     private string savetype = string.Empty;
-    private bool alertMessageShow = false;
+    private string ModalTitle = string.Empty;
+    private string? SuccessMessage { get; set; }
+    public List<string> AlertText = new List<string>();
+    public bool DisplayAlert { get; set; }
 
     [Inject]
+    // private ILkRecordDeliveryMethodService lkrecorddeliverymethodservice { get; set; }
     private IAnalystService analystservice { get; set; }
 
     private Analyst analyst { get; set; } = new Analyst();
     private Analyst oanalyst { get; set; } = new Analyst();
-
+    
+    // private List<LkRecorddeliverymethod> lkrecorddeliverymethods { get; set; } = new List<LkRecorddeliverymethod>();
     private List<Analyst> analysts { get; set; } = new List<Analyst>();
 
     //Audit
     private AuditLog auditlog = new AuditLog();
 
-    private IQueryable<Analyst> analystList;
+    // private IQueryable<SearchLkRecordDeliveryMethod> searchlkrecorddeliverymethods;
+    private IQueryable<SearchAnalyst> searchanalysts;
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
     bool tester = false;
-    bool showpanel = true;
     bool showid = false;
 
     #endregion
 
     #region "Component Lifecycle"
-
 
     protected async override Task OnInitializedAsync()
     {
@@ -105,7 +103,6 @@
             analyst.Createuser = userReg;
             analyst.Moduser = userReg;
             analyst.Createdate = DateTime.Today;
-            analyst.Moddate = DateTime.Today;
 
             StateHasChanged();
             firstRender = false;
@@ -118,67 +115,84 @@
 
     private void LoadData()
     {
-        analystList = analystservice.GetAnalystsList().AsQueryable<Analyst>();
+        searchanalysts = searchanalystservice.GetAnalystsList().AsQueryable<SearchAnalyst>();
         StateHasChanged();
     }
 
-    private async Task AuditData(string act, string type)
+    private async Task ValidSubmit()
     {
-        auditlog = new AuditLog();
+        ValidateData();
 
-        auditlog.AccessDate = DateTime.Now;
-        auditlog.RegNo = userReg;
-        auditlog.Sdate = DateTime.Now;
-        auditlog.UserName = userReg;
-        auditlog.AccessSystem = "GateKeeper";
-        auditlog.Activity = act;
-
-        if (type == "update" || type == "delete")
+        if (AlertText.Count > 0)
         {
-            auditlog.ActivityXml = auditlogService.GetAuditxml(oanalyst, analyst, act).ToString();
-        }
-
-        await auditlogService.CreateAuditlog(auditlog);
-    }
-
-    protected void HandleInvalidSubmit()
-    {
-        StatusClass = "alert-danger";
-        Message = "There are some validation errors. Please try again.";
-    }
-
-    protected async Task HandleValidSubmit()
-    {
-        Saved = false;
-
-        analyst.Moddate = DateTime.Now;
-        analyst.Moduser = userReg;
-
-        if (savetype == "update")
-        {
-            await analystservice.UpdateAnalyst(analyst);
-            await AuditData("Update Analyst", "update");
+            ModalTitle = "Data was not saved due to missing information. ";
+            DisplayAlert = true;
+            await OnShowModalClick();
         }
         else
         {
-            analyst.Createdate = DateTime.Now;
-            analyst.Createuser = userReg;
-            await analystservice.CreateAnalyst(analyst);
-            await AuditData("Create Analyst", "create");
+            ModalTitle = "Data Details";
+            DisplayAlert = false;
+            
+            if (savetype == "update")
+            {
+                analyst.Moddate = DateTime.Now;
+                analyst.Moduser = userReg;
+
+                await analystservice.UpdateAnalyst(analyst);
+                await AuditData("Update Analyst", "update");
+                
+                SuccessMessage = "The data has been updated successfully";
+            }
+            else
+            {
+                analyst.Createdate = DateTime.Now;
+                analyst.Createuser = userReg;
+                await analystservice.CreateAnalyst(analyst);
+                await AuditData("Create Analyst", "create");
+
+                SuccessMessage = "The data has been added successfully";
+            }
+          
+            StateHasChanged();
+            await OnShowModalClick();
+        }
+    }
+
+    private void ValidateData()
+    {
+        AlertText = new List<string>();
+        
+        if (analyst.Regno == null)
+        {
+            AlertText.Add("- Regno");
         }
 
-        StatusClass = "alert-success";
-        Message = "Data updated successfully";
-        alertMessageShow = true;
-        await InvokeAsync(() => StateHasChanged());
-        await Task.Delay(1000);
+        if (analyst.Localname == null)
+        {
+            AlertText.Add("- Local name");
+        }
 
-        alertMessageShow = false;
-        Saved = true;
-        navigationManager.NavigateTo($"/analyst/add", true);
-        LoadData();
-        analyst = new Analyst();
-        StateHasChanged();
+        if (analyst.Displayname == null)
+        {
+            AlertText.Add("- Display name");
+        }
+
+        if (analyst.Email == null)
+        {
+            AlertText.Add("- Email");
+        }
+
+        if (analyst.Role == null)
+        {
+            AlertText.Add("- Role");
+        }
+
+
+        if (AlertText.Count > 0)
+        {
+            AlertText.Insert(0, "The Analyst information below is required.");
+        }
     }
 
     private async void UpdateData(int id)
@@ -193,14 +207,12 @@
                 {
                     analyst = context.Analysts.Where(x => x.Id == id).FirstOrDefault();
                     oanalyst = (Analyst)context.Entry(analyst).GetDatabaseValues().ToObject();
-
                     StateHasChanged();
                 }
             }
         }
     }
-
-
+    
     private ConfirmDialog dialog = default!;
     private async Task ShowConfirmationAsync(int id)
     {
@@ -218,19 +230,29 @@
                 AuditData("Delete Analyst", "delete");
             }
 
-
-            StatusClass = "alert-success";
-            Message = "Data deleted successfully";
-            alertMessageShow = true;
+            SuccessMessage = "Data deleted successfully";
             await InvokeAsync(() => StateHasChanged());
             await Task.Delay(1000);
-
-            alertMessageShow = false;
-            Saved = true;
-
             navigationManager.NavigateTo($"/analyst/add/", true);
         }
 
+    }
+
+    private async Task AuditData(string act, string type)
+    {
+        auditlog = new AuditLog();
+        auditlog.AccessDate = DateTime.Now;
+        auditlog.RegNo = userReg;
+        auditlog.Sdate = DateTime.Now;
+        auditlog.UserName = userReg;
+        auditlog.AccessSystem = "GateKeeper";
+        auditlog.Activity = act;
+
+        if (type == "update" || type == "delete")
+        {
+            auditlog.ActivityXml = auditlogService.GetAuditxml(oanalyst, analyst, act).ToString();
+        }
+        await auditlogService.CreateAuditlog(auditlog);
     }
 
     private void ClearData()
@@ -238,66 +260,75 @@
         analyst = new Analyst();
     }
 
-    private void prefilldata()
+    private Modal modal = default!;
+
+    private async Task OnShowModalClick()
     {
-        if (!analyst.Regno.ToLower().Contains("po"))
-        {
-            analyst.Regno = "POL" + analyst.Regno;
-            analyst.Email = analyst.Regno + "@calgarypolice.ca";
-        }
-
-        if (analyst.Localname != "" && analyst.Localname != null)
-        {
-
-            analyst.Displayname = analyst.Localname;
-        }
-        StateHasChanged();
+        await modal.ShowAsync();
     }
 
-    private void FillData()
+    private async Task OnHideModalClick()
     {
-
-        analyst.Regno = "POL6666";
-        analyst.Localname = "Mickey Mouse";
-        analyst.Displayname = "displayname";
-        analyst.Email = "POL666@calgarypolice.ca";
-        analyst.Role = "Admin";
-        //analyst.Status = "";
-        analyst.Moddate = DateTime.Now;
-        analyst.Moduser = userReg;
-        analyst.Createdate = DateTime.Now;
-        analyst.Createuser = userReg;
+        await modal.HideAsync();
+        navigationManager.NavigateTo($"/analyst/add/", true);
     }
-
-
 
     #endregion
 }
 
-   @if (alertMessageShow)
-{
-    <br />
-    <div class="alert @StatusClass" style="margin-left: 50px">@Message</div>
-}
-
 <h1>Analysts</h1>
 
-<EditForm Model="@analyst" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+<Modal @ref="modal" Size="ModalSize.Large">
+    <HeaderTemplate>
+        @if (DisplayAlert)
+        {
+            <h4 style="color:red">@ModalTitle</h4>
+        }
+        else
+        {
+            <h4 style="color:black">@ModalTitle</h4>
+
+        }
+    </HeaderTemplate>
+    <BodyTemplate>
+        @if (DisplayAlert)
+        {
+            @if (AlertText.Count > 0)
+            {
+
+                @foreach (var item in AlertText)
+                {
+                    <div style="color:red">&nbsp; @item</div>
+
+                }
+            }
+        }
+        else
+        {
+            <div style="color:green">&nbsp; @SuccessMessage</div>
+        }
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
+    </FooterTemplate>
+</Modal>
+
+<EditForm Model="@analyst" OnValidSubmit="@ValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <ValidationSummary/>
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbregno">
                     Regno:
                 </label>
-                <InputText id="regno" class="form-control" placeholder="REGNO" @onblur="prefilldata" @onchange="prefilldata" @bind-Value="analyst.Regno" />
+                <InputText id="regno" class="form-control" placeholder="REGNO" @bind-Value="analyst.Regno" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lblocalname">
                     Localname:
                 </label>
-                <InputText id="localname" class="form-control" placeholder="LOCALNAME" @onblur="prefilldata" @onchange="prefilldata" @bind-Value="analyst.Localname" />
+                <InputText id="localname" class="form-control" placeholder="LOCALNAME" @bind-Value="analyst.Localname" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbdisplayname">
@@ -324,16 +355,10 @@
             </div>
         </div>
     </div>
+    <br />
 
-    <hr />
-
-    @if (tester)
-    {
-    <button type="button" class="btn btn-primary" @onclick="FillData">Fill Data</button>
-    }
     <button type="button" class="btn btn-primary" @onclick="ClearData">Add New</button>
-    <button type="submit" class="btn btn-primary">Save</button>
-
+    <button type="button" class="btn btn-primary" @onclick="ValidSubmit">Save</button>
 </EditForm>
 
 <br />
@@ -363,7 +388,12 @@
 <ConfirmDialog @ref="dialog" />
 
 <div class="grid" tabindex="-1">
-    <QuickGrid Items="@analystList" Pagination="@pagination">
+    <QuickGrid Items="@searchanalysts" Pagination="@pagination">
+        @if (showid)
+        {
+            <PropertyColumn Property="@(r => r.Id)" Title="Id" Sortable="true" class="col-width" />
+        }
+
         <PropertyColumn Property="@(r => r.Regno)" Title="Regno" Sortable="true" />
         <PropertyColumn Property="@(r => r.Localname)" Title="Localname" Sortable="true" class="col-width" />
         <PropertyColumn Property="@(r => r.Displayname)" Title="Displayname" Sortable="true" class="col-width" />
@@ -377,3 +407,4 @@
 </div>
 
 <Paginator State="@pagination" />
+

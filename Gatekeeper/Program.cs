@@ -119,6 +119,7 @@ builder.Services.AddScoped<ILkCityService, LkCityService>();
 builder.Services.AddScoped<ILkExtensionsService, LkExtensionsService>();
 
 builder.Services.AddScoped<IAnalystService, AnalystService>();
+builder.Services.AddScoped<ISearchAnalystService, SearchAnalystService>();
 
 builder.Services.AddScoped<IDisclosureViewService, DisclosureViewService>();
 builder.Services.AddScoped<ISearchRequestfeeService, SearchRequestfeeService>();

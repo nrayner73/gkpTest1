@@ -17,7 +17,6 @@
 @inject AuthenticationStateProvider authenticationProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-@* @inject ISearchLkRecordDeliveryMethodService searchlkrecorddeliverymethodservice *@
 @inject ISearchAnalystService searchanalystservice
 @inject IAuditlogService auditlogService
 
@@ -40,19 +39,16 @@
     public bool DisplayAlert { get; set; }
 
     [Inject]
-    // private ILkRecordDeliveryMethodService lkrecorddeliverymethodservice { get; set; }
     private IAnalystService analystservice { get; set; }
 
     private Analyst analyst { get; set; } = new Analyst();
     private Analyst oanalyst { get; set; } = new Analyst();
     
-    // private List<LkRecorddeliverymethod> lkrecorddeliverymethods { get; set; } = new List<LkRecorddeliverymethod>();
     private List<Analyst> analysts { get; set; } = new List<Analyst>();
 
     //Audit
     private AuditLog auditlog = new AuditLog();
 
-    // private IQueryable<SearchLkRecordDeliveryMethod> searchlkrecorddeliverymethods;
     private IQueryable<SearchAnalyst> searchanalysts;
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 

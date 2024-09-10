@@ -55,14 +55,14 @@
     public List<PersonEmail>? personemails { get; set; } = new List<PersonEmail>();
     public List<PersonPhone>? personphones { get; set; } = new List<PersonPhone>();
 
-    private PersonName selectedpersonname;
-    private PersonName personname { get; set; } = new PersonName();
+    // private PersonName selectedpersonname;
+    // private PersonName personname { get; set; } = new PersonName();
 
-    private PersonPhone selectedpersonphone;
-    private PersonPhone personphone { get; set; } = new PersonPhone();
+    // private PersonPhone selectedpersonphone;
+    // private PersonPhone personphone { get; set; } = new PersonPhone();
 
-    private PersonEmail selectedpersonemail;
-    private PersonEmail personemail { get; set; } = new PersonEmail();
+    // private PersonEmail selectedpersonemail;
+    // private PersonEmail personemail { get; set; } = new PersonEmail();
 
     public List<POIName>? POIpersonnames { get; set; } = new List<POIName>();
     private POIName POIselectedpersonname;
@@ -142,9 +142,9 @@
     {
         SelectedTypes = new String[] { };
         POIselectedpersonname = null;
-        selectedpersonname = null;
-        selectedpersonphone = null;
-        selectedpersonemail = null;
+        // selectedpersonname = null;
+        // selectedpersonphone = null;
+        // selectedpersonemail = null;
         searchrequestfiles = Enumerable.Empty<Searchrequestfile>().AsQueryable();
         fileInfo = new Searchrequestfile();
         filtering = false;
@@ -247,36 +247,36 @@
         }
     }
 
-    private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
-    {
-        //filter data for Blazor Type Ahead
-        string[] names = ProcessSearchTerms(searchText);
-        return await Task.FromResult(POIpersonnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
-    }
+    // private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
+    // {
+    //     //filter data for Blazor Type Ahead
+    //     string[] names = ProcessSearchTerms(searchText);
+    //     return await Task.FromResult(POIpersonnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
+    // }
 
-    private async Task<IEnumerable<PersonName>> SearchPersonName(string searchText)
-    {
-        string[] names = ProcessSearchTerms(searchText);
-        return await Task.FromResult(personnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
-    }
+    // private async Task<IEnumerable<PersonName>> SearchPersonName(string searchText)
+    // {
+    //     string[] names = ProcessSearchTerms(searchText);
+    //     return await Task.FromResult(personnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
+    // }
 
-    private async Task<IEnumerable<PersonEmail>> SearchPersonEmail(string searchText)
-    {
-        return await Task.FromResult(personemails.Where(x => (x.email ).ToLower().Contains(searchText.ToLower())));
-    }
+    // private async Task<IEnumerable<PersonEmail>> SearchPersonEmail(string searchText)
+    // {
+    //     return await Task.FromResult(personemails.Where(x => (x.email ).ToLower().Contains(searchText.ToLower())));
+    // }
 
-    private async Task<IEnumerable<PersonPhone>> SearchPersonPhone(string searchText)
-    {
-        return await Task.FromResult(personphones.Where(x => (x.daytimephone ).ToLower().Contains(searchText.ToLower())));
-    }
+    // private async Task<IEnumerable<PersonPhone>> SearchPersonPhone(string searchText)
+    // {
+    //     return await Task.FromResult(personphones.Where(x => (x.daytimephone ).ToLower().Contains(searchText.ToLower())));
+    // }
 
-    private string[] ProcessSearchTerms(string searchText)
-    {
-        searchText = searchText.ToLower();
-        char[] delimiterChars = { ' ', ',', '.', ':', '\t' };
-        string[] searchTextWords = searchText.Split(delimiterChars, System.StringSplitOptions.RemoveEmptyEntries);
-        return searchTextWords;
-    }
+    // private string[] ProcessSearchTerms(string searchText)
+    // {
+    //     searchText = searchText.ToLower();
+    //     char[] delimiterChars = { ' ', ',', '.', ':', '\t' };
+    //     string[] searchTextWords = searchText.Split(delimiterChars, System.StringSplitOptions.RemoveEmptyEntries);
+    //     return searchTextWords;
+    // }
 
     private IEnumerable<Searchrequestfile> requestfilelist = default!;
 
@@ -670,92 +670,35 @@
                     </select>
                 </div>
 
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-2 col-md-3 col-sm-12">
                     <label>
                         Applicant Name:
                     </label>
-                    <div class="input-group ">
-                        <BlazoredTypeahead class="blazored-typeahead__clear" placeholder="Search Applicants" SearchMethod="SearchPersonName" @bind-Value="selectedpersonname">
-                            <SelectedTemplate Context="personname">@personname.firstname @personname.middlename  @personname.lastname</SelectedTemplate>
-                            <ResultTemplate Context="personname">@personname.firstname @personname.middlename @personname.lastname </ResultTemplate>
-                        </BlazoredTypeahead>
-                    </div>
+                    <InputText id="applicantname" class="form-control" @bind-Value="fileInfo.Personname" />
                 </div>
-                @if (selectedpersonname != null)
-                {
-                    string lname = string.Empty;
-                    string fname = string.Empty;
-                    string mname = string.Empty;
 
-                    lname = selectedpersonname.lastname != null ? "," + selectedpersonname.lastname : "";
-                    fname = selectedpersonname.firstname != null ? selectedpersonname.firstname : "";
-                    mname = selectedpersonname.middlename != null ? " " + selectedpersonname.middlename : "";
-
-                    fileInfo.Personname = lname + fname + mname;
-                    fileInfo.Firstname = selectedpersonname.firstname;
-                    fileInfo.Lastname = selectedpersonname.lastname;
-                    fileInfo.Middlename = selectedpersonname.middlename;
-                }
-
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-2 col-md-3 col-sm-12">
                     <label>
                         Phone Number:
                     </label>
-                    <div class="input-group ">
-                        <BlazoredTypeahead class="blazored-typeahead__clear" placeholder="Search Phone Numbers" SearchMethod="SearchPersonPhone" @bind-Value="selectedpersonphone">
-                            <SelectedTemplate Context="personphone">@personphone.daytimephone</SelectedTemplate>
-                            <ResultTemplate Context="personphone">@personphone.daytimephone </ResultTemplate>
-                        </BlazoredTypeahead>
-                    </div>
+                    <InputText id="phonenumber" class="form-control" @bind-Value="fileInfo.Daytimephone" />
                 </div>
-                @if (selectedpersonphone != null)
-                {
-                    fileInfo.Daytimephone = selectedpersonphone.daytimephone;
-                   
-                }
-                <div class="col-lg-3 col-md-3 col-sm-12">
+
+
+                <div class="col-lg-2 col-md-3 col-sm-12">
                     <label>
                         Email Address:
                     </label>
-                    <div class="input-group ">
-                        <BlazoredTypeahead class="blazored-typeahead__clear" placeholder="Search Emails" SearchMethod="SearchPersonEmail" @bind-Value="selectedpersonemail">
-                            <SelectedTemplate Context="personemail">@personemail.email</SelectedTemplate>
-                            <ResultTemplate Context="personemail">@personemail.email</ResultTemplate>
-                        </BlazoredTypeahead>
-                    </div>
+                    <InputText id="email" class="form-control" @bind-Value="fileInfo.Email" />
                 </div>
-                @if (selectedpersonemail != null)
-                {
-                    fileInfo.Email = selectedpersonemail.email;
 
-                }
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-2 col-md-3 col-sm-12">
                     <label>
                         Subject of Request:
                     </label>
-                    <div class="input-group ">
-                        <BlazoredTypeahead class="blazored-typeahead__clear" placeholder="Search Subjects of Requests" SearchMethod="SearchPOIpersonName" @bind-Value="POIselectedpersonname">
-                            <SelectedTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.middlename @POIpersonname.lastname</SelectedTemplate>
-                            <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.middlename @POIpersonname.lastname</ResultTemplate>
-                        </BlazoredTypeahead>
-                    </div>
+                    <InputText id="subjectofrequest" class="form-control" @bind-Value="fileInfo.PersonOfInterest" />
                 </div>
-                @if (POIselectedpersonname != null)
-                {
-                    string poilname = string.Empty;
-                    string poifname = string.Empty;
-                    string poimname = string.Empty;
 
-                    poilname = POIselectedpersonname.lastname != null ? "," + POIselectedpersonname.lastname : "";
-                    poifname = POIselectedpersonname.firstname != null ? POIselectedpersonname.firstname : "";
-                    poimname = POIselectedpersonname.middlename != null ? " " + POIselectedpersonname.middlename : "";
-
-                    fileInfo.PersonOfInterest = poilname + poifname + poimname;
-                    fileInfo.POIfirstname = POIselectedpersonname.firstname;
-                    fileInfo.POIlastname = POIselectedpersonname.lastname;
-                    fileInfo.POImiddlename = POIselectedpersonname.middlename;
-
-                }
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label>
                         Request Due Date From:
@@ -775,13 +718,6 @@
                         Request Details:
                     </label>
                     <InputText id="requestdetail" class="form-control" @bind-Value="fileInfo.Requestdetails" />
-                </div>
-
-                <div class="col-lg-4 col-md-3 col-sm-12">
-                    <label>
-                        Intake Notes:
-                    </label>
-                    <InputText id="intakenotes" class="form-control" @bind-Value="fileInfo.Intakenotes" />
                 </div>
             </div>
 
@@ -848,13 +784,13 @@
             <PropertyColumn Property="@(r => r.Fileyear)" Title="Year" Sortable="true" />
         }
         <PropertyColumn Property="@(r => r.Filenumber)" Title="File Number" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
         <PropertyColumn Property="@(r => r.Personname)" Title="Applicant Name" Sortable="true" />
-        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
-        <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
         <PropertyColumn Property="@(r => r.Statusnote)" Title="Status Note" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Analystassigned)" Title="Analyst" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requestduedate)" Title="Request Due Date" Sortable="true" />
+        <PropertyColumn Property="@(r => r.PersonOfInterest)" Title="Subject Of Request" Sortable="true" />
+        <PropertyColumn Property="@(r => r.Requestdate)" Title="Request Date" Sortable="true" IsDefaultSortColumn="true" InitialSortDirection="SortDirection.Descending"/>
+        @* <PropertyColumn Property="@(r => r.Requeststate)" Title="Request State" Sortable="true" /> *@
 
         <TemplateColumn Title="Actions">
             <button type="button" class="btn btn-primary" @onclick="()=>goToAddPage(context.Id, true)" aria-label="View">View</button>

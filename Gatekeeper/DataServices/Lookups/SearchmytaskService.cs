@@ -36,12 +36,10 @@ namespace Gatekeeper.DataServices.Lookups
                 new SqlParameter { ParameterName = "@analystassignedid",Value = searchfilter.Analystassignedid == null ? (object)DBNull.Value : searchfilter.Analystassignedid } ,
                 new SqlParameter { ParameterName = "@requeststateid",Value = searchfilter.Requeststateid == null ? (object)DBNull.Value : searchfilter.Requeststateid } ,
                 new SqlParameter { ParameterName = "@personid",Value = searchfilter.PersonId== null ? (object)DBNull.Value : searchfilter.PersonId } ,
-                new SqlParameter { ParameterName = "@firstname",Value = string.IsNullOrEmpty(searchfilter.Firstname) ? (object)DBNull.Value : searchfilter.Firstname } ,
-                new SqlParameter { ParameterName = "@lastname",Value = string.IsNullOrEmpty(searchfilter.Lastname) ? (object)DBNull.Value : searchfilter.Lastname } ,
-                new SqlParameter { ParameterName = "@middlename",Value = string.IsNullOrEmpty(searchfilter.Middlename) ? (object)DBNull.Value : searchfilter.Middlename } ,
-                new SqlParameter { ParameterName = "@poifirstname",Value = string.IsNullOrEmpty(searchfilter.POIfirstname) ? (object)DBNull.Value : searchfilter.POIfirstname } ,
-                new SqlParameter { ParameterName = "@poilastname",Value = string.IsNullOrEmpty(searchfilter.POIlastname) ? (object)DBNull.Value : searchfilter.POIlastname } ,
-                new SqlParameter { ParameterName = "@poimiddlename",Value = string.IsNullOrEmpty(searchfilter.POImiddlename) ? (object)DBNull.Value : searchfilter.POImiddlename } ,
+                new SqlParameter {ParameterName = "@personname",Value = searchfilter.Personname== null ? (object)DBNull.Value : searchfilter.Personname } ,
+                new SqlParameter { ParameterName = "@email",Value = string.IsNullOrEmpty(searchfilter.Email) ? (object)DBNull.Value : searchfilter.Email } ,
+                new SqlParameter { ParameterName = "@daytimephone",Value = string.IsNullOrEmpty(searchfilter.Daytimephone) ? (object)DBNull.Value : searchfilter.Daytimephone } ,
+                new SqlParameter { ParameterName = "@poiname",Value = string.IsNullOrEmpty(searchfilter.PersonOfInterest) ? (object)DBNull.Value : searchfilter.PersonOfInterest } ,
                 new SqlParameter { ParameterName = "@requestdetails",Value = string.IsNullOrEmpty(searchfilter.Requestdetails) ? (object)DBNull.Value : searchfilter.Requestdetails } ,
                 new SqlParameter { ParameterName = "@intakenotes",Value = string.IsNullOrEmpty(searchfilter.Intakenotes) ? (object)DBNull.Value : searchfilter.Intakenotes }
              };
@@ -64,12 +62,10 @@ namespace Gatekeeper.DataServices.Lookups
             " @analystassignedid, " +
             " @requeststateid, " +
             " @personid, " +
-            " @firstname, " +
-            " @lastname, " +
-            " @middlename, " +
-            " @poifirstname, " +
-            " @poilastname, " +
-            " @poimiddlename, " +
+            " @personname, " +
+            " @email, " +
+            " @daytimephone, " +
+            " @poiname, " +
             " @requestdetails, " +
             " @intakenotes ", parms.ToArray()).ToList();
            

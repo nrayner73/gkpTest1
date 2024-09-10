@@ -26,6 +26,8 @@ namespace Gatekeeper.Models.Lookups
         public string? Lastname { get; set; } = string.Empty;
         public string? Middlename { get; set; } = string.Empty;
         public string? Personname { get; set; } = string.Empty;
+        public string? Email { get; set; } = string.Empty;
+        public string? Daytimephone { get; set; } = string.Empty;
         public string? PersonOfInterest { get; set; } = string.Empty;
         public string? POIfirstname { get; set; } = string.Empty;
         public string? POIlastname { get; set; } = string.Empty;

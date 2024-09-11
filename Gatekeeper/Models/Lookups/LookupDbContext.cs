@@ -36,6 +36,8 @@ namespace Gatekeeper.Models.Lookups
         
         public virtual DbSet<SearchLkRecordDeliveryMethod> LkRecordDeliveryMethodInfos { get; set; }
 
+        public virtual DbSet<SearchLkVideoType> LkVideoTypeInfos { get; set; }
+
         public virtual DbSet<SearchAnalyst> AnalystInfos { get; set; }
 
 

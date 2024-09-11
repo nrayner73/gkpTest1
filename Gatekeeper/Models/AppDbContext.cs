@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Gatekeeper.Models;
+using Gatekeeper.Models.Lookups;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gatekeeper.Models;
@@ -41,6 +42,10 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<LkRequesttype> LkRequesttypes { get; set; }
 
     public virtual DbSet<LkSection> LkSections { get; set; }
+
+    public virtual DbSet<LkVideoType> LkVideoTypes { get; set; }
+
+    
 
     public virtual DbSet<Locationitem> Locationitems { get; set; }
     public virtual DbSet<Mytask> Mytasks { get; set; }

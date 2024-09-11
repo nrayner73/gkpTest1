@@ -125,4 +125,6 @@ public partial class Requestfile
     
     public int? Gkpid { get; set; }
 
+    public DateTime? Originalrequestduedate { get; set; }
+
 }

@@ -614,6 +614,7 @@
         Requestfile updatefile = requestfile;
         try
         {
+            requestfile.Originalrequestduedate = requestfile.Requestduedate;
             await requestFileService.CreateRequestfile(requestfile);
         }
         catch (Exception e)

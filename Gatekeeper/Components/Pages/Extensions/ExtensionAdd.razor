@@ -36,6 +36,8 @@
     private bool alertMessageShow = false;
     private string? oDuedate = string.Empty;
 
+    private DateTime Originalrequestduedate;
+
     [Parameter]
     public int fileid { get; set; }
 
@@ -163,6 +165,7 @@
                 }
                 requestfile = loginState.Requestfile;
                 FileNumber = loginState.Requestfile.Filenumber;
+                Originalrequestduedate = (DateTime)loginState.Requestfile.Originalrequestduedate;
             }
 
             if (context.LkRequeststates.Where(x => x.Detail == "Closed" || x.Detail == "Abandoned" || x.Detail == "Withdrawn").Any(x => x.Id == requestfile.Requeststate))
@@ -381,6 +384,13 @@
                     Number of Extension Days:
                 </label>
                 <InputNumber id="dayamount" class="form-control" placeholder="DAYAMOUNT" @bind-Value="extension.Dayamount" disabled="@IsDisabled" />
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <label for="lbfileid">
+                    Original Request Due Date:
+                </label>
+                <input type="text" readonly id="fileid" class="form-control" value="@Originalrequestduedate.ToString("yyyy/MM/dd")" style="background-color:lightgray" />
             </div>
 
 

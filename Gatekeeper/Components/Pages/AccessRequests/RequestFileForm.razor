@@ -780,10 +780,10 @@
     #endregion
 
     #region TypeAhead function
-    private async Task<IEnumerable<POIName>> SearchPOIPersonName(string searchText)
-    {
-        return await Task.FromResult(POIPersonNames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
-    }
+    // private async Task<IEnumerable<POIName>> SearchPOIPersonName(string searchText)
+    // {
+    //     return await Task.FromResult(POIPersonNames.Where(x => (x.firstname + x.lastname + x.middlename).ToLower().Contains(searchText.ToLower())));
+    // }
 
     private async Task<IEnumerable<CompanyName>> SearchCompanyName(string searchText)
     {
@@ -822,9 +822,7 @@
         person.Province = "Alberta";
         person.Country = "Canada";
 
-        person.Personofinterestfirstname = "Mickey";
-        person.Personofinterestlastname = "Mouse";
-        person.Personofinterestmiddlename = "MD";
+        person.Personofinterest = "Mickey MD Mouse";
 
         person.Companyname = "Disney";
 
@@ -1198,42 +1196,12 @@
 
         <hr />
         <h5>Subject of Request</h5>
-        <div class="row h-auto">
-            <div class="col-lg-6 col-md-3 col-sm-12">
-                <div class="input-group ">
-                    <label style="font-weight:bold;color:blue;">Search Subject of Request:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPOIPersonName" disabled="@IsDisabled" @bind-Value="POISelectedPersonName">
-                        <SelectedTemplate Context="POIPersonName">@POIPersonName.firstname @POIPersonName.lastname @POIPersonName.middlename</SelectedTemplate>
-                        <ResultTemplate Context="POIpersonname">@POIpersonname.firstname @POIpersonname.lastname @POIpersonname.middlename</ResultTemplate>
-                    </BlazoredTypeahead>
-                </div>
-            </div>
-        </div>
-
 
         <br />
-        @* Subject of Request Info *@
-
-        @if (POISelectedPersonName != null)
-        {
-            accessRequestForm.Personofinterestfirstname = POISelectedPersonName.firstname;
-            accessRequestForm.Personofinterestlastname = POISelectedPersonName.lastname;
-            accessRequestForm.Personofinterestmiddlename = POISelectedPersonName.middlename;
-            POISelectedPersonName = null;
-        }
         <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label>First Name:</label>
-                <InputText id="poifirstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestfirstname" />
-            </div>
-
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label>Middle Name:</label>
-                <InputText id="poimiddlename" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestmiddlename" />
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <label>Last Name:</label>
-                <InputText id="poilastname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterestlastname" />
+            <div class="col-lg-6 col-md-3 col-sm-12">
+                <label>Subject of Request:</label>
+                <InputText id="poifirstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterest" />
             </div>
         </div>
 

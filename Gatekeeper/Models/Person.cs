@@ -29,9 +29,7 @@ public partial class Person
         Province = accessRequestForm.Province;
         Postalcode = accessRequestForm.Postalcode;
         Country = accessRequestForm.Country;
-        Personofinterestfirstname = accessRequestForm.Personofinterestfirstname;
-        Personofinterestlastname = accessRequestForm.Personofinterestlastname;
-        Personofinterestmiddlename = accessRequestForm.Personofinterestmiddlename;
+        Personofinterest = accessRequestForm.Personofinterest;
         Remark = accessRequestForm.Remark;
 
 
@@ -82,11 +80,7 @@ public partial class Person
     [Column(TypeName = "varchar(500)")]
     public string? Country { get; set; }
     [Column(TypeName = "varchar(1000)")]
-    public string? Personofinterestfirstname { get; set; }
-    [Column(TypeName = "varchar(1000)")]
-    public string? Personofinterestmiddlename { get; set; }
-    [Column(TypeName = "varchar(1000)")]
-    public string? Personofinterestlastname { get; set; }
+    public string? Personofinterest { get; set; }
     [Column(TypeName = "varchar(max)")]
     public string? Remark { get; set; }
     public DateTime? Moddate { get; set; }

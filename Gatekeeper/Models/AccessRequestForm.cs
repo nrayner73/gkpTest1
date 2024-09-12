@@ -59,9 +59,7 @@ namespace Gatekeeper.Models
             Province = person.Province;
             Postalcode = person.Postalcode;
             Country = person.Country;
-            Personofinterestfirstname = person.Personofinterestfirstname;
-            Personofinterestlastname = person.Personofinterestlastname;
-            Personofinterestmiddlename = person.Personofinterestmiddlename;
+            Personofinterest = person.Personofinterest;
             Remark = person.Remark;
         }
 
@@ -160,9 +158,7 @@ namespace Gatekeeper.Models
         public string? Province { get; set; }
         public string? Postalcode { get; set; }
         public string? Country { get; set; }
-        public string? Personofinterestfirstname { get; set; }
-        public string? Personofinterestmiddlename { get; set; }
-        public string? Personofinterestlastname { get; set; }
+        public string? Personofinterest { get; set; }
         public string? Remark { get; set; }
         //public DateTime? Moddate { get; set; }
         //[Column(TypeName = "varchar(45)")]

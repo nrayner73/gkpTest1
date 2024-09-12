@@ -39,9 +39,7 @@ namespace Gatekeeper.Models.Lookups
     [Keyless]
     public class POIName
     {
-        public string firstname { get; set; }
-        public string middlename { get; set; }
-        public string lastname { get; set; }
+        public string name { get; set; }
 
     }
 }

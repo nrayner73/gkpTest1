@@ -19,7 +19,9 @@ namespace Gatekeeper.Models.Lookups
         public virtual DbSet<DisclosedViewitem> DisclosedViewitems { get; set; }
 
         public virtual DbSet<SearchExtension> ExtensionInfos { get; set; }
-        
+
+        public virtual DbSet<SearchLkExtension> LkExtensionInfos { get; set; }
+
         public virtual DbSet<HolidayView> HolidayInfos { get; set; }
 
         public virtual DbSet<SearchLkLocation> LkLocationInfos { get; set; }

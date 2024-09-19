@@ -1037,20 +1037,20 @@
         <div class="row">
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
-                    <label style="font-weight:bold;color:blue;">Search Company Name:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" disabled="@IsDisabled" @bind-Value="selectedcompanyname">
-                        <SelectedTemplate Context="companyname">@companyname.companyname. </SelectedTemplate>
-                        <ResultTemplate Context="companyname">@companyname.companyname.</ResultTemplate>
+                    <label style="font-weight:bold;color:blue;">Search Applicant Name:</label>
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" disabled="@IsDisabled" @bind-Value="selectedpersonname">
+                        <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
+                        <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
                     </BlazoredTypeahead>
                 </div>
             </div>
 
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <div class="input-group ">
-                    <label style="font-weight:bold;color:blue;">Search Applicant Name:</label>
-                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchPersonName" disabled="@IsDisabled" @bind-Value="selectedpersonname">
-                        <SelectedTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</SelectedTemplate>
-                        <ResultTemplate Context="personname">@personname.firstname @personname.lastname @personname.middlename</ResultTemplate>
+                    <label style="font-weight:bold;color:blue;">Search Company Name:</label>
+                    <BlazoredTypeahead class="blazored-typeahead__clear" style="background-color:lightyellow" SearchMethod="SearchCompanyName" disabled="@IsDisabled" @bind-Value="selectedcompanyname">
+                        <SelectedTemplate Context="companyname">@companyname.companyname. </SelectedTemplate>
+                        <ResultTemplate Context="companyname">@companyname.companyname.</ResultTemplate>
                     </BlazoredTypeahead>
                 </div>
             </div>
@@ -1073,14 +1073,6 @@
 
         <div class="row">
             <div class="col-lg-2 col-md-3 col-sm-12">
-                <label>
-                    Company:
-                </label>
-                <InputText id="companyname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Companyname" />
-            </div>
-
-
-            <div class="col-lg-2 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label>First Name:</label>
                 <InputText id="firstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Firstname" />
@@ -1100,6 +1092,13 @@
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <label>Birth Date:</label>
                 <InputDate id="birthdate" class="form-control" disabled="@IsDisabled" placeholder="BIRTH DATE" @bind-Value="accessRequestForm.Birthdate" />
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label>
+                    Company:
+                </label>
+                <InputText id="companyname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Companyname" />
             </div>
 
         </div>
@@ -1194,7 +1193,7 @@
 
         </div>
 
-        <hr />
+@*         <hr />
         <h5>Subject of Request</h5>
 
         <br />
@@ -1203,7 +1202,7 @@
                 <label>Subject of Request:</label>
                 <InputText id="poifirstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterest" />
             </div>
-        </div>
+        </div> *@
 
 
         <hr />
@@ -1271,6 +1270,13 @@
                 </label>
                 <InputDate id="closedate" class="form-control" disabled="@IsDisabled" placeholder="CLOSE DATE" @bind-Value="accessRequestForm.Closedate" />
             </div>
+
+                <div class="col-lg-6 col-md-3 col-sm-12">
+                    <label>Subject of Request:</label>
+                    <InputText id="poifirstname" class="form-control" disabled="@IsDisabled" @bind-Value="accessRequestForm.Personofinterest" />
+                </div>
+</div>
+        <div class="row">
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <span class="required">*</span>
                 <label for="requestdetails">
@@ -1283,7 +1289,7 @@
             </div>
             <div class="col-lg-6 col-md-3 col-sm-12">
                 <label for="intakenotes">
-                    Intake Notes:disabled="@(IsDisabled || @ReadOnly)
+                    Intake Notes:
                 </label>
                 <InputTextArea id="intakenotes" class="form-control" disabled="@IsDisabled" placeholder="INTAKE NOTES" @bind-Value="accessRequestForm.Intakenotes" row="15" col="150" style="min-height: 130px; overflow:auto;" />
             </div>

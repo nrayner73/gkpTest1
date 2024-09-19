@@ -678,14 +678,14 @@
                     <label>
                         Request Due Date From:
                     </label>
-                    <InputDate id="requestdatefrom" class="form-control" @bind-Value="fileInfo.RequestDueDateFrom" />
+                    <InputDate id="requestdatefrom" class="form-control" max="2100-12-31" @bind-Value="fileInfo.RequestDueDateFrom" />
                 </div>
 
                 <div class="col-lg-2 col-md-3 col-sm-12">
                     <label>
                         Request Due Date To:
                     </label>
-                    <InputDate id="requestdateto" class="form-control" @bind-Value="fileInfo.RequestDueDateTo" />
+                    <InputDate id="requestdateto" class="form-control" max="2100-12-31" @bind-Value="fileInfo.RequestDueDateTo" />
                 </div>
 
                 <div class="col-lg-4 col-md-3 col-sm-12">

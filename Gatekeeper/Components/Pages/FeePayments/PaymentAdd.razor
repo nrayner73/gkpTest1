@@ -283,7 +283,7 @@
                                 <InputText id="description" class="form-control" placeholder="DESCRIPTION" @onchange="() => UpdateData(item)" @bind-Value="@item.Description" />
                             </td>
                             <td>
-                                <InputDate id="paymentdate" class="form-control" placeholder="PAYMENT DATE" @onchange="() => UpdateData(item)" @bind-Value="@item.Paymentdate" />
+                                <InputDate id="paymentdate" class="form-control" placeholder="PAYMENT DATE" max="2100-12-31" @onchange="() => UpdateData(item)" @bind-Value="@item.Paymentdate" />
                             </td>
                             <td>
                                 <InputSelect id="paytypeid" class="form-select d-inline" placeholder="PAY TYPE" @onchange="() => UpdateData(item)" @bind-Value="@item.Paytypeid">

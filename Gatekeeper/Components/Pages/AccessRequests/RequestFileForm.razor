@@ -957,13 +957,13 @@
                 <span class="required">*</span> <label for="lbrequestdate">
                     Request Date:
                 </label>
-                <InputDate id="requestdate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DATE" @bind-Value="accessRequestForm.Requestdate" />
+                <InputDate id="requestdate" class="form-control" disabled="@IsDisabled" placeholder="REQUEST DATE" max="2100-12-31" @bind-Value="accessRequestForm.Requestdate" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <span class="required">*</span> <label for="lbreceivedate">
                     Received Date:
                 </label>
-                <InputDate id="receivedate" class="form-control" disabled="@IsDisabled" placeholder="RECEIVE DATE" @onblur="@setDuedate" @bind-Value="accessRequestForm.Receivedate" @bind-Value:after="setDuedate" />
+                <InputDate id="receivedate" class="form-control" disabled="@IsDisabled" placeholder="RECEIVE DATE" max="2100-12-31" @onblur="@setDuedate" @bind-Value="accessRequestForm.Receivedate" @bind-Value:after="setDuedate" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbrequestduedate">
@@ -1091,7 +1091,7 @@
 
             <div class="col-lg-2 col-md-3 col-sm-12">
                 <label>Birth Date:</label>
-                <InputDate id="birthdate" class="form-control" disabled="@IsDisabled" placeholder="BIRTH DATE" @bind-Value="accessRequestForm.Birthdate" />
+                <InputDate id="birthdate" class="form-control" disabled="@IsDisabled" placeholder="BIRTH DATE" max="2100-12-31" @bind-Value="accessRequestForm.Birthdate" />
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-12">
@@ -1268,7 +1268,7 @@
                 <label for="closedate">
                     Close Date:
                 </label>
-                <InputDate id="closedate" class="form-control" disabled="@IsDisabled" placeholder="CLOSE DATE" @bind-Value="accessRequestForm.Closedate" />
+                <InputDate id="closedate" class="form-control" disabled="@IsDisabled" placeholder="CLOSE DATE" max="2100-12-31" @bind-Value="accessRequestForm.Closedate" />
             </div>
 
                 <div class="col-lg-6 col-md-3 col-sm-12">

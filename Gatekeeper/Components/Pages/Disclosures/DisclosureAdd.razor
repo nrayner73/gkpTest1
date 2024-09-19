@@ -423,7 +423,7 @@
                 <label for="lbfileclosedate">
                     Date file close:
                 </label>
-                <InputDate id="fileclosedate" class="form-control" placeholder="FILE CLOSE DATE" @bind-Value="summarydisclosure.Fileclosedate" disabled="@IsDisabled" />
+                <InputDate id="fileclosedate" class="form-control" placeholder="FILE CLOSE DATE" max="2100-12-31" @bind-Value="summarydisclosure.Fileclosedate" disabled="@IsDisabled" />
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12">
                 <label for="lbpagesidentified">

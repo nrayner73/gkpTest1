@@ -141,9 +141,6 @@
     {
         SelectedTypes = new String[] { };
         POIselectedpersonname = null;
-        // selectedpersonname = null;
-        // selectedpersonphone = null;
-        // selectedpersonemail = null;
         searchrequestfiles = Enumerable.Empty<Searchrequestfile>().AsQueryable();
         fileInfo = new Searchrequestfile();
         filtering = false;
@@ -244,38 +241,11 @@
             loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
             requestfile = loginState.Requestfile;
         }
+        else
+        {
+            await sessionStorage.ClearAsync();
+        }
     }
-
-    // private async Task<IEnumerable<POIName>> SearchPOIpersonName(string searchText)
-    // {
-    //     //filter data for Blazor Type Ahead
-    //     string[] names = ProcessSearchTerms(searchText);
-    //     return await Task.FromResult(POIpersonnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
-    // }
-
-    // private async Task<IEnumerable<PersonName>> SearchPersonName(string searchText)
-    // {
-    //     string[] names = ProcessSearchTerms(searchText);
-    //     return await Task.FromResult(personnames.Where(x => (x.firstname + x.middlename + x.lastname).ToLower().ContainsAll(names)));
-    // }
-
-    // private async Task<IEnumerable<PersonEmail>> SearchPersonEmail(string searchText)
-    // {
-    //     return await Task.FromResult(personemails.Where(x => (x.email ).ToLower().Contains(searchText.ToLower())));
-    // }
-
-    // private async Task<IEnumerable<PersonPhone>> SearchPersonPhone(string searchText)
-    // {
-    //     return await Task.FromResult(personphones.Where(x => (x.daytimephone ).ToLower().Contains(searchText.ToLower())));
-    // }
-
-    // private string[] ProcessSearchTerms(string searchText)
-    // {
-    //     searchText = searchText.ToLower();
-    //     char[] delimiterChars = { ' ', ',', '.', ':', '\t' };
-    //     string[] searchTextWords = searchText.Split(delimiterChars, System.StringSplitOptions.RemoveEmptyEntries);
-    //     return searchTextWords;
-    // }
 
     private IEnumerable<Searchrequestfile> requestfilelist = default!;
 

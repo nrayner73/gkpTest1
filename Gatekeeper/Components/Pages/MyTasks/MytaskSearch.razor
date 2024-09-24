@@ -261,6 +261,10 @@
             loginState.SetLogin(await requestFileService.GetRequestfileById(requestfile.Id));
             requestfile = loginState.Requestfile;
         }
+        else
+        {
+            await sessionStorage.ClearAsync();
+        }
     }
 
     private IEnumerable<Searchrequestfile> requestfilelist = default!;

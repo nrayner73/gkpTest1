@@ -500,6 +500,9 @@
 
             StateHasChanged();
             saving = false;
+
+            //Return to Main File List
+            // navigationManager.NavigateTo("/accessrequests/search", true);
         }
     }
 
@@ -639,6 +642,9 @@
         await OnShowModalClick();
         JSRuntime.InvokeVoidAsync("activetab");
         saving = false;
+
+        //Return to Main File List
+        navigationManager.NavigateTo("/accessrequests/search", true);
     }
 
     public async Task setDuedate()

@@ -363,17 +363,6 @@
 
     private async Task ActivateFile()
     {
-        ValidateData();
-        if (AlertText1.Count > 0 || AlertText2.Count > 0)
-        {
-            ModalTitle = "Data was not saved due to missing information. ";
-            popUpType = PopUpType.Alert;
-            await OnShowModalClick();
-            IsClosed = true;
-            IsDisabled = true;
-        }
-        else
-        {
             IsClosed = false;
             IsDisabled = ReadOnly;
 
@@ -393,7 +382,6 @@
             StateHasChanged();
             SuccessMessage = "The data has been activated successfully";
             await OnShowModalClick();
-        }
 
     }
 
